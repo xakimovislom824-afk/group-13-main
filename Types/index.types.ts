@@ -181,3 +181,11 @@ export interface IDelivery {
   delivery_days: number;
   is_active: boolean;
 }
+
+export interface IFAQ {
+  id: number;
+  question: string;
+  answer: string;
+  is_active: boolean;
+  order: number;
+}
