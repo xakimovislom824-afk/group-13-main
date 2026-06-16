@@ -172,3 +172,12 @@ export interface ICategory {
   id: number;
   name: string;
 }
+
+export interface IDelivery {
+  id: number;
+  name: string;
+  description: string;
+  price: string;
+  delivery_days: number;
+  is_active: boolean;
+}
