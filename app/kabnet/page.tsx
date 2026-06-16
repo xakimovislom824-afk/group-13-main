@@ -2,7 +2,7 @@
 
 import { useGetProfileQuery, useEditProfilMutation } from "../../services/editProfileApi";
 import { useChangeParolMutation } from "../../services/changePasswordApi";
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import {
   FaUserCircle, FaListUl, FaMapMarkerAlt, FaShieldAlt,
@@ -25,9 +25,6 @@ import {
   CreateOrderAddressBody,
 } from "../../services/orderAddressApi";
 
-// ─────────────────────────────────────────────
-// TYPES
-// ─────────────────────────────────────────────
 type SavedOrder = {
   id: string;
   date: string;
@@ -50,9 +47,6 @@ type UserInfo = {
   last_name?: string;
 };
 
-// ─────────────────────────────────────────────
-// ADDRESS FORM CONFIG
-// ─────────────────────────────────────────────
 const EMPTY_ADDR: CreateOrderAddressBody = {
   first_name: "", last_name: "", phone: "", country: "O'zbekiston",
   region: "", city: "", district: "", street: "", house: "",
@@ -66,33 +60,30 @@ const ADDR_FIELDS: {
   required?: boolean;
   textarea?: boolean;
 }[] = [
-  { key: "first_name",  label: "Ism",           placeholder: "Ismingiz",           required: true  },
-  { key: "last_name",   label: "Familiya",       placeholder: "Familiyangiz",       required: true  },
-  { key: "phone",       label: "Telefon",        placeholder: "+998 90 123 45 67",  required: true  },
-  { key: "country",     label: "Mamlakat",       placeholder: "O'zbekiston"                         },
-  { key: "region",      label: "Viloyat",        placeholder: "Toshkent viloyati",  required: true  },
-  { key: "city",        label: "Shahar",         placeholder: "Toshkent",           required: true  },
-  { key: "district",    label: "Tuman",          placeholder: "Yunusobod tumani"                    },
-  { key: "street",      label: "Ko'cha",         placeholder: "Amir Temur ko'chasi",required: true  },
-  { key: "house",       label: "Uy raqami",      placeholder: "37",                 required: true  },
-  { key: "apartment",   label: "Xonadon",        placeholder: "5"                                   },
-  { key: "postal_code", label: "Pochta indeksi", placeholder: "100084"                              },
-  { key: "note",        label: "Izoh",           placeholder: "Qo'shimcha ma'lumot", textarea: true },
-];
+    { key: "first_name", label: "Ism", placeholder: "Ismingiz", required: true },
+    { key: "last_name", label: "Familiya", placeholder: "Familiyangiz", required: true },
+    { key: "phone", label: "Telefon", placeholder: "+998 90 123 45 67", required: true },
+    { key: "country", label: "Mamlakat", placeholder: "O'zbekiston" },
+    { key: "region", label: "Viloyat", placeholder: "Toshkent viloyati", required: true },
+    { key: "city", label: "Shahar", placeholder: "Toshkent", required: true },
+    { key: "district", label: "Tuman", placeholder: "Yunusobod tumani" },
+    { key: "street", label: "Ko'cha", placeholder: "Amir Temur ko'chasi", required: true },
+    { key: "house", label: "Uy raqami", placeholder: "37", required: true },
+    { key: "apartment", label: "Xonadon", placeholder: "5" },
+    { key: "postal_code", label: "Pochta indeksi", placeholder: "100084" },
+    { key: "note", label: "Izoh", placeholder: "Qo'shimcha ma'lumot", textarea: true },
+  ];
 
-// ─────────────────────────────────────────────
-// ADDRESS TAB
-// ─────────────────────────────────────────────
 function AddressTab() {
   const { data: addresses = [], isLoading: addrLoading } = useGetOrderAddressesQuery();
   const [createAddress, { isLoading: creating }] = useCreateOrderAddressMutation();
   const [deleteAddress, { isLoading: deleting }] = useDeleteOrderAddressMutation();
   const [updateAddress, { isLoading: updating }] = useUpdateOrderAddressMutation();
 
-  const [showForm, setShowForm]     = useState(false);
-  const [editId, setEditId]         = useState<number | null>(null);
-  const [form, setForm]             = useState<CreateOrderAddressBody>(EMPTY_ADDR);
-  const [formError, setFormError]   = useState("");
+  const [showForm, setShowForm] = useState(false);
+  const [editId, setEditId] = useState<number | null>(null);
+  const [form, setForm] = useState<CreateOrderAddressBody>(EMPTY_ADDR);
+  const [formError, setFormError] = useState("");
   const [formSuccess, setFormSuccess] = useState("");
 
   const openNew = () => {
@@ -178,8 +169,8 @@ function AddressTab() {
                 <p className="text-gray-400 mb-0.5">Manzil</p>
                 <p className="text-gray-700 font-medium leading-relaxed">
                   {[addr.postal_code, addr.country, addr.region, addr.city,
-                    addr.district, addr.street, addr.house,
-                    addr.apartment ? `${addr.apartment}-xonadon` : ""]
+                  addr.district, addr.street, addr.house,
+                  addr.apartment ? `${addr.apartment}-xonadon` : ""]
                     .filter(Boolean).join(", ")}
                 </p>
               </div>
@@ -256,7 +247,7 @@ function AddressTab() {
               </label>
             </div>
           </div>
-          {formError   && <p className="mt-4 text-red-500 text-sm font-medium">{formError}</p>}
+          {formError && <p className="mt-4 text-red-500 text-sm font-medium">{formError}</p>}
           {formSuccess && <p className="mt-4 text-green-500 text-sm font-medium">{formSuccess}</p>}
           <div className="flex gap-3 mt-6">
             <button
@@ -280,24 +271,23 @@ function AddressTab() {
 }
 
 // ─────────────────────────────────────────────
-// MAIN COMPONENT
+// MAIN CONTENT COMPONENT
 // ─────────────────────────────────────────────
-export default function ShaxsiyKabinet() {
-  const { data: payments = [] }                        = useGetPaymentsQuery();
+function ShaxsiyKabinetContent() {
+  const { data: payments = [] } = useGetPaymentsQuery();
   const { data: wishlists = [], isLoading: wishlistLoading } = useGetWishlistQuery();
-  const [removeWishlist]                               = useRemoveWishlistMutation();
-  const searchParams                                   = useSearchParams();
-  const router                                         = useRouter();
+  const [removeWishlist] = useRemoveWishlistMutation();
+  const searchParams = useSearchParams();
+  const router = useRouter();
 
-  const [activeTab, setActiveTab]       = useState("dashboard");
+  const [activeTab, setActiveTab] = useState("dashboard");
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [showPass, setShowPass]         = useState({ old: false, new: false, confirm: false });
-  const [userInfo, setUserInfo]         = useState<UserInfo | null>(null);
-  const [userOrders, setUserOrders]     = useState<SavedOrder[]>([]);
-  const [currentPage, setCurrentPage]   = useState(1);
+  const [showPass, setShowPass] = useState({ old: false, new: false, confirm: false });
+  const [userInfo, setUserInfo] = useState<UserInfo | null>(null);
+  const [userOrders, setUserOrders] = useState<SavedOrder[]>([]);
+  const [currentPage, setCurrentPage] = useState(1);
   const ITEMS_PER_PAGE = 5;
 
-  // ── localStorage dan user ma'lumotlari ──
   useEffect(() => {
     const keys = ["user", "userInfo", "userData", "authUser", "currentUser"];
     let found: UserInfo | null = null;
@@ -327,9 +317,9 @@ export default function ShaxsiyKabinet() {
 
   const handleLogout = () => {
     [
-      "user","userInfo","userData","authUser","currentUser",
-      "token","access","access_token","accessToken",
-      "refresh_token","refresh","refreshToken","userOrders",
+      "user", "userInfo", "userData", "authUser", "currentUser",
+      "token", "access", "access_token", "accessToken",
+      "refresh_token", "refresh", "refreshToken", "userOrders",
     ].forEach((k) => { localStorage.removeItem(k); sessionStorage.removeItem(k); });
     window.dispatchEvent(new Event("authChange"));
     setUserInfo(null); setUserOrders([]);
@@ -351,7 +341,7 @@ export default function ShaxsiyKabinet() {
     return name.slice(0, 2).toUpperCase();
   };
 
-  const totalPages    = Math.ceil(userOrders.length / ITEMS_PER_PAGE);
+  const totalPages = Math.ceil(userOrders.length / ITEMS_PER_PAGE);
   const currentOrders = userOrders.slice((currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE);
 
   const getStatusStyles = (status: string) => {
@@ -362,9 +352,8 @@ export default function ShaxsiyKabinet() {
     return "border-blue-300 text-blue-500 bg-blue-50";
   };
 
-  // ── Password state ──
-  const [passValues, setPassValues]   = useState({ old: "", new: "", confirm: "" });
-  const [passError, setPassError]     = useState("");
+  const [passValues, setPassValues] = useState({ old: "", new: "", confirm: "" });
+  const [passError, setPassError] = useState("");
   const [passSuccess, setPassSuccess] = useState("");
   const [changeParol, { isLoading: passLoading }] = useChangeParolMutation();
 
@@ -381,11 +370,10 @@ export default function ShaxsiyKabinet() {
     }
   };
 
-  // ── Profile state ──
   const [profileValues, setProfileValues] = useState({ username: "", email: "", first_name: "", last_name: "" });
   const [profileSuccess, setProfileSuccess] = useState("");
-  const [profileError, setProfileError]     = useState("");
-  const { data: profile }                   = useGetProfileQuery();
+  const [profileError, setProfileError] = useState("");
+  const { data: profile } = useGetProfileQuery();
   const [editProfil, { isLoading: profileLoading }] = useEditProfilMutation();
 
   useEffect(() => {
@@ -413,29 +401,28 @@ export default function ShaxsiyKabinet() {
       setProfileSuccess("Profil muvaffaqiyatli yangilandi!");
     } catch (err: any) {
       const d = err?.data;
-      if (d?.email?.[0]?.includes("already exists"))    setProfileError("Bu email allaqachon ro'yxatdan o'tgan");
+      if (d?.email?.[0]?.includes("already exists")) setProfileError("Bu email allaqachon ro'yxatdan o'tgan");
       else if (d?.username?.[0]?.includes("already exists")) setProfileError("Bu username allaqachon band");
       else setProfileError(d?.email?.[0] || d?.username?.[0] || d?.detail || "Xatolik yuz berdi");
     }
   };
 
-  // ── Nav items ──
   const navItems = [
-    { id: "dashboard", label: "Mening hisobim",        icon: <FaUserCircle size={18} /> },
-    { id: "profile",   label: "Profilni tahrirlash",   icon: <LiaUserEditSolid size={18} /> },
-    { id: "orders",    label: "Mening buyurtmalarim",  icon: <FaListUl size={18} />, badge: payments.length },
-    { id: "address",   label: "Yetkazib berish manzili", icon: <FaMapMarkerAlt size={18} /> },
-    { id: "favorites", label: "Tanlangan tovarlar",    icon: <FaHeart size={18} />, badge: wishlists.length },
-    { id: "password",  label: "Parolni o'zgartirish",  icon: <FaShieldAlt size={18} /> },
+    { id: "dashboard", label: "Mening hisobim", icon: <FaUserCircle size={18} /> },
+    { id: "profile", label: "Profilni tahrirlash", icon: <LiaUserEditSolid size={18} /> },
+    { id: "orders", label: "Mening buyurtmalarim", icon: <FaListUl size={18} />, badge: payments.length },
+    { id: "address", label: "Yetkazib berish manzili", icon: <FaMapMarkerAlt size={18} /> },
+    { id: "favorites", label: "Tanlangan tovarlar", icon: <FaHeart size={18} />, badge: wishlists.length },
+    { id: "password", label: "Parolni o'zgartirish", icon: <FaShieldAlt size={18} /> },
   ];
 
   const menuCards = [
-    { id: "orders",    label: "MENING BUYURTMALARIM",   icon: <FaListUl size={24} />,     badge: payments.length },
-    { id: "profile",   label: "PROFILNI TAHRIRLASH",    icon: <FiUser size={24} /> },
-    { id: "address",   label: "YETKAZIB BERISH MANZILI",icon: <FaMapMarkerAlt size={24} /> },
-    { id: "favorites", label: "TANLANGAN TOVARLAR",     icon: <FaHeart size={24} />,      badge: wishlists.length },
-    { id: "password",  label: "PAROLNI O'ZGARTIRISH",   icon: <FaShieldAlt size={24} /> },
-    { id: "logout",    label: "CHIQISH",                icon: <FaSignOutAlt size={24} /> },
+    { id: "orders", label: "MENING BUYURTMALARIM", icon: <FaListUl size={24} />, badge: payments.length },
+    { id: "profile", label: "PROFILNI TAHRIRLASH", icon: <FiUser size={24} /> },
+    { id: "address", label: "YETKAZIB BERISH MANZILI", icon: <FaMapMarkerAlt size={24} /> },
+    { id: "favorites", label: "TANLANGAN TOVARLAR", icon: <FaHeart size={24} />, badge: wishlists.length },
+    { id: "password", label: "PAROLNI O'ZGARTIRISH", icon: <FaShieldAlt size={24} /> },
+    { id: "logout", label: "CHIQISH", icon: <FaSignOutAlt size={24} /> },
   ];
 
   const activeLabel = navItems.find((n) => n.id === activeTab)?.label || "Mening hisobim";
@@ -445,17 +432,12 @@ export default function ShaxsiyKabinet() {
     setActiveTab(id); setMobileMenuOpen(false);
   };
 
-  // ─────────────────────────────────────────────
-  // RENDER
-  // ─────────────────────────────────────────────
   return (
     <div className="min-h-screen bg-[#F9FAFB] p-4 md:p-10 font-sans text-slate-900">
       <div className="max-w-6xl mx-auto">
-
         <p className="text-xs text-gray-400 mb-2">Bosh sahifa / Shaxsiy kabinet</p>
         <h1 className="text-2xl md:text-3xl font-bold mb-6 md:mb-8">Shaxsiy kabinet</h1>
 
-        {/* Foydalanuvchi kartochkasi */}
         {userInfo && (
           <div className="flex items-center gap-4 bg-white rounded-xl border border-gray-100 shadow-sm px-5 py-4 mb-6">
             <div className="w-12 h-12 rounded-full bg-[#1D71D4] flex items-center justify-center text-white font-bold text-lg shrink-0">
@@ -468,7 +450,6 @@ export default function ShaxsiyKabinet() {
           </div>
         )}
 
-        {/* Mobile menyu */}
         <div className="lg:hidden mb-4">
           <button
             onClick={() => setMobileMenuOpen((p) => !p)}
@@ -483,9 +464,8 @@ export default function ShaxsiyKabinet() {
                 <button
                   key={item.id}
                   onClick={() => handleTabChange(item.id)}
-                  className={`w-full flex items-center justify-between p-4 border-b last:border-b-0 text-sm transition-all ${
-                    activeTab === item.id ? "bg-[#0F172A] text-white" : "hover:bg-gray-50 text-gray-600"
-                  }`}
+                  className={`w-full flex items-center justify-between p-4 border-b last:border-b-0 text-sm transition-all ${activeTab === item.id ? "bg-[#0F172A] text-white" : "hover:bg-gray-50 text-gray-600"
+                    }`}
                 >
                   <div className="flex items-center gap-3">{item.icon}<span>{item.label}</span></div>
                   {(item as any).badge > 0 && (
@@ -506,8 +486,6 @@ export default function ShaxsiyKabinet() {
         </div>
 
         <div className="flex flex-col lg:flex-row gap-8 items-start">
-
-          {/* Desktop sidebar */}
           <aside className="hidden lg:block w-[280px] shrink-0 bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden sticky top-5">
             {userInfo && (
               <div className="flex items-center gap-3 p-4 border-b border-gray-100 bg-gray-50">
@@ -525,9 +503,8 @@ export default function ShaxsiyKabinet() {
                 <button
                   key={item.id}
                   onClick={() => handleTabChange(item.id)}
-                  className={`flex items-center justify-between p-4 border-b transition-all ${
-                    activeTab === item.id ? "bg-[#0F172A] text-white" : "hover:bg-gray-50 text-gray-600"
-                  }`}
+                  className={`flex items-center justify-between p-4 border-b transition-all ${activeTab === item.id ? "bg-[#0F172A] text-white" : "hover:bg-gray-50 text-gray-600"
+                    }`}
                 >
                   <div className="flex items-center gap-3">{item.icon}<span>{item.label}</span></div>
                   {(item as any).badge > 0 && (
@@ -546,10 +523,8 @@ export default function ShaxsiyKabinet() {
             </nav>
           </aside>
 
-          {/* Main content */}
           <main className="flex-1 min-w-0 w-full">
 
-            {/* ── DASHBOARD ── */}
             {activeTab === "dashboard" && (
               <div className="space-y-8">
                 <p className="text-lg md:text-xl font-medium">
@@ -560,9 +535,8 @@ export default function ShaxsiyKabinet() {
                     <button
                       key={card.id}
                       onClick={() => handleTabChange(card.id)}
-                      className={`relative flex flex-col items-center justify-center p-4 md:p-6 rounded-lg border bg-white transition-all duration-200 group ${
-                        card.id === "logout" ? "hover:bg-red-50" : "hover:bg-blue-50"
-                      }`}
+                      className={`relative flex flex-col items-center justify-center p-4 md:p-6 rounded-lg border bg-white transition-all duration-200 group ${card.id === "logout" ? "hover:bg-red-50" : "hover:bg-blue-50"
+                        }`}
                     >
                       {(card as any).badge > 0 && (
                         <span className="absolute top-2 right-2 bg-red-500 text-white text-[10px] font-bold w-5 h-5 flex items-center justify-center rounded-full">
@@ -627,16 +601,15 @@ export default function ShaxsiyKabinet() {
               </div>
             )}
 
-            {/* ── PROFILE ── */}
             {activeTab === "profile" && (
               <div className="bg-white p-5 md:p-8 rounded-xl shadow-sm border border-gray-100 w-full max-w-2xl">
                 <h2 className="text-xl font-bold mb-6">Profilni tahrirlash</h2>
                 <div className="space-y-4">
                   {[
-                    { label: "Username",   type: "text",  placeholder: "Username kiriting",      key: "username",   required: true  },
-                    { label: "Email",      type: "email", placeholder: "Emailingizni kiriting",  key: "email",      required: true  },
-                    { label: "Ism",        type: "text",  placeholder: "Ismingizni kiriting",    key: "first_name", required: false },
-                    { label: "Familiya",   type: "text",  placeholder: "Familiyangizni kiriting",key: "last_name",  required: false },
+                    { label: "Username", type: "text", placeholder: "Username kiriting", key: "username", required: true },
+                    { label: "Email", type: "email", placeholder: "Emailingizni kiriting", key: "email", required: true },
+                    { label: "Ism", type: "text", placeholder: "Ismingizni kiriting", key: "first_name", required: false },
+                    { label: "Familiya", type: "text", placeholder: "Familiyangizni kiriting", key: "last_name", required: false },
                   ].map(({ label, type, placeholder, key, required }) => (
                     <div key={key} className="grid gap-2">
                       <label className="text-sm font-semibold">
@@ -647,15 +620,14 @@ export default function ShaxsiyKabinet() {
                         placeholder={placeholder}
                         value={profileValues[key as keyof typeof profileValues]}
                         onChange={(e) => setProfileValues((p) => ({ ...p, [key]: e.target.value }))}
-                        className={`w-full p-3 border rounded-lg outline-none transition-all ${
-                          required && !profileValues[key as keyof typeof profileValues]
+                        className={`w-full p-3 border rounded-lg outline-none transition-all ${required && !profileValues[key as keyof typeof profileValues]
                             ? "border-red-200 focus:border-red-400"
                             : "border-gray-200 focus:border-blue-500"
-                        }`}
+                          }`}
                       />
                     </div>
                   ))}
-                  {profileError   && <p className="text-red-500 text-sm font-medium">{profileError}</p>}
+                  {profileError && <p className="text-red-500 text-sm font-medium">{profileError}</p>}
                   {profileSuccess && <p className="text-green-500 text-sm font-medium">{profileSuccess}</p>}
                   <button
                     onClick={handleSaveProfile}
@@ -668,21 +640,16 @@ export default function ShaxsiyKabinet() {
               </div>
             )}
 
-            {/* ── ORDERS ── */}
             {activeTab === "orders" && (
               <div className="w-full bg-white p-4 md:p-6 rounded-xl shadow-sm border border-gray-100">
                 <h2 className="text-xl font-bold mb-6 text-[#1D2939]">Buyurtma tarixi</h2>
-
                 {userOrders.length === 0 ? (
                   <div className="text-center py-16">
                     <p className="text-5xl w-15 mx-auto mb-4 flex justify-center text-gray-300">
                       <FaShoppingCart />
                     </p>
                     <p className="text-gray-400 text-sm">Hozircha buyurtmalar yo'q</p>
-                    <Link
-                      href="/katalog"
-                      className="inline-block mt-4 text-blue-500 text-sm font-semibold hover:underline"
-                    >
+                    <Link href="/katalog" className="inline-block mt-4 text-blue-500 text-sm font-semibold hover:underline">
                       Xaridni boshlash →
                     </Link>
                   </div>
@@ -702,23 +669,15 @@ export default function ShaxsiyKabinet() {
                         <tbody className="divide-y divide-gray-100">
                           {currentOrders.map((o, index) => (
                             <tr key={index} className="hover:bg-gray-50/50 transition-colors">
-                              <td className="px-4 md:px-6 py-4 text-sm text-gray-600 font-medium">
-                                {o.id}
-                              </td>
-                              <td className="px-4 md:px-6 py-4 text-sm text-gray-600 whitespace-nowrap">
-                                {o.date}
-                              </td>
+                              <td className="px-4 md:px-6 py-4 text-sm text-gray-600 font-medium">{o.id}</td>
+                              <td className="px-4 md:px-6 py-4 text-sm text-gray-600 whitespace-nowrap">{o.date}</td>
                               <td className="px-4 md:px-6 py-4">
-                                <span
-                                  className={`inline-flex items-center gap-1.5 px-2.5 py-1 border rounded-md text-[10px] font-bold uppercase ${getStatusStyles(o.status)}`}
-                                >
+                                <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 border rounded-md text-[10px] font-bold uppercase ${getStatusStyles(o.status)}`}>
                                   <span className="w-1.5 h-1.5 rounded-full bg-current"></span>
                                   {o.status}
                                 </span>
                               </td>
-                              <td className="px-4 md:px-6 py-4 text-base font-semibold text-[#1D406E] whitespace-nowrap">
-                                {o.amount} so'm
-                              </td>
+                              <td className="px-4 md:px-6 py-4 text-base font-semibold text-[#1D406E] whitespace-nowrap">{o.amount} so'm</td>
                               <td className="px-4 md:px-6 py-4 text-right">
                                 <button className="p-2.5 bg-gray-50 text-blue-500 rounded-lg hover:bg-blue-500 hover:text-white transition-all">
                                   <FaChevronRight size={12} />
@@ -729,8 +688,6 @@ export default function ShaxsiyKabinet() {
                         </tbody>
                       </table>
                     </div>
-
-                    {/* Pagination */}
                     {totalPages > 1 && (
                       <div className="flex items-center gap-2 mt-6">
                         <button
@@ -740,20 +697,15 @@ export default function ShaxsiyKabinet() {
                         >
                           ← Nazad
                         </button>
-
                         {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
                           <button
                             key={page}
                             onClick={() => setCurrentPage(page)}
-                            className={`w-9 h-9 rounded-lg text-sm font-semibold transition ${currentPage === page
-                              ? "bg-[#1a1a1a] text-white"
-                              : "border border-gray-200 text-gray-600 hover:bg-gray-50"
-                              }`}
+                            className={`w-9 h-9 rounded-lg text-sm font-semibold transition ${currentPage === page ? "bg-[#1a1a1a] text-white" : "border border-gray-200 text-gray-600 hover:bg-gray-50"}`}
                           >
                             {page}
                           </button>
                         ))}
-
                         <button
                           onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
                           disabled={currentPage === totalPages}
@@ -768,50 +720,8 @@ export default function ShaxsiyKabinet() {
               </div>
             )}
 
-            {activeTab === 'address' && (
-              <div className="space-y-6">
-                <h2 className="text-xl font-bold">Mening yetkazib berish manzilim</h2>
-                <div className="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
-                  <div className="flex flex-col md:flex-row justify-between p-5 md:p-6 gap-4 md:gap-6">
-                    <div className="flex-1">
-                      <h3 className="text-lg font-bold mb-4">{getUserDisplayName()}</h3>
-                      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 md:gap-6 text-sm">
-                        <div>
-                          <p className="text-gray-400 mb-1">Manzil</p>
-                          <p className="text-gray-700 font-medium leading-relaxed">056734, Toshkent, O'zbekiston, Amir Temur ko'chasi, 37/5</p>
-                        </div>
-                        <div>
-                          <p className="text-gray-400 mb-1">Telefon</p>
-                          <p className="text-gray-700 font-medium">{userInfo?.phone || '+998 (90) 123-45-67'}</p>
-                        </div>
-                        <div>
-                          <p className="text-gray-400 mb-1">Email</p>
-                          <p className="text-gray-700 font-medium break-all">{userInfo?.email || 'example@gmail.com'}</p>
-                        </div>
-                      </div>
-                    </div>
-                    <div className="bg-[#F4F7FE] text-[#1D71D4] h-fit px-4 py-2 rounded flex items-center gap-2 text-[10px] font-extrabold uppercase tracking-widest border border-blue-50 self-start">
-                      <Link href="/aloqa" className="flex justify-center gap-2 items-center">
-                        <FaMapMarkerAlt /> Tasdiqlangan manzil
-                      </Link>
-                    </div>
-                  </div>
-                  <div className="flex border-t border-gray-50 bg-gray-50/20 font-bold text-[10px] uppercase tracking-widest">
-                    <button className="flex-1 p-4 flex items-center justify-center gap-2 text-gray-400 hover:bg-white hover:text-blue-500 border-r transition-all">
-                      <FaEdit size={14} /> Tahrirlash
-                    </button>
-                    <button className="flex-1 p-4 flex items-center justify-center gap-2 text-gray-400 hover:bg-red-50 hover:text-red-500 transition-all">
-                      <FaTrash size={14} /> O'chirish
-                    </button>
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {/* ── ADDRESS ── */}
             {activeTab === "address" && <AddressTab />}
 
-            {/* ── FAVORITES ── */}
             {activeTab === "favorites" && (
               <div className="bg-white p-5 rounded-xl shadow-sm border border-gray-100">
                 <h2 className="text-xl font-bold mb-4">Sevimlilar</h2>
@@ -844,15 +754,14 @@ export default function ShaxsiyKabinet() {
               </div>
             )}
 
-            {/* ── PASSWORD ── */}
             {activeTab === "password" && (
               <div className="bg-white p-5 md:p-8 rounded-xl shadow-sm border border-gray-100 w-full max-w-2xl">
                 <h2 className="text-xl font-bold mb-8 text-[#1D2939]">Parolni o'zgartirish</h2>
                 <div className="space-y-5">
                   {[
-                    { key: "old",     label: "Amaldagi parol",   placeholder: "Amaldagi parol"  },
-                    { key: "new",     label: "Yangi parol",       placeholder: "Parolni kiriting" },
-                    { key: "confirm", label: "Parolni takrorlang",placeholder: "Parolni kiriting" },
+                    { key: "old", label: "Amaldagi parol", placeholder: "Amaldagi parol" },
+                    { key: "new", label: "Yangi parol", placeholder: "Parolni kiriting" },
+                    { key: "confirm", label: "Parolni takrorlang", placeholder: "Parolni kiriting" },
                   ].map(({ key, label, placeholder }) => (
                     <div key={key} className="grid gap-2">
                       <label className="text-sm font-semibold text-[#344054]">
@@ -876,7 +785,7 @@ export default function ShaxsiyKabinet() {
                       </div>
                     </div>
                   ))}
-                  {passError   && <p className="text-red-500 text-sm font-medium">{passError}</p>}
+                  {passError && <p className="text-red-500 text-sm font-medium">{passError}</p>}
                   {passSuccess && <p className="text-green-500 text-sm font-medium">{passSuccess}</p>}
                   <button
                     onClick={handleChangePassword}
@@ -893,5 +802,16 @@ export default function ShaxsiyKabinet() {
         </div>
       </div>
     </div>
+  );
+}
+
+// ─────────────────────────────────────────────
+// DEFAULT EXPORT — Suspense wrapper
+// ─────────────────────────────────────────────
+export default function ShaxsiyKabinet() {
+  return (
+    <Suspense fallback={<div className="min-h-screen flex items-center justify-center text-gray-400">Yuklanmoqda...</div>}>
+      <ShaxsiyKabinetContent />
+    </Suspense>
   );
 }

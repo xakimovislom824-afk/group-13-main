@@ -1,14 +1,13 @@
-// app/verify/page.tsx
 "use client";
 
-import { useState } from "react";
+import { useState, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useVerifyUserMutation } from "../../services/verifyApi";
 
-export default function VerifyPage() {
+function VerifyContent() {
   const searchParams = useSearchParams();
   const emailFromUrl = searchParams.get("email") || "";
-    
+
   const [form, setForm] = useState({ email: emailFromUrl, code: "" });
   const [verifyUser, { isLoading, error }] = useVerifyUserMutation();
   const router = useRouter();
@@ -72,5 +71,13 @@ export default function VerifyPage() {
         </form>
       </div>
     </div>
+  );
+}
+
+export default function VerifyPage() {
+  return (
+    <Suspense fallback={<div>Yuklanmoqda...</div>}>
+      <VerifyContent />
+    </Suspense>
   );
 }
