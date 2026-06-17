@@ -12,7 +12,7 @@ import {
   ShoppingCart,
   Plus,
   Minus,
-  Zap,
+  Lock,
 } from "lucide-react";
 
 import {
@@ -36,6 +36,12 @@ import {
   useGetWishlistQuery,
 } from "../../services/wishlistApi";
 
+// ─── Auth check ───────────────────────────────────────────────────────────────
+function isLoggedIn(): boolean {
+  if (typeof window === "undefined") return false;
+  return !!localStorage.getItem("access");
+}
+
 // ─── Toast ────────────────────────────────────────────────────────────────────
 type ToastType = "success" | "wish" | "error";
 interface Toast {
@@ -55,13 +61,13 @@ function ToastContainer({ toasts, onRemove }: { toasts: Toast[]; onRemove: (id: 
             text-sm font-medium shadow-lg pointer-events-auto
             min-w-[220px] max-w-[300px]
             ${toast.type === "success" ? "border-l-4 border-l-green-500 border-gray-100" : ""}
-            ${toast.type === "wish"    ? "border-l-4 border-l-pink-400 border-gray-100"  : ""}
-            ${toast.type === "error"   ? "border-l-4 border-l-red-400 border-gray-100"   : ""}
+            ${toast.type === "wish" ? "border-l-4 border-l-pink-400 border-gray-100" : ""}
+            ${toast.type === "error" ? "border-l-4 border-l-red-400 border-gray-100" : ""}
           `}
         >
           {toast.type === "success" && <CheckCircle size={18} className="text-green-500 flex-shrink-0" />}
-          {toast.type === "wish"    && <Heart        size={18} className="text-pink-400 flex-shrink-0"  />}
-          {toast.type === "error"   && <AlertCircle  size={18} className="text-red-400 flex-shrink-0"   />}
+          {toast.type === "wish" && <Heart size={18} className="text-pink-400 flex-shrink-0" />}
+          {toast.type === "error" && <AlertCircle size={18} className="text-red-400 flex-shrink-0" />}
           <span className="text-gray-700">{toast.message}</span>
           <button onClick={() => onRemove(toast.id)} className="ml-auto text-gray-300 hover:text-gray-500 transition-colors">×</button>
         </div>
@@ -85,16 +91,9 @@ const formatPrice = (val?: number | string) => {
 
 // ─── Cart Stepper ─────────────────────────────────────────────────────────────
 function CartStepper({
-  productId,
-  qty,
-  loading,
-  onAdd,
-  onIncrease,
-  onDecrease,
+  productId, qty, loading, onAdd, onIncrease, onDecrease,
 }: {
-  productId: number;
-  qty: number;
-  loading: boolean;
+  productId: number; qty: number; loading: boolean;
   onAdd: (id: number) => void;
   onIncrease: (id: number) => void;
   onDecrease: (id: number) => void;
@@ -106,35 +105,42 @@ function CartStepper({
         disabled={loading}
         className="flex-1 h-9 flex items-center justify-center gap-1.5 rounded-lg bg-blue-600 hover:bg-blue-700 active:scale-95 text-white text-xs font-semibold transition-all disabled:opacity-50 shadow-sm shadow-blue-200"
       >
-        {loading ? (
-          <Loader2 size={13} className="animate-spin" />
-        ) : (
-          <>
-            <ShoppingCart size={13} strokeWidth={2} />
-            Sotib olish
-          </>
-        )}
+        {loading ? <Loader2 size={13} className="animate-spin" /> : <><ShoppingCart size={13} strokeWidth={2} />Sotib olish</>}
       </button>
     );
   }
-
   return (
     <div className="flex-1 h-9 flex items-center justify-between rounded-lg bg-blue-50 border border-blue-200 px-1">
-      <button
-        onClick={() => onDecrease(productId)}
-        disabled={loading}
-        className="w-7 h-7 flex items-center justify-center rounded-md text-blue-600 hover:bg-blue-100 active:scale-90 transition disabled:opacity-30 font-bold"
-      >
+      <button onClick={() => onDecrease(productId)} disabled={loading} className="w-7 h-7 flex items-center justify-center rounded-md text-blue-600 hover:bg-blue-100 active:scale-90 transition disabled:opacity-30 font-bold">
         {loading ? <Loader2 size={12} className="animate-spin" /> : <Minus size={13} strokeWidth={2.5} />}
       </button>
       <span className="text-sm font-bold text-blue-700 min-w-[20px] text-center">{qty}</span>
-      <button
-        onClick={() => onIncrease(productId)}
-        disabled={loading}
-        className="w-7 h-7 flex items-center justify-center rounded-md text-blue-600 hover:bg-blue-100 active:scale-90 transition font-bold"
-      >
+      <button onClick={() => onIncrease(productId)} disabled={loading} className="w-7 h-7 flex items-center justify-center rounded-md text-blue-600 hover:bg-blue-100 active:scale-90 transition font-bold">
         {loading ? <Loader2 size={12} className="animate-spin" /> : <Plus size={13} strokeWidth={2.5} />}
       </button>
+    </div>
+  );
+}
+
+// ─── Not logged in UI ─────────────────────────────────────────────────────────
+function NotLoggedIn() {
+  return (
+    <div className="min-h-screen flex flex-col items-center justify-center bg-white gap-6 px-4">
+      <div className="w-20 h-20 bg-blue-50 rounded-full flex items-center justify-center">
+        <Lock size={36} className="text-blue-400" />
+      </div>
+      <div className="text-center">
+        <h2 className="text-xl font-bold text-gray-800 mb-2">Kirish talab etiladi</h2>
+        <p className="text-gray-400 text-sm">
+          Taqqoslash ro&apos;yxatini ko&apos;rish uchun avval tizimga kiring
+        </p>
+      </div>
+      <Link
+        href="/kirish"
+        className="bg-blue-600 hover:bg-blue-700 text-white font-bold px-8 py-3 rounded-xl transition text-sm"
+      >
+        Kirish
+      </Link>
     </div>
   );
 }
@@ -145,28 +151,29 @@ export default function Taqqoslash() {
   const [selectedGroupId, setSelectedGroupId] = useState<number | null>(null);
   const [localProducts, setLocalProducts] = useState<IComparisonProduct[]>([]);
   const [toasts, setToasts] = useState<Toast[]>([]);
+  const [loggedIn, setLoggedIn] = useState<boolean | null>(null);
 
-  // Per-product loading sets
   const [loadingCart, setLoadingCart] = useState<Set<number>>(new Set());
   const [loadingWish, setLoadingWish] = useState<Set<number>>(new Set());
-
-  // Local cart quantities for instant UI feedback
   const [cartQuantities, setCartQuantities] = useState<Record<number, number>>({});
 
-  // ── API ──────────────────────────────────────────────────────────────────────
-  const { data: comparisonGroups, isLoading, isError, refetch } = useGetComparisonsQuery();
+  // Auth check
+  useEffect(() => {
+    setLoggedIn(isLoggedIn());
+  }, []);
+
+  const { data: comparisonGroups, isLoading, isError, refetch } = useGetComparisonsQuery(undefined, { skip: !loggedIn });
   const [updateComparison] = useUpdateComparisonMutation();
   const [deleteComparison] = useDeleteComparisonMutation();
 
-  const { data: cartData } = useGetCartsQuery();
+  const { data: cartData } = useGetCartsQuery(undefined, { skip: !loggedIn });
   const [addToCart] = useAddToCartMutation();
   const [updateCart] = useUpdateCartMutation();
   const [deleteCart] = useDeleteCartMutation();
 
   const [toggleWishlist] = useToggleWishlistMutation();
-  const { data: wishlistData } = useGetWishlistQuery();
+  const { data: wishlistData } = useGetWishlistQuery(undefined, { skip: !loggedIn });
 
-  // ── Toast ────────────────────────────────────────────────────────────────────
   const showToast = useCallback((message: string, type: ToastType = "success") => {
     const id = Date.now();
     setToasts((prev) => [...prev, { id, message, type }]);
@@ -177,7 +184,6 @@ export default function Taqqoslash() {
     setToasts((prev) => prev.filter((t) => t.id !== id));
   }, []);
 
-  // ── Helpers ──────────────────────────────────────────────────────────────────
   const isInWishlist = (productId: number): boolean => {
     if (!wishlistData) return false;
     return wishlistData.some((item: any) => {
@@ -201,7 +207,6 @@ export default function Taqqoslash() {
     });
   };
 
-  // ── Sync cart quantities from server ─────────────────────────────────────────
   useEffect(() => {
     if (!cartData) return;
     let items: any[] = [];
@@ -220,7 +225,6 @@ export default function Taqqoslash() {
     setCartQuantities(quantities);
   }, [cartData]);
 
-  // ── Init selected group ───────────────────────────────────────────────────────
   useEffect(() => {
     if (comparisonGroups && comparisonGroups.length > 0 && selectedGroupId === null) {
       setSelectedGroupId(comparisonGroups[0].id);
@@ -234,7 +238,6 @@ export default function Taqqoslash() {
     setLocalProducts(parseProductsDetail(group.products_detail));
   }, [comparisonGroups, selectedGroupId]);
 
-  // ── Add to cart ───────────────────────────────────────────────────────────────
   const handleAddToCart = async (productId: number) => {
     if (loadingCart.has(productId)) return;
     setLoadingCart((prev) => new Set(prev).add(productId));
@@ -250,7 +253,6 @@ export default function Taqqoslash() {
     }
   };
 
-  // ── Increase ──────────────────────────────────────────────────────────────────
   const handleIncrease = async (productId: number) => {
     const cartItem = getCartItem(productId);
     if (!cartItem) { await handleAddToCart(productId); return; }
@@ -265,13 +267,11 @@ export default function Taqqoslash() {
     }
   };
 
-  // ── Decrease ──────────────────────────────────────────────────────────────────
   const handleDecrease = async (productId: number) => {
     const cartItem = getCartItem(productId);
     if (!cartItem) return;
     const currentQty = cartQuantities[productId] || cartItem.quantity;
     const newQty = currentQty - 1;
-
     if (newQty <= 0) {
       setCartQuantities((prev) => { const next = { ...prev }; delete next[productId]; return next; });
       try {
@@ -283,7 +283,6 @@ export default function Taqqoslash() {
       }
       return;
     }
-
     setCartQuantities((prev) => ({ ...prev, [productId]: newQty }));
     try {
       await updateCart({ id: cartItem.id, product: productId, quantity: newQty }).unwrap();
@@ -293,7 +292,6 @@ export default function Taqqoslash() {
     }
   };
 
-  // ── Wishlist ──────────────────────────────────────────────────────────────────
   const handleToggleWishlist = async (productId: number) => {
     if (loadingWish.has(productId)) return;
     setLoadingWish((prev) => new Set(prev).add(productId));
@@ -308,7 +306,6 @@ export default function Taqqoslash() {
     }
   };
 
-  // ── Remove from comparison ────────────────────────────────────────────────────
   const handleRemoveProduct = async (productId: number) => {
     if (!selectedGroupId || !comparisonGroups) return;
     const group = comparisonGroups.find((g: IComparison) => g.id === selectedGroupId);
@@ -334,7 +331,18 @@ export default function Taqqoslash() {
     ? FEATURE_KEYS.filter((f) => isFeatureDifferent(f.key))
     : FEATURE_KEYS;
 
-  // ── States ────────────────────────────────────────────────────────────────────
+  // Auth yuklanayotgan payt
+  if (loggedIn === null) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-white">
+        <div className="w-10 h-10 border-4 border-blue-600 border-t-transparent rounded-full animate-spin" />
+      </div>
+    );
+  }
+
+  // Login qilinmagan
+  if (!loggedIn) return <NotLoggedIn />;
+
   if (isLoading) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center bg-white gap-4">
@@ -360,8 +368,8 @@ export default function Taqqoslash() {
   return (
     <div className="min-h-screen bg-white font-sans text-[#2D2D2D] pb-20">
       <ToastContainer toasts={toasts} onRemove={removeToast} />
+      [17/06/2026 15:36] Nodir aka:
 
-      {/* Breadcrumbs */}
       <div className="max-w-[1440px] mx-auto px-4 py-4 flex items-center gap-2 text-[11px] text-gray-400">
         <Link href="/" className="hover:text-blue-500 transition-colors">Stroyoptorg</Link>
         <span>/</span>
@@ -369,7 +377,6 @@ export default function Taqqoslash() {
       </div>
 
       <div className="max-w-[1440px] mx-auto px-4">
-        {/* Header */}
         <div className="flex items-center gap-3 mb-8 flex-wrap">
           <GitCompareArrows size={28} className="text-blue-600 flex-shrink-0" />
           <h1 className="text-3xl sm:text-4xl font-bold text-[#1A202C]">Taqqoslash</h1>
@@ -392,7 +399,6 @@ export default function Taqqoslash() {
           </div>
         ) : (
           <div className="flex flex-col lg:flex-row gap-6">
-            {/* Left filter panel */}
             <div className="w-full lg:w-56 flex-shrink-0 space-y-4">
               <div className="border border-gray-100 rounded-xl p-4 bg-white shadow-sm">
                 <p className="text-[11px] font-bold text-gray-400 uppercase tracking-widest mb-3">Ko&apos;rsatish</p>
@@ -418,7 +424,6 @@ export default function Taqqoslash() {
               </div>
             </div>
 
-            {/* Products grid */}
             <div className="flex-1 overflow-x-auto select-none">
               <div className="min-w-0" style={{ minWidth: `${Math.max(localProducts.length * 240, 400)}px` }}>
                 <div
@@ -433,22 +438,12 @@ export default function Taqqoslash() {
 
                     return (
                       <div key={product.id} className="relative border border-gray-100 rounded-2xl py-4 px-3.5 bg-white hover:shadow-md transition-all flex flex-col justify-between">
-                        {/* Remove button */}
-                        <button
-                          onClick={() => handleRemoveProduct(product.id)}
-                          className="absolute right-2 top-2 w-7 h-7 flex items-center justify-center rounded-lg text-gray-300 hover:text-red-500 hover:bg-red-50 transition-all z-10"
-                        >
+                        <button onClick={() => handleRemoveProduct(product.id)} className="absolute right-2 top-2 w-7 h-7 flex items-center justify-center rounded-lg text-gray-300 hover:text-red-500 hover:bg-red-50 transition-all z-10">
                           <Trash2 size={14} />
                         </button>
-
-                        {/* Image */}
                         <div className="h-40 flex items-center justify-center mb-3 bg-gray-50 rounded-xl overflow-hidden relative p-2">
                           {product?.image ? (
-                            <img
-                              src={product.image}
-                              alt={product.name as string}
-                              className="max-h-full max-w-full object-contain p-1 transition-transform duration-300 hover:scale-105"
-                            />
+                            <img src={product.image} alt={product.name as string} className="max-h-full max-w-full object-contain p-1 transition-transform duration-300 hover:scale-105" />
                           ) : (
                             <div className="w-12 h-12 bg-gray-200 rounded-full flex items-center justify-center">
                               <span className="text-gray-400 text-xl">📦</span>
@@ -460,65 +455,25 @@ export default function Taqqoslash() {
                             </span>
                           )}
                         </div>
-
-                        {/* Name */}
                         <p className="text-[9px] text-slate-400 mb-0.5">ID: {product.id}</p>
                         <h3 className="text-sm font-bold leading-tight mb-2 line-clamp-2 min-h-[2.5rem] text-gray-800" title={product.name as string}>
                           {product?.name || "Nomsiz mahsulot"}
                         </h3>
-
-                        {/* Price */}
                         <div className="flex flex-col gap-0.5 mb-4 mt-auto">
                           {product.old_price && (
-                            <span className="line-through text-slate-400 text-[11px]">
-                              {Number(product.old_price).toLocaleString()} so&apos;m
-                            </span>
+                            <span className="line-through text-slate-400 text-[11px]">{Number(product.old_price).toLocaleString()} so&apos;m</span>
                           )}
-                          <span className="text-blue-600 font-extrabold text-base">
-                            {Number(product.price).toLocaleString()} so&apos;m
-                          </span>
+                          <span className="text-blue-600 font-extrabold text-base">{Number(product.price).toLocaleString()} so&apos;m</span>
                           {qty > 0 && (
-                            <span className="text-[10px] text-blue-400 font-medium">
-                              Jami: {(Number(product.price) * qty).toLocaleString()} so&apos;m
-                            </span>
+                            <span className="text-[10px] text-blue-400 font-medium">Jami: {(Number(product.price) * qty).toLocaleString()} so&apos;m</span>
                           )}
                         </div>
-
-                        {/* Action buttons */}
                         <div className="flex gap-1.5 items-center">
-                          {/* Cart stepper or buy button */}
-                          <CartStepper
-                            productId={product.id}
-                            qty={qty}
-                            loading={cartLoading}
-                            onAdd={handleAddToCart}
-                            onIncrease={handleIncrease}
-                            onDecrease={handleDecrease}
-                          />
-
-                          {/* Wishlist */}
-                          <button
-                            onClick={() => handleToggleWishlist(product.id)}
-                            disabled={wishLoading}
-                            className={`w-9 h-9 flex items-center justify-center rounded-lg border transition-all shrink-0 cursor-pointer ${
-                              inWish
-                                ? "bg-pink-50 border-pink-400 text-pink-500"
-                                : "border-gray-200 text-gray-400 hover:bg-gray-50"
-                            }`}
-                          >
-                            {wishLoading ? (
-                              <Loader2 size={14} className="animate-spin" />
-                            ) : (
-                              <Heart size={15} fill={inWish ? "currentColor" : "none"} />
-                            )}
+                          <CartStepper productId={product.id} qty={qty} loading={cartLoading} onAdd={handleAddToCart} onIncrease={handleIncrease} onDecrease={handleDecrease} />
+                          <button onClick={() => handleToggleWishlist(product.id)} disabled={wishLoading} className={`w-9 h-9 flex items-center justify-center rounded-lg border transition-all shrink-0 cursor-pointer ${inWish ? "bg-pink-50 border-pink-400 text-pink-500" : "border-gray-200 text-gray-400 hover:bg-gray-50"}`}>
+                            {wishLoading ? <Loader2 size={14} className="animate-spin" /> : <Heart size={15} fill={inWish ? "currentColor" : "none"} />}
                           </button>
-
-                          {/* Remove from comparison */}
-                          <button
-                            onClick={() => handleRemoveProduct(product.id)}
-                            className="w-9 h-9 flex items-center justify-center rounded-lg border border-blue-200 bg-blue-50 text-blue-500 hover:bg-blue-100 hover:border-blue-300 transition-all shrink-0 cursor-pointer"
-                            title="Taqqoslashdan o'chirish"
-                          >
+                          <button onClick={() => handleRemoveProduct(product.id)} className="w-9 h-9 flex items-center justify-center rounded-lg border border-blue-200 bg-blue-50 text-blue-500 hover:bg-blue-100 hover:border-blue-300 transition-all shrink-0 cursor-pointer" title="Taqqoslashdan o'chirish">
                             <GitCompareArrows size={15} />
                           </button>
                         </div>
@@ -527,7 +482,6 @@ export default function Taqqoslash() {
                   })}
                 </div>
 
-                {/* Features table */}
                 {visibleFeatures.length > 0 && (
                   <div className="border border-gray-100 rounded-2xl overflow-hidden shadow-sm">
                     <div className="bg-gray-50 px-4 py-3 border-b border-gray-100">
@@ -536,11 +490,7 @@ export default function Taqqoslash() {
                     {visibleFeatures.map((feature, fIdx) => {
                       const isDiff = isFeatureDifferent(feature.key);
                       return (
-                        <div
-                          key={fIdx}
-                          className={`grid gap-0 border-b border-gray-100 last:border-0 items-start ${isDiff ? "bg-amber-50/40" : "bg-white"}`}
-                          style={{ gridTemplateColumns: `repeat(${localProducts.length}, minmax(220px, 1fr))` }}
-                        >
+                        <div key={fIdx} className={`grid gap-0 border-b border-gray-100 last:border-0 items-start ${isDiff ? "bg-amber-50/40" : "bg-white"}`} style={{ gridTemplateColumns: `repeat(${localProducts.length}, minmax(220px, 1fr))` }}>
                           {localProducts.map((product: IComparisonProduct, cIdx: number) => (
                             <div key={cIdx} className="px-4 py-3 border-r border-gray-100 last:border-r-0">
                               <div className="flex items-center gap-1.5 mb-1">

@@ -21,6 +21,21 @@ const loginSchema = z.object({
 
 type LoginFormData = z.infer<typeof loginSchema>;
 
+function setCookie(name: string, value: string, days?: number) {
+  let expires = "";
+  if (days) {
+    const date = new Date();
+    date.setTime(date.getTime() + days * 24 * 60 * 60 * 1000);
+    expires = `; expires=${date.toUTCString()}`;
+  }
+  document.cookie = `${name}=${value}${expires}; path=/; SameSite=Lax`;
+}
+
+export function clearAuthCookies() {
+  document.cookie = "access=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+  document.cookie = "refresh=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+}
+
 export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
   const router = useRouter();
@@ -46,16 +61,16 @@ export default function LoginPage() {
         password: data.password,
       }).unwrap();
 
-      // Tokenlarni saqlash
       localStorage.setItem("access", response.access);
       localStorage.setItem("refresh", response.refresh);
 
-      // ✅ User ma'lumotlarini saqlash (navbar username uchun)
-      // response.user mavjud bo'lsa saqlaydi, bo'lmasa faqat username saqlaydi
+      const cookieDays = data.rememberMe ? 30 : undefined;
+      setCookie("access", response.access, cookieDays);
+      setCookie("refresh", response.refresh, cookieDays);
+
       if (response.user) {
         localStorage.setItem("user", JSON.stringify(response.user));
       } else {
-        // Kamida kirgan username ni saqlaymiz
         localStorage.setItem(
           "user",
           JSON.stringify({ username: data.identifier.trim() })
@@ -66,10 +81,11 @@ export default function LoginPage() {
         localStorage.setItem("remember_me", "true");
       }
 
-      // ✅ Navbar darhol yangilansin — refresh kerak emas
       window.dispatchEvent(new Event("authChange"));
 
-      router.push("/kabnet");
+      const params = new URLSearchParams(window.location.search);
+      const next = params.get("next") || "/kabnet";
+      router.push(next);
     } catch (error: any) {
       const errorMessage =
         error?.data?.detail ||
@@ -94,6 +110,7 @@ export default function LoginPage() {
           Avtorizatsiya
         </h1>
 
+
         <div className="bg-white rounded-xl border border-gray-100 shadow-sm flex flex-col lg:flex-row overflow-hidden">
           {/* Login */}
           <div className="w-full lg:w-1/2 p-6 md:p-10 lg:p-14 border-b lg:border-b-0 lg:border-r border-gray-100">
@@ -105,8 +122,8 @@ export default function LoginPage() {
                 <input
                   {...register("identifier")}
                   className={`w-full border rounded-lg p-3.5 text-sm outline-none transition-all ${errors.identifier
-                    ? "border-red-500 bg-red-50"
-                    : "border-gray-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+                      ? "border-red-500 bg-red-50"
+                      : "border-gray-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
                     }`}
                   placeholder="Usernameni kiriting"
                 />
@@ -126,8 +143,8 @@ export default function LoginPage() {
                     {...register("password")}
                     type={showPassword ? "text" : "password"}
                     className={`w-full border rounded-lg p-3.5 text-sm outline-none transition-all pr-12 ${errors.password
-                      ? "border-red-500 bg-red-50"
-                      : "border-gray-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+                        ? "border-red-500 bg-red-50"
+                        : "border-gray-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
                       }`}
                     placeholder="Parolni kiriting"
                   />
@@ -174,6 +191,7 @@ export default function LoginPage() {
             </form>
           </div>
 
+
           {/* Right Side */}
           <div className="w-full lg:w-1/2 p-6 md:p-10 lg:p-14 bg-[#FCFDFF] flex flex-col justify-start">
             <div className="flex items-center gap-4 mb-6">
@@ -197,7 +215,7 @@ export default function LoginPage() {
             </div>
 
             <div className="mt-10">
-              <Link href="/login" className="inline-block w-full sm:w-auto">
+              <Link href="/yetkazibBerish" className="inline-block w-full sm:w-auto">
                 <button
                   type="button"
                   className="w-full sm:w-auto flex items-center justify-center gap-3 bg-[#0B1320] hover:bg-black text-white px-10 py-4 rounded-lg uppercase text-[11px] font-bold tracking-[2px] transition-all group shadow-lg"
