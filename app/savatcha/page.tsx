@@ -80,7 +80,6 @@ export default function SavatchaPage() {
     }
   };
 
-  // Savatchadan buyurtmaga o'tishda snapshot saqlash va savatchani tozalash
   const handleGoToCheckout = async () => {
     if (items.length === 0) return;
 
@@ -99,7 +98,6 @@ export default function SavatchaPage() {
 
     sessionStorage.setItem("orderSnapshot", JSON.stringify(snapshot));
 
-    // Savatchadagi barcha mahsulotlarni o'chirish
     for (const item of items) {
       await deleteCart(item.id);
     }
@@ -116,13 +114,17 @@ export default function SavatchaPage() {
   }
 
   return (
-    <div className="bg-[#f9fafb] min-h-screen py-10">
-      <div className="max-w-7xl mx-auto px-4">
-        <h1 className="text-4xl font-bold text-[#1a1a1a] mb-8">Savatcha</h1>
+    <div className="bg-[#f9fafb] min-h-screen py-6 sm:py-10">
+      <div className="max-w-7xl mx-auto px-3 sm:px-4">
+        <h1 className="text-2xl sm:text-4xl font-bold text-[#1a1a1a] mb-5 sm:mb-8">
+          Savatcha
+        </h1>
 
         {items.length === 0 ? (
-          <div className="bg-white p-20 text-center rounded-2xl shadow-sm border">
-            <p className="text-gray-400 text-xl mb-6">Savatchangiz hozircha bo'sh</p>
+          <div className="bg-white p-10 sm:p-20 text-center rounded-2xl shadow-sm border">
+            <p className="text-gray-400 text-lg sm:text-xl mb-6">
+              Savatchangiz hozircha bo'sh
+            </p>
             <Link
               href="/katalog"
               className="bg-blue-600 text-white px-8 py-3 rounded-lg font-bold hover:bg-blue-700 transition"
@@ -131,21 +133,26 @@ export default function SavatchaPage() {
             </Link>
           </div>
         ) : (
-          <div className="flex flex-col lg:flex-row gap-8">
+          <div className="flex flex-col lg:flex-row gap-4 sm:gap-8">
 
             {/* CHAP TOMON */}
-            <div className="flex-1 space-y-6">
+            <div className="flex-1 space-y-4 sm:space-y-6">
 
               {/* Progress bar */}
-              <div className="bg-white p-6 rounded-xl border border-gray-100 shadow-sm">
-                <p className="text-sm font-medium mb-3">
+              <div className="bg-white p-4 sm:p-6 rounded-xl border border-gray-100 shadow-sm">
+                <p className="text-sm font-medium mb-2 sm:mb-3">
                   Xarid summasidan chegirmangiz:{" "}
-                  <span className="font-bold" style={{ color: progressColor }}>0 so'm</span>
+                  <span className="font-bold" style={{ color: progressColor }}>
+                    0 so'm
+                  </span>
                 </p>
-                <div className="relative w-full h-2 bg-gray-100 rounded-full overflow-hidden mb-4">
+                <div className="relative w-full h-2 bg-gray-100 rounded-full overflow-hidden mb-3 sm:mb-4">
                   <div
                     className="absolute top-0 left-0 h-full transition-all duration-500 rounded-full"
-                    style={{ width: `${progressPercent}%`, backgroundColor: progressColor }}
+                    style={{
+                      width: `${progressPercent}%`,
+                      backgroundColor: progressColor,
+                    }}
                   />
                 </div>
                 <p className="text-xs text-gray-500">
@@ -160,125 +167,241 @@ export default function SavatchaPage() {
                 </p>
               </div>
 
-              {/* Jadval */}
-              <div className="bg-white rounded-xl border border-gray-100 shadow-sm overflow-x-auto">
-                <table className="w-full text-left border-collapse min-w-[600px]">
-                  <thead className="bg-gray-50 border-b border-gray-100 text-[11px] uppercase tracking-wider text-gray-400 font-semibold">
-                    <tr>
-                      <th className="px-6 py-4">Mahsulot</th>
-                      <th className="px-6 py-4 text-center">Narxi</th>
-                      <th className="px-6 py-4 text-center">Soni</th>
-                      <th className="px-6 py-4 text-center">Jami</th>
-                      <th className="px-6 py-4"></th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-gray-100">
-                    {items.map((item) => {
-                      const price = Number(item.product_details?.price ?? 0);
-                      const qty = item.quantity ?? 1;
+              {/* Mobile: Card list | Desktop: Table */}
+              <>
+                {/* MOBILE CARDS (hidden on lg+) */}
+                <div className="space-y-3 lg:hidden">
+                  {items.map((item) => {
+                    const price = Number(item.product_details?.price ?? 0);
+                    const qty = item.quantity ?? 1;
 
-                      return (
-                        <tr key={item.id} className="hover:bg-gray-50/50 transition">
-                          <td className="px-6 py-6">
-                            <div className="flex items-center gap-4">
-                              <div className="w-20 h-20 bg-gray-50 rounded-lg flex items-center justify-center border border-gray-100 p-2 shrink-0">
-                                {item.product_details?.image ? (
-                                  <img
-                                    src={item.product_details.image}
-                                    alt={item.product_details?.name ?? ""}
-                                    className="object-contain max-h-full"
-                                  />
-                                ) : (
-                                  <span className="text-xs text-gray-400">Rasm yo'q</span>
-                                )}
-                              </div>
-                              <div className="max-w-[200px]">
-                                <p className="text-[14px] font-bold text-gray-800 leading-tight mb-1">
-                                  {item.product_details?.name ?? `Mahsulot (ID: ${item.product})`}
-                                </p>
-                                <p className="text-[10px] text-gray-400">
-                                  ID: {item.product}
-                                </p>
-                              </div>
+                    return (
+                      <div
+                        key={item.id}
+                        className="bg-white rounded-xl border border-gray-100 shadow-sm p-4"
+                      >
+                        <div className="flex gap-3">
+                          {/* Image */}
+                          <div className="w-16 h-16 sm:w-20 sm:h-20 bg-gray-50 rounded-lg flex items-center justify-center border border-gray-100 p-2 shrink-0">
+                            {item.product_details?.image ? (
+                              <img
+                                src={item.product_details.image}
+                                alt={item.product_details?.name ?? ""}
+                                className="object-contain max-h-full"
+                              />
+                            ) : (
+                              <span className="text-[10px] text-gray-400">
+                                Rasm yo'q
+                              </span>
+                            )}
+                          </div>
+
+                          {/* Name + delete */}
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-start justify-between gap-2">
+                              <p className="text-[13px] font-bold text-gray-800 leading-tight">
+                                {item.product_details?.name ??
+                                  `Mahsulot (ID: ${item.product})`}
+                              </p>
+                              <button
+                                onClick={() => deleteCart(item.id)}
+                                className="text-gray-300 hover:text-red-500 transition-colors shrink-0 mt-0.5"
+                              >
+                                <Trash2 size={17} />
+                              </button>
                             </div>
-                          </td>
+                            <p className="text-[10px] text-gray-400 mt-0.5">
+                              Artikul: {item.product}
+                            </p>
+                          </div>
+                        </div>
 
-                          <td className="px-6 py-6 text-center">
-                            <p className="text-[15px] font-bold text-gray-900">
+                        {/* Price row */}
+                        <div className="flex items-center justify-between mt-3 pt-3 border-t border-gray-100">
+                          <div>
+                            <p className="text-[15px] font-black text-gray-900">
                               {price.toLocaleString()} so'm
                             </p>
-                          </td>
+                            {price !== (price * qty) && (
+                              <p className="text-[11px] text-gray-400 line-through">
+                                {(price * 1.1).toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, " ")} so'm
+                              </p>
+                            )}
+                          </div>
 
-                          <td className="px-6 py-6">
-                            <div className="flex items-center justify-center bg-gray-100 rounded-full w-28 mx-auto px-2 py-1.5">
-                              <button
-                                onClick={() => handleDecrease(item.id, item.product, qty)}
-                                className="p-1 hover:text-blue-600 transition"
-                              >
-                                <Minus size={16} />
-                              </button>
-                              <span className="w-10 text-center text-sm font-bold">
-                                {qty}
-                              </span>
-                              <button
-                                onClick={() =>
-                                  updateCart({ id: item.id, product: item.product, quantity: qty + 1 })
-                                }
-                                className="p-1 hover:text-blue-600 transition"
-                              >
-                                <Plus size={16} />
-                              </button>
-                            </div>
-                          </td>
-
-                          <td className="px-6 py-6 text-center">
-                            <p className="text-[15px] font-bold text-blue-600">
-                              {(price * qty).toLocaleString()} so'm
-                            </p>
-                          </td>
-
-                          <td className="px-6 py-6 text-right">
+                          {/* Quantity control */}
+                          <div className="flex items-center gap-0 border border-gray-200 rounded-full overflow-hidden">
                             <button
-                              onClick={() => deleteCart(item.id)}
-                              className="text-gray-300 hover:text-red-500 transition-colors"
+                              onClick={() =>
+                                handleDecrease(item.id, item.product, qty)
+                              }
+                              className="w-8 h-8 flex items-center justify-center hover:text-blue-600 transition text-gray-600"
                             >
-                              <Trash2 size={20} />
+                              <Minus size={14} />
                             </button>
-                          </td>
-                        </tr>
-                      );
-                    })}
-                  </tbody>
-                </table>
-              </div>
+                            <span className="w-8 text-center text-sm font-bold text-gray-800">
+                              {qty}
+                            </span>
+                            <button
+                              onClick={() =>
+                                updateCart({
+                                  id: item.id,
+                                  product: item.product,
+                                  quantity: qty + 1,
+                                })
+                              }
+                              className="w-8 h-8 flex items-center justify-center hover:text-blue-600 transition text-gray-600"
+                            >
+                              <Plus size={14} />
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+
+                {/* DESKTOP TABLE (hidden below lg) */}
+                <div className="hidden lg:block bg-white rounded-xl border border-gray-100 shadow-sm overflow-x-auto">
+                  <table className="w-full text-left border-collapse min-w-[600px]">
+                    <thead className="bg-gray-50 border-b border-gray-100 text-[11px] uppercase tracking-wider text-gray-400 font-semibold">
+                      <tr>
+                        <th className="px-6 py-4">Mahsulot</th>
+                        <th className="px-6 py-4 text-center">Narxi</th>
+                        <th className="px-6 py-4 text-center">Soni</th>
+                        <th className="px-6 py-4 text-center">Jami</th>
+                        <th className="px-6 py-4"></th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-gray-100">
+                      {items.map((item) => {
+                        const price = Number(item.product_details?.price ?? 0);
+                        const qty = item.quantity ?? 1;
+
+                        return (
+                          <tr
+                            key={item.id}
+                            className="hover:bg-gray-50/50 transition"
+                          >
+                            <td className="px-6 py-6">
+                              <div className="flex items-center gap-4">
+                                <div className="w-20 h-20 bg-gray-50 rounded-lg flex items-center justify-center border border-gray-100 p-2 shrink-0">
+                                  {item.product_details?.image ? (
+                                    <img
+                                      src={item.product_details.image}
+                                      alt={item.product_details?.name ?? ""}
+                                      className="object-contain max-h-full"
+                                    />
+                                  ) : (
+                                    <span className="text-xs text-gray-400">
+                                      Rasm yo'q
+                                    </span>
+                                  )}
+                                </div>
+                                <div className="max-w-[200px]">
+                                  <p className="text-[14px] font-bold text-gray-800 leading-tight mb-1">
+                                    {item.product_details?.name ??
+                                      `Mahsulot (ID: ${item.product})`}
+                                  </p>
+                                  <p className="text-[10px] text-gray-400">
+                                    ID: {item.product}
+                                  </p>
+                                </div>
+                              </div>
+                            </td>
+
+                            <td className="px-6 py-6 text-center">
+                              <p className="text-[15px] font-bold text-gray-900">
+                                {price.toLocaleString()} so'm
+                              </p>
+                            </td>
+
+                            <td className="px-6 py-6">
+                              <div className="flex items-center justify-center bg-gray-100 rounded-full w-28 mx-auto px-2 py-1.5">
+                                <button
+                                  onClick={() =>
+                                    handleDecrease(item.id, item.product, qty)
+                                  }
+                                  className="p-1 hover:text-blue-600 transition"
+                                >
+                                  <Minus size={16} />
+                                </button>
+                                <span className="w-10 text-center text-sm font-bold">
+                                  {qty}
+                                </span>
+                                <button
+                                  onClick={() =>
+                                    updateCart({
+                                      id: item.id,
+                                      product: item.product,
+                                      quantity: qty + 1,
+                                    })
+                                  }
+                                  className="p-1 hover:text-blue-600 transition"
+                                >
+                                  <Plus size={16} />
+                                </button>
+                              </div>
+                            </td>
+
+                            <td className="px-6 py-6 text-center">
+                              <p className="text-[15px] font-bold text-blue-600">
+                                {(price * qty).toLocaleString()} so'm
+                              </p>
+                            </td>
+
+                            <td className="px-6 py-6 text-right">
+                              <button
+                                onClick={() => deleteCart(item.id)}
+                                className="text-gray-300 hover:text-red-500 transition-colors"
+                              >
+                                <Trash2 size={20} />
+                              </button>
+                            </td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                </div>
+              </>
             </div>
 
-            {/* O'NG TOMON */}
+            {/* O'NG TOMON - Summary */}
             <div className="lg:w-[380px]">
-              <div className="bg-white p-8 rounded-2xl border border-gray-100 shadow-lg sticky top-6">
-                <h2 className="text-2xl font-bold mb-6 text-gray-800">Jami</h2>
+              <div className="bg-white p-5 sm:p-8 rounded-2xl border border-gray-100 shadow-lg lg:sticky lg:top-6">
+                <h2 className="text-xl sm:text-2xl font-bold mb-5 sm:mb-6 text-gray-800">
+                  Jami
+                </h2>
 
-                <div className="space-y-4 mb-8">
-                  <div className="flex justify-between text-[15px]">
-                    <span className="text-gray-500">Promokod bo'yirma chegirma</span>
-                    <span className={`font-semibold ${promoApplied ? "text-green-600" : "text-gray-800"}`}>
-                      {promoApplied ? `-${promoDiscount.toLocaleString()} so'm` : "0 so'm"}
+                <div className="space-y-3 sm:space-y-4 mb-6 sm:mb-8">
+                  <div className="flex justify-between text-[14px] sm:text-[15px]">
+                    <span className="text-gray-500">Promokod bo'yicha chegirma</span>
+                    <span
+                      className={`font-semibold ${promoApplied ? "text-green-600" : "text-gray-800"
+                        }`}
+                    >
+                      {promoApplied
+                        ? `-${promoDiscount.toLocaleString()} so'm`
+                        : "0 so'm"}
                     </span>
                   </div>
-                  <div className="flex justify-between text-[15px] border-b border-dashed pb-4">
+                  <div className="flex justify-between text-[14px] sm:text-[15px] border-b border-dashed pb-3 sm:pb-4">
                     <span className="text-gray-500">Xarid summasidan chegirma</span>
                     <span className="font-semibold text-gray-800">0 so'm</span>
                   </div>
-                  <div className="flex justify-between items-end pt-2">
-                    <span className="text-lg font-bold text-gray-800">Umumiy:</span>
-                    <span className="text-3xl font-black text-blue-600 tracking-tighter">
+                  <div className="flex justify-between items-end pt-1 sm:pt-2">
+                    <span className="text-base sm:text-lg font-bold text-gray-800">
+                      Summa:
+                    </span>
+                    <span className="text-2xl sm:text-3xl font-black text-blue-600 tracking-tighter">
                       {finalTotal.toLocaleString()}{" "}
-                      <span className="text-lg font-bold">so'm</span>
+                      <span className="text-base sm:text-lg font-bold">so'm</span>
                     </span>
                   </div>
                 </div>
 
-                <div className="space-y-3">
+                <div className="space-y-2 sm:space-y-3">
                   <div className="relative">
                     <input
                       type="text"
@@ -289,11 +412,11 @@ export default function SavatchaPage() {
                         setPromoError("");
                         if (promoApplied) setPromoApplied(false);
                       }}
-                      className={`w-full border rounded-xl px-4 py-3.5 text-sm focus:ring-2 focus:outline-none transition ${promoApplied
-                          ? "border-green-400 focus:ring-green-300 bg-green-50"
-                          : promoError
-                            ? "border-red-400 focus:ring-red-300"
-                            : "border-gray-200 focus:ring-blue-500"
+                      className={`w-full border rounded-xl px-4 py-3 sm:py-3.5 text-sm focus:ring-2 focus:outline-none transition ${promoApplied
+                        ? "border-green-400 focus:ring-green-300 bg-green-50"
+                        : promoError
+                          ? "border-red-400 focus:ring-red-300"
+                          : "border-gray-200 focus:ring-blue-500"
                         }`}
                     />
                     {promoApplied && (
@@ -314,17 +437,17 @@ export default function SavatchaPage() {
                     Promokodni qo'llash
                   </button>
 
-                  {/* ── Snapshot saqlab buyurtmaga o'tish ── */}
                   <button
                     onClick={handleGoToCheckout}
-                    className="block w-full bg-blue-600 text-white font-bold py-4 rounded-xl mt-4 hover:bg-blue-700 shadow-xl shadow-blue-200 transition-all uppercase text-xs tracking-[2px] text-center"
+                    className="block w-full bg-blue-600 text-white font-bold py-4 rounded-xl mt-3 sm:mt-4 hover:bg-blue-700 shadow-xl shadow-blue-200 transition-all uppercase text-xs tracking-[2px] text-center"
                   >
                     Rasmiylashtirishga o'tish
                   </button>
                 </div>
 
-                <p className="text-gray-400 text-[11px] text-center mt-6 leading-relaxed">
-                  "Rasmiylashtirish" tugmasini bosish orqali siz ommaviy oferta shartlariga rozilik bildirasiz.
+                <p className="text-gray-400 text-[11px] text-center mt-4 sm:mt-6 leading-relaxed">
+                  "Rasmiylashtirish" tugmasini bosish orqali siz ommaviy oferta
+                  shartlariga rozilik bildirasiz.
                 </p>
               </div>
             </div>
