@@ -388,7 +388,6 @@ function SearchBox({ isMobile = false }: SearchBoxProps) {
                         <p className="text-[11px] text-gray-400 mt-0.5 truncate">{product.category}</p>
                       )}
                     </div>
-                    [18/06/2026 17:15] Abdug'afur:
 
                     {/* narx */}
                     {product.price != null && (
@@ -484,7 +483,6 @@ export default function Navbar() {
 
   return (
     <div ref={navbarRef} className="w-full border-b bg-white relative z-[1000]">
-      [18/06/2026 17:15] Abdug'afur:
 
       {/* ── TOP BAR ── */}
       <div className="flex justify-between items-center px-4 md:px-6 py-2 text-[12px] text-gray-500 bg-gray-100 border-b">
@@ -560,7 +558,6 @@ export default function Navbar() {
           <SearchBox isMobile />
         </div>
       </div>
-      [18/06/2026 17:15] Abdug'afur:
 
       {/* ── KATALOG DROPDOWN ── */}
       {isKatalogOpen && (
@@ -615,7 +612,6 @@ export default function Navbar() {
           </div>
         </div>
       )}
-      [18/06/2026 17:15] Abdug'afur:
 
       {/* ── SIDEBAR ── */}
       <div className={`fixed inset-0 bg-black/60 z-[2000] transition-opacity duration-300 ${isSidebarOpen ? "opacity-100 visible" : "opacity-0 invisible pointer-events-none"}`}>
