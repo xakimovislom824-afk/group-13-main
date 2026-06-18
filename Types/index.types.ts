@@ -173,6 +173,14 @@ export interface ICategory {
   name: string;
 }
 
+export interface IFAQ {
+  id: number;
+  question: string;
+  answer: string;
+  is_active: boolean;
+  order: number;
+}
+
 export interface IDelivery {
   id: number;
   name: string;
@@ -180,12 +188,4 @@ export interface IDelivery {
   price: string;
   delivery_days: number;
   is_active: boolean;
-}
-
-export interface IFAQ {
-  id: number;
-  question: string;
-  answer: string;
-  is_active: boolean;
-  order: number;
 }
