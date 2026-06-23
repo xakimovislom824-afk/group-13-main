@@ -632,7 +632,9 @@ export default function Navbar() {
               <button onClick={openModal} className="w-full py-4 px-4 bg-[#f0f4f8] text-blue-600 font-bold rounded-md uppercase text-[13px] tracking-widest mb-3">
                 Qo'ng'iroq qilishni so'rang
               </button>
-              <div className="text-[13px] text-gray-500 italic">Har kuni, 8:00 dan 18:00 gacha</div>
+              <div className="text-[13px] text-gray-500 italic">
+                Har kuni, 8:00 dan 18:00 gacha
+              </div>
             </div>
           </div>
         </div>

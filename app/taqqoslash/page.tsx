@@ -368,7 +368,6 @@ export default function Taqqoslash() {
   return (
     <div className="min-h-screen bg-white font-sans text-[#2D2D2D] pb-20">
       <ToastContainer toasts={toasts} onRemove={removeToast} />
-      [17/06/2026 15:36] Nodir aka:
 
       <div className="max-w-[1440px] mx-auto px-4 py-4 flex items-center gap-2 text-[11px] text-gray-400">
         <Link href="/" className="hover:text-blue-500 transition-colors">Stroyoptorg</Link>
