@@ -286,14 +286,14 @@ const CallbackModal = () => {
                 {/* Close */}
                 <button className="close-btn" onClick={closeModal} aria-label="Yopish">
                     <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-                        <path d="M1 1L13 13M13 1L1 13" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+                        <path d="M1 1L13 13M13 1L1 13" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
                     </svg>
                 </button>
 
                 {/* Icon */}
                 <div className="modal-icon">
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-                        <path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z" fill="white"/>
+                        <path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z" fill="white" />
                     </svg>
                 </div>
 
@@ -318,8 +318,8 @@ const CallbackModal = () => {
                         {errors.name && (
                             <p className="error-msg">
                                 <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
-                                    <circle cx="6" cy="6" r="5.5" stroke="#ef4444"/>
-                                    <path d="M6 3.5V6.5M6 8.5V8.6" stroke="#ef4444" strokeWidth="1.2" strokeLinecap="round"/>
+                                    <circle cx="6" cy="6" r="5.5" stroke="#ef4444" />
+                                    <path d="M6 3.5V6.5M6 8.5V8.6" stroke="#ef4444" strokeWidth="1.2" strokeLinecap="round" />
                                 </svg>
                                 {errors.name}
                             </p>
@@ -345,8 +345,8 @@ const CallbackModal = () => {
                         {errors.mainPhone && (
                             <p className="error-msg">
                                 <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
-                                    <circle cx="6" cy="6" r="5.5" stroke="#ef4444"/>
-                                    <path d="M6 3.5V6.5M6 8.5V8.6" stroke="#ef4444" strokeWidth="1.2" strokeLinecap="round"/>
+                                    <circle cx="6" cy="6" r="5.5" stroke="#ef4444" />
+                                    <path d="M6 3.5V6.5M6 8.5V8.6" stroke="#ef4444" strokeWidth="1.2" strokeLinecap="round" />
                                 </svg>
                                 {errors.mainPhone}
                             </p>
@@ -366,7 +366,7 @@ const CallbackModal = () => {
                         {submitted ? (
                             <span className="success-icon">
                                 <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
-                                    <path d="M3 9L7 13L15 5" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
+                                    <path d="M3 9L7 13L15 5" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
                                 </svg>
                                 Muvaffaqiyatli yuborildi!
                             </span>

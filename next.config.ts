@@ -6,7 +6,7 @@ const nextConfig: NextConfig = {
       {
         protocol: 'https',
         hostname: 'deployminigroup13.pythonanywhere.com',
-        pathname: '/media/**', // barcha papkalardagi rasmlarga ruxsat berish
+        pathname: '/**',  // ✅ barcha pathlar
       },
     ],
   },

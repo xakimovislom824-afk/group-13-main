@@ -54,7 +54,10 @@ const Products = ({ searchQuery = "" }: ProductsProps) => {
     <div className="w-full">
       {searchQuery && filteredProducts.length > 0 && (
         <p className="text-sm text-gray-500 mb-4">
-          <span className="font-semibold text-gray-700">{filteredProducts.length}</span> ta mahsulot topildi
+          <span className="font-semibold text-gray-700">
+            {filteredProducts.length}
+          </span>{" "}
+          ta mahsulot topildi
         </p>
       )}
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-6 w-full">

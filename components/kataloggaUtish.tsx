@@ -20,22 +20,22 @@ function kataloggaUtish() {
                     </div>
                 ))
                 : categories.map((cat, index) => (
-                        <div key={index} className="group cursor-pointer">
-                            <div className="aspect-square bg-[#F3F4F6] rounded-xl flex flex-col items-center justify-center p-4 transition-all group-hover:shadow-md  border border-transparent">
-                                <div className="w-16 h-16 rounded-lg mb-3 shadow-sm flex items-center justify-center overflow-hidden relative">
-                                    <Image
-                                        src={`${BASE_URL}${cat.image}`}
-                                        alt={cat.title}
-                                        fill
-                                        sizes="64px"
-                                        // className="object-contain p-1"
-                                    />  
-                                </div>
-                                <span className="text-[11px] font-semibold text-center text-gray-800 leading-tight">
-                                    {cat.title}
-                                </span>
+                    <div key={index} className="group cursor-pointer">
+                        <div className="aspect-square bg-[#F3F4F6] rounded-xl flex flex-col items-center justify-center p-4 transition-all group-hover:shadow-md  border border-transparent">
+                            <div className="w-16 h-16 rounded-lg mb-3 shadow-sm flex items-center justify-center overflow-hidden relative">
+                                <Image
+                                    src={`${BASE_URL}${cat.image}`}
+                                    alt={cat.title}
+                                    fill
+                                    sizes="64px"
+                                // className="object-contain p-1"
+                                />
                             </div>
+                            <span className="text-[11px] font-semibold text-center text-gray-800 leading-tight">
+                                {cat.title}
+                            </span>
                         </div>
+                    </div>
                 ))
             }
 
