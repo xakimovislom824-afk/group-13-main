@@ -396,7 +396,15 @@ export default function Navbar() {
 
   const { openModal } = useModal();
   const { data: wishlist = [] } = useGetWishlistQuery();
-  const { data: cart = [] } = useGetCartsQuery();
+  const { data: cart } = useGetCartsQuery();
+
+  // Savatchadagi mahsulotlar sonini xavfsiz hisoblash
+  // (backend array ham, { items: [...] } kabi object ham qaytarishi mumkin)
+  const cartCount = Array.isArray(cart)
+    ? cart.length
+    : Array.isArray(cart?.items)
+      ? cart.items.length
+      : 0;
 
   // navbar balandligi
   const updateNavbarHeight = useCallback(() => {
@@ -503,7 +511,7 @@ export default function Navbar() {
           <NavIcon href="/aksiyalar" icon={<FiGift size={20} />} label="Barcha aksiyalar" className="hidden lg:flex ml-6" />
           <NavIcon href="/taqqoslash" icon={<BarChart2 size={20} />} label="Taqqoslash" />
           <NavIcon href="/wishlist" icon={<FaHeart size={20} />} label="Saralangan" badge={wishlist.length || ""} />
-          <NavIcon href="/savatcha" icon={<FaShoppingCart size={20} />} label="Savat" badge={cart.length || ""} />
+          <NavIcon href="/savatcha" icon={<FaShoppingCart size={20} />} label="Savat" badge={cartCount || ""} />
           {isLoggedIn ? (
             <Link href="/kabnet" className="flex flex-col items-center hover:text-blue-600 transition-colors group">
               <UserAvatar avatar={userData.avatar} username={userData.username} size="md" />
