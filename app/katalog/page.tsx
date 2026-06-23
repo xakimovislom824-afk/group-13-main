@@ -1,10 +1,11 @@
 "use client";
 
+import { Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import Products from "../../components/products";
 import Katalog2 from "../katalog2/page";
 
-export default function CatalogPage() {
+function CatalogContent() {
   const searchParams = useSearchParams();
   const searchQuery = searchParams.get("search") || "";
 
@@ -22,5 +23,13 @@ export default function CatalogPage() {
         </main>
       </div>
     </div>
+  );
+}
+
+export default function CatalogPage() {
+  return (
+    <Suspense fallback={<div className="max-w-[1440px] mx-auto px-4 py-6">Yuklanmoqda...</div>}>
+      <CatalogContent />
+    </Suspense>
   );
 }
