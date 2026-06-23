@@ -398,10 +398,11 @@ export default function Navbar() {
   const { data: wishlist = [] } = useGetWishlistQuery();
   const { data: cart } = useGetCartsQuery();
 
-  // Savatchadagi mahsulotlar sonini xavfsiz hisoblash
-  // (backend array ham, { items: [...] } kabi object ham qaytarishi mumkin)
+  // Savatchadagi mahsulotlar sonini hisoblash.
+  // `cart` odatda cartlar ro'yxati bo'lib, har birining ichida `items` massivi bor.
+  // Shu sabab cartlar sonini emas, ichidagi barcha itemlar sonini yig'amiz.
   const cartCount = Array.isArray(cart)
-    ? cart.length
+    ? cart.reduce((sum, c) => sum + (Array.isArray(c?.items) ? c.items.length : 0), 0)
     : Array.isArray(cart?.items)
       ? cart.items.length
       : 0;
