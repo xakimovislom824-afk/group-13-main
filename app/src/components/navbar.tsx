@@ -18,7 +18,7 @@ import { IoClose, IoMenu } from "react-icons/io5";
 import Logo from "../assets/imgs/logo1.png";
 import { useModal } from "../../context/ModalContext";
 import { useGetWishlistQuery } from "../../../services/wishlistApi";
-import { useGetCartQuery } from "../../../services/cartApi";
+import { useGetCartsQuery } from "../../../services/cartApi";
 import { usePathname, useRouter } from "next/navigation";
 import { useProductSearch } from "../../hooks/useProductSearch";
 
@@ -396,7 +396,7 @@ export default function Navbar() {
 
   const { openModal } = useModal();
   const { data: wishlist = [] } = useGetWishlistQuery();
-  const { data: cart = [] } = useGetCartQuery();
+  const { data: cart = [] } = useGetCartsQuery();
 
   // navbar balandligi
   const updateNavbarHeight = useCallback(() => {
