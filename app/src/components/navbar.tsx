@@ -476,7 +476,6 @@ export default function Navbar() {
     { href: "/yetkazibBerish", label: "Yetkazib berish" },
     { href: "/qaytarish", label: "Qaytarish" },
     { href: "/fikrlar", label: "Fikrlar" },
-    { href: "/savol-javob", label: "Savol-javob" },
     { href: "/blog", label: "Yangiliklar" },
     { href: "/aloqa", label: "Aloqa" },
   ], []);
