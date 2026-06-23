@@ -18,6 +18,7 @@ import { IoClose, IoMenu } from "react-icons/io5";
 import Logo from "../assets/imgs/logo1.png";
 import { useModal } from "../../context/ModalContext";
 import { useGetWishlistQuery } from "../../../services/wishlistApi";
+import { useGetCartQuery } from "../../../services/cartApi";
 import { usePathname, useRouter } from "next/navigation";
 import { useProductSearch } from "../../hooks/useProductSearch";
 
@@ -213,41 +214,28 @@ const NavIcon = ({ href, icon, label, badge, className = "" }: NavIconProps) => 
 
 // ─────────────────────────────────────────────
 // SearchBox  — Uzum uslubidagi mustaqil search
-//
-// Holat mashinkasi:
-//   IDLE      — input bo'sh, dropdown yopiq
-//   TYPING    — foydalanuvchi yozmoqda, dropdown ochiq
-//   SELECTED  — ro'yxatdan mahsulot tanlandi, dropdown yopiq
-//              (input'da mahsulot nomi turadi)
-//   X bosilsa → IDLE ga qaytadi, dropdown qayta ochilmaydi
-//   SELECTED holatda yana yozilsa → TYPING
 // ─────────────────────────────────────────────
 interface SearchBoxProps { isMobile?: boolean }
 
 function SearchBox({ isMobile = false }: SearchBoxProps) {
   const router = useRouter();
 
-  // inputValue — foydalanuvchi ko'rgan matn
-  // searchQuery — useProductSearch'ga beriladigan so'rov
-  //   (tanlanganda searchQuery o'zgartirilmaydi — avvalgi natijalar qoladi)
   const [inputValue, setInputValue] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
   const [isOpen, setIsOpen] = useState(false);
-  const [selected, setSelected] = useState(false); // mahsulot tanlandi holati
+  const [selected, setSelected] = useState(false);
 
   const wrapperRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
   const results = useProductSearch(searchQuery);
 
-  // Natijalar debounce tugagach keladi — shu payt dropdown ochiladi
   useEffect(() => {
     if (!selected && searchQuery.trim().length >= 2) {
       setIsOpen(true);
     }
   }, [results]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // Tashqaridan click → dropdown yopiladi
   useEffect(() => {
     const handler = (e: MouseEvent) => {
       if (wrapperRef.current && !wrapperRef.current.contains(e.target as Node)) {
@@ -258,20 +246,18 @@ function SearchBox({ isMobile = false }: SearchBoxProps) {
     return () => document.removeEventListener("mousedown", handler);
   }, []);
 
-  // Input o'zgarganda
   const handleChange = (val: string) => {
     setInputValue(val);
-    setSelected(false); // yana yoza boshladi → tanlangan holat tugadi
+    setSelected(false);
 
     if (val.trim().length >= 2) {
-      setSearchQuery(val); // debounce useProductSearch ichida
+      setSearchQuery(val);
     } else {
       setIsOpen(false);
       setSearchQuery("");
     }
   };
 
-  // × tugmasi bosildi
   const handleClear = () => {
     setInputValue("");
     setSearchQuery("");
@@ -280,21 +266,18 @@ function SearchBox({ isMobile = false }: SearchBoxProps) {
     inputRef.current?.focus();
   };
 
-  // Dropdown'dan mahsulot tanlandi
   const handleSelect = (name: string) => {
-    setInputValue(name);  // input'ga mahsulot nomi
-    setIsOpen(false);     // dropdown yopiladi
-    setSelected(true);    // tanlangan holat — searchQuery o'zgarmaydi
+    setInputValue(name);
+    setIsOpen(false);
+    setSelected(true);
   };
 
-  // Enter yoki qidiruv tugmasi
   const handleSubmit = () => {
     if (!inputValue.trim()) return;
     setIsOpen(false);
     router.push(`/katalog?search=${encodeURIComponent(inputValue.trim())}`);
   };
 
-  // Focus → tanlangan holat bo'lmasa va natijalar bor bo'lsa — qayta ochiladi
   const handleFocus = () => {
     if (!selected && searchQuery.trim().length >= 2 && results.length > 0) {
       setIsOpen(true);
@@ -305,7 +288,6 @@ function SearchBox({ isMobile = false }: SearchBoxProps) {
 
   return (
     <div ref={wrapperRef} className="relative w-full">
-      {/* Input qatori */}
       <div className={`flex items-center border-2 border-blue-600 rounded-sm overflow-hidden ${isMobile ? "h-11" : "h-10"}`}>
         <input
           ref={inputRef}
@@ -318,7 +300,6 @@ function SearchBox({ isMobile = false }: SearchBoxProps) {
           className="w-full min-w-0 px-3 outline-none text-sm h-full"
         />
 
-        {/* × — input bo'sh bo'lmasa ko'rinadi */}
         {showClear && (
           <button
             onMouseDown={e => { e.preventDefault(); handleClear(); }}
@@ -330,7 +311,6 @@ function SearchBox({ isMobile = false }: SearchBoxProps) {
           </button>
         )}
 
-        {/* Qidiruv tugmasi */}
         <button
           onClick={handleSubmit}
           className="bg-blue-600 hover:bg-blue-700 text-white px-4 h-full shrink-0 flex items-center justify-center transition-colors"
@@ -340,7 +320,6 @@ function SearchBox({ isMobile = false }: SearchBoxProps) {
         </button>
       </div>
 
-      {/* Dropdown */}
       {isOpen && searchQuery.trim().length >= 2 && (
         <div
           className={`absolute top-full left-0 w-full bg-white border border-gray-200 shadow-2xl rounded-b-md z-[1100] overflow-hidden flex flex-col ${isMobile ? "max-h-[60vh]" : "max-h-[420px]"
@@ -353,22 +332,18 @@ function SearchBox({ isMobile = false }: SearchBoxProps) {
             </div>
           ) : (
             <>
-              {/* header */}
               <div className="px-4 py-2 border-b border-gray-100 bg-gray-50 flex items-center justify-between shrink-0">
                 <span className="text-[11px] font-bold uppercase text-gray-400 tracking-wider">Mahsulotlar</span>
                 <span className="text-[11px] text-blue-600 font-semibold">{results.length} ta topildi</span>
               </div>
 
-              {/* list */}
               <div className="overflow-y-auto flex-1">
                 {results.map(product => (
                   <div
                     key={product.id}
-                    // onMouseDown — blur'dan oldin ishlashi uchun
                     onMouseDown={e => { e.preventDefault(); handleSelect(product.name); }}
                     className="flex items-center gap-3 px-4 py-3 hover:bg-blue-50 cursor-pointer border-b border-gray-50 last:border-none transition-colors group"
                   >
-                    {/* rasm */}
                     <div className="w-11 h-11 rounded-md overflow-hidden bg-gray-100 shrink-0 border border-gray-200">
                       {product.image ? (
                         <Image src={product.image} alt={product.name} width={44} height={44} className="w-full h-full object-cover" />
@@ -379,7 +354,6 @@ function SearchBox({ isMobile = false }: SearchBoxProps) {
                       )}
                     </div>
 
-                    {/* nom + kategoriya */}
                     <div className="flex-1 min-w-0">
                       <p className="text-sm font-semibold text-gray-800 truncate group-hover:text-blue-700 transition-colors">
                         {highlightMatch(product.name, searchQuery)}
@@ -389,7 +363,6 @@ function SearchBox({ isMobile = false }: SearchBoxProps) {
                       )}
                     </div>
 
-                    {/* narx */}
                     {product.price != null && (
                       <span className="text-sm font-bold text-blue-700 whitespace-nowrap shrink-0">
                         {Number(product.price).toLocaleString("uz-UZ")} so'm
@@ -423,6 +396,7 @@ export default function Navbar() {
 
   const { openModal } = useModal();
   const { data: wishlist = [] } = useGetWishlistQuery();
+  const { data: cart = [] } = useGetCartQuery();
 
   // navbar balandligi
   const updateNavbarHeight = useCallback(() => {
@@ -529,7 +503,7 @@ export default function Navbar() {
           <NavIcon href="/aksiyalar" icon={<FiGift size={20} />} label="Barcha aksiyalar" className="hidden lg:flex ml-6" />
           <NavIcon href="/taqqoslash" icon={<BarChart2 size={20} />} label="Taqqoslash" />
           <NavIcon href="/wishlist" icon={<FaHeart size={20} />} label="Saralangan" badge={wishlist.length || ""} />
-          <NavIcon href="/savatcha" icon={<FaShoppingCart size={20} />} label="Savat" />
+          <NavIcon href="/savatcha" icon={<FaShoppingCart size={20} />} label="Savat" badge={cart.length || ""} />
           {isLoggedIn ? (
             <Link href="/kabnet" className="flex flex-col items-center hover:text-blue-600 transition-colors group">
               <UserAvatar avatar={userData.avatar} username={userData.username} size="md" />
