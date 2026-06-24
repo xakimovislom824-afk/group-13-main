@@ -5,7 +5,6 @@ import { CiCirclePlus } from "react-icons/ci";
 import Skitka2 from "../src/assets/imgs/skitka2.png";
 import Skitka4 from "../src/assets/imgs/skitka4.png";
 
-
 export default function savolJavob() {
   // Qaysi savol ochiq ekanligini saqlash uchun state
   // null bo'lsa hamma yopiq, son bo'lsa o'sha tartibdagi savol ochiq

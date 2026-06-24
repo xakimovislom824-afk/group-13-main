@@ -8,8 +8,8 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 
-import vozrat1 from "../src/assets/imgs/vozrat1.png";
-import vozrat2 from "../src/assets/imgs/vozrat2.png";
+import vozrat1 from "../src/assets/imgs/skitka2.png";
+import vozrat2 from "../src/assets/imgs/skitka4.png";
 
 import { useSendFeedbackMutation, useGetFeedbacksQuery } from "../../services/feedbackApi";
 
@@ -108,7 +108,7 @@ export default function FikrlarSahifasi() {
       selectedFiles.forEach((item) => URL.revokeObjectURL(item.url));
       setSelectedFiles([]);
       setCurrentPage(1);
-    } catch (_) {}
+    } catch (_) { }
   };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -238,9 +238,8 @@ export default function FikrlarSahifasi() {
                   <button
                     key={page}
                     onClick={() => setCurrentPage(page as number)}
-                    className={`w-8 h-8 flex items-center justify-center text-[12px] rounded-sm transition-colors ${
-                      currentPage === page ? "bg-[#1A202C] text-white" : "text-gray-400 hover:bg-gray-50"
-                    }`}
+                    className={`w-8 h-8 flex items-center justify-center text-[12px] rounded-sm transition-colors ${currentPage === page ? "bg-[#1A202C] text-white" : "text-gray-400 hover:bg-gray-50"
+                      }`}
                   >
                     {page}
                   </button>
@@ -287,9 +286,8 @@ export default function FikrlarSahifasi() {
                     {...registerComment("name")}
                     type="text"
                     disabled={isLoading}
-                    className={`w-full border p-3 text-sm outline-none rounded-sm bg-[#FBFBFB] disabled:opacity-50 ${
-                      commentErrors.name ? "border-red-500" : "border-gray-200 focus:border-blue-400"
-                    }`}
+                    className={`w-full border p-3 text-sm outline-none rounded-sm bg-[#FBFBFB] disabled:opacity-50 ${commentErrors.name ? "border-red-500" : "border-gray-200 focus:border-blue-400"
+                      }`}
                     placeholder="Ismingizni kiriting"
                   />
                   {commentErrors.name && (
@@ -304,9 +302,8 @@ export default function FikrlarSahifasi() {
                     {...registerComment("email")}
                     type="email"
                     disabled={isLoading}
-                    className={`w-full border p-3 text-sm outline-none rounded-sm bg-[#FBFBFB] disabled:opacity-50 ${
-                      commentErrors.email ? "border-red-500" : "border-gray-200 focus:border-blue-400"
-                    }`}
+                    className={`w-full border p-3 text-sm outline-none rounded-sm bg-[#FBFBFB] disabled:opacity-50 ${commentErrors.email ? "border-red-500" : "border-gray-200 focus:border-blue-400"
+                      }`}
                     placeholder="Elektron pochtangizni kiriting"
                   />
                   {commentErrors.email && (
@@ -323,9 +320,8 @@ export default function FikrlarSahifasi() {
                   {...registerComment("comment")}
                   rows={5}
                   disabled={isLoading}
-                  className={`w-full border p-3 text-sm outline-none rounded-sm bg-[#FBFBFB] disabled:opacity-50 ${
-                    commentErrors.comment ? "border-red-500" : "border-gray-200 focus:border-blue-400"
-                  }`}
+                  className={`w-full border p-3 text-sm outline-none rounded-sm bg-[#FBFBFB] disabled:opacity-50 ${commentErrors.comment ? "border-red-500" : "border-gray-200 focus:border-blue-400"
+                    }`}
                   placeholder="Fikringizni yozing"
                 />
                 {commentErrors.comment && (
@@ -467,11 +463,10 @@ export default function FikrlarSahifasi() {
                     {...register("subscribeEmail")}
                     type="text"
                     placeholder="Email"
-                    className={`w-full border p-3 rounded-sm text-[13px] outline-none transition-all ${
-                      errors.subscribeEmail
+                    className={`w-full border p-3 rounded-sm text-[13px] outline-none transition-all ${errors.subscribeEmail
                         ? "border-red-500 bg-red-50"
                         : "border-gray-200 focus:border-blue-500 bg-white"
-                    }`}
+                      }`}
                   />
                   {errors.subscribeEmail && (
                     <p className="text-red-500 text-[10px] mt-1">{errors.subscribeEmail.message}</p>
@@ -493,9 +488,8 @@ export default function FikrlarSahifasi() {
                     />
                     <label
                       htmlFor="privacy"
-                      className={`text-[10px] leading-tight cursor-pointer select-none ${
-                        errors.privacyConsent ? "text-red-500 font-medium" : "text-gray-400"
-                      }`}
+                      className={`text-[10px] leading-tight cursor-pointer select-none ${errors.privacyConsent ? "text-red-500 font-medium" : "text-gray-400"
+                        }`}
                     >
                       Maxfiylik siyosatiga muvofiq shaxsiy ma'lumotlarni qayta ishlashga roziman.
                     </label>

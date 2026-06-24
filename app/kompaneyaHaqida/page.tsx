@@ -3,7 +3,7 @@ import Image from "next/image";
 import { FaCreditCard, FaList, FaTruck, FaTag } from "react-icons/fa";
 import { useGetCompanyInfoQuery, useGetTeamQuery } from "../../services/companyApi";
 
-import rasm from "../src/assets/imgs/rasmkompaniya.png";
+import rasm from "../src/assets/imgs/haqida.png";
 import { useGetNewsQuery } from "../../services/newsApi";
 import Link from "next/link";
 

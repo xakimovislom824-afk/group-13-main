@@ -19,7 +19,7 @@ import Logo from "../assets/imgs/logo1.png";
 import { useModal } from "../../context/ModalContext";
 import { useGetWishlistQuery } from "../../../services/wishlistApi";
 import { useGetCartsQuery } from "../../../services/cartApi";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useProductSearch } from "../../hooks/useProductSearch";
 
 // ─────────────────────────────────────────────
@@ -219,6 +219,8 @@ interface SearchBoxProps { isMobile?: boolean }
 
 function SearchBox({ isMobile = false }: SearchBoxProps) {
   const router = useRouter();
+  const pathname = usePathname();
+  const urlSearchParams = useSearchParams();
 
   const [inputValue, setInputValue] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
@@ -246,6 +248,20 @@ function SearchBox({ isMobile = false }: SearchBoxProps) {
     return () => document.removeEventListener("mousedown", handler);
   }, []);
 
+  // ── YANGI: katalog sahifasida "Tozalash" linki bosilib URL'dan
+  // ?search= olib tashlanganda, navbardagi inputni ham tozalaymiz ──
+  useEffect(() => {
+    if (pathname !== "/katalog") return;
+    const urlSearch = urlSearchParams.get("search") || "";
+    if (urlSearch === "" && inputValue !== "") {
+      setInputValue("");
+      setSearchQuery("");
+      setSelected(false);
+      setIsOpen(false);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [urlSearchParams, pathname]);
+
   const handleChange = (val: string) => {
     setInputValue(val);
     setSelected(false);
@@ -264,6 +280,10 @@ function SearchBox({ isMobile = false }: SearchBoxProps) {
     setIsOpen(false);
     setSelected(false);
     inputRef.current?.focus();
+
+    if (pathname === "/katalog") {
+      router.push("/katalog");
+    }
   };
 
   const handleSelect = (name: string) => {
@@ -273,9 +293,15 @@ function SearchBox({ isMobile = false }: SearchBoxProps) {
   };
 
   const handleSubmit = () => {
-    if (!inputValue.trim()) return;
     setIsOpen(false);
-    router.push(`/katalog?search=${encodeURIComponent(inputValue.trim())}`);
+    const trimmed = inputValue.trim();
+
+    if (!trimmed) {
+      router.push("/katalog");
+      return;
+    }
+
+    router.push(`/katalog?search=${encodeURIComponent(trimmed)}`);
   };
 
   const handleFocus = () => {
@@ -398,16 +424,12 @@ export default function Navbar() {
   const { data: wishlist = [] } = useGetWishlistQuery();
   const { data: cart } = useGetCartsQuery();
 
-  // Savatchadagi mahsulotlar sonini hisoblash.
-  // `cart` odatda cartlar ro'yxati bo'lib, har birining ichida `items` massivi bor.
-  // Shu sabab cartlar sonini emas, ichidagi barcha itemlar sonini yig'amiz.
   const cartCount = Array.isArray(cart)
     ? cart.reduce((sum, c) => sum + (Array.isArray(c?.items) ? c.items.length : 0), 0)
     : Array.isArray(cart?.items)
       ? cart.items.length
       : 0;
 
-  // navbar balandligi
   const updateNavbarHeight = useCallback(() => {
     if (navbarRef.current) setNavbarHeight(navbarRef.current.getBoundingClientRect().bottom);
   }, []);
@@ -422,7 +444,6 @@ export default function Navbar() {
   }, [updateNavbarHeight]);
   useEffect(() => { updateNavbarHeight(); }, [isKatalogOpen, updateNavbarHeight]);
 
-  // auth
   const refreshAuth = useCallback(() => {
     const ok = checkIsLoggedIn();
     setIsLoggedIn(ok);
@@ -438,7 +459,6 @@ export default function Navbar() {
     };
   }, [refreshAuth]);
 
-  // katalog toggle
   const toggleKatalog = useCallback(() => {
     setIsKatalogOpen(prev => {
       if (!prev) {
@@ -546,7 +566,6 @@ export default function Navbar() {
         <div className="fixed left-0 w-full bg-white shadow-2xl border-t z-[1001]" style={{ top: `${navbarHeight}px` }}>
           <div className="max-w-[1440px] mx-auto flex flex-col md:flex-row h-[70vh] md:h-[600px] overflow-hidden bg-white items-start">
 
-            {/* kategoriyalar */}
             <div className={`w-full md:w-[320px] border-r bg-gray-50 overflow-y-auto h-full ${activeCat ? "hidden md:block" : "block"}`}>
               {catalogData.map(cat => (
                 <div key={cat.id}
@@ -559,7 +578,6 @@ export default function Navbar() {
               ))}
             </div>
 
-            {/* subkategoriyalar */}
             {activeCat && !activeSub && (
               <div className="w-full md:w-80 border-r bg-white overflow-y-auto h-full">
                 <div onClick={() => setActiveCat(null)}
@@ -575,7 +593,6 @@ export default function Navbar() {
               </div>
             )}
 
-            {/* itemlar */}
             {activeSub && (
               <div className="w-full flex-1 bg-white overflow-y-auto h-full">
                 <div onClick={() => setActiveSub(null)}
@@ -632,9 +649,7 @@ export default function Navbar() {
               <button onClick={openModal} className="w-full py-4 px-4 bg-[#f0f4f8] text-blue-600 font-bold rounded-md uppercase text-[13px] tracking-widest mb-3">
                 Qo'ng'iroq qilishni so'rang
               </button>
-              <div className="text-[13px] text-gray-500 italic">
-                Har kuni, 8:00 dan 18:00 gacha
-              </div>
+              <div className="text-[13px] text-gray-500 italic">Har kuni, 8:00 dan 18:00 gacha</div>
             </div>
           </div>
         </div>
