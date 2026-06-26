@@ -77,7 +77,9 @@ const catalogData: Category[] = [
       { id: 41, name: "Izmeritelno-razmetochniy instrument", items: ["Ruletkalar", "Lazer sathlar", "Nivelirlar"] },
       { id: 42, name: "Ruchnoy instrument", items: ["Bolg'alar", "Atvertkalar", "Kalitlar", "Ombirlar"] },
       { id: 43, name: "Svarochnoye oborudovanie", items: ["Invertorlar", "Payvandlash niqoblari", "Elektrodlar"] },
-      { id: 46, name: "Elektroinstrument", items: ["Drellar va shurupovertlar", "Perforatorlar", "USHM (Bolgarka)", "Lobziklar", "Generatorlar", "Kompressorlar", "Shtroborezlar", "Pnevmoinstrumentlar"] },
+      { id: 44, name: "Stroitelnoye oborudovanie", items: ["Betonmeshalkalar", "Vibratorlar", "Lestnisalar"] },
+      { id: 45, name: "Shtukaturno-otdelochniye instrumenti", items: ["Shpatellar", "Kelmalar", "Valiklar", "Shetkalar"] },
+      { id: 46, name: "Elektroinstrument", items: ["Vibrotexnika i komplektuyushchie", "Generatori i komplektuyushchie", "Dreli, shurupoverti i gaykoverti", "Kraskopulti elektricheskie, kompressori, gvozdezabivateli", "Mikseri stroitelnie", "Otboynie molotki", "Perforatori", "Graveri", "Frezeri", "Shlifovalnie mashini i mnogofunktsionalniy instrument", "Shtroborezi i prisposobleniya", "Elektrolobtseri", "Motopompi i komplektuyushchie", "Multimetri", "Pili", "Plitkorez", "Pnevmoinstrumenti, kompressori i komplektuyushchie", "Pusko-zaryadnie i zaryadnie ustroystva", "Rasxodnie materiali i osnastka dlya elektroinstrumenta", "Stabilizatori napryajeniya"] },
     ]
   },
   {
@@ -213,7 +215,7 @@ const NavIcon = ({ href, icon, label, badge, className = "" }: NavIconProps) => 
 );
 
 // ─────────────────────────────────────────────
-// SearchBox  — Uzum uslubidagi mustaqil search
+// SearchBox
 // ─────────────────────────────────────────────
 interface SearchBoxProps { isMobile?: boolean }
 
@@ -236,7 +238,7 @@ function SearchBox({ isMobile = false }: SearchBoxProps) {
     if (!selected && searchQuery.trim().length >= 2) {
       setIsOpen(true);
     }
-  }, [results]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [results]);
 
   useEffect(() => {
     const handler = (e: MouseEvent) => {
@@ -248,8 +250,6 @@ function SearchBox({ isMobile = false }: SearchBoxProps) {
     return () => document.removeEventListener("mousedown", handler);
   }, []);
 
-  // ── YANGI: katalog sahifasida "Tozalash" linki bosilib URL'dan
-  // ?search= olib tashlanganda, navbardagi inputni ham tozalaymiz ──
   useEffect(() => {
     if (pathname !== "/katalog") return;
     const urlSearch = urlSearchParams.get("search") || "";
@@ -259,7 +259,6 @@ function SearchBox({ isMobile = false }: SearchBoxProps) {
       setSelected(false);
       setIsOpen(false);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [urlSearchParams, pathname]);
 
   const handleChange = (val: string) => {
@@ -463,7 +462,7 @@ export default function Navbar() {
     setIsKatalogOpen(prev => {
       if (!prev) {
         if (window.innerWidth <= 768) { setActiveCat(null); setActiveSub(null); }
-        else { setActiveCat(catalogData[0]); setActiveSub(catalogData[0].subCategories[0]); }
+        else { setActiveCat(catalogData[3]); setActiveSub(catalogData[3].subCategories[5]); } // Standart "Instrument" -> "Elektroinstrument" yuklanadi rasmda turgandek
       } else { setActiveCat(null); setActiveSub(null); }
       return !prev;
     });
@@ -561,53 +560,77 @@ export default function Navbar() {
         </div>
       </div>
 
-      {/* ── KATALOG DROPDOWN ── */}
+      {/* ── RASMDAGIDEK KENGAYTIRILGAN 3 USTUNLI KATALOG DROPDOWN (DESKTOP) ── */}
       {isKatalogOpen && (
-        <div className="fixed left-0 w-full bg-white shadow-2xl border-t z-[1001]" style={{ top: `${navbarHeight}px` }}>
-          <div className="max-w-[1440px] mx-auto flex flex-col md:flex-row h-[70vh] md:h-[600px] overflow-hidden bg-white items-start">
+        <div className="fixed left-0 w-full bg-white shadow-2xl border-t border-gray-200 z-[1001]" style={{ top: `${navbarHeight}px` }}>
+          <div className="max-w-[1440px] mx-auto flex flex-col md:flex-row h-[70vh] md:h-[520px] overflow-hidden bg-white items-start">
 
-            <div className={`w-full md:w-[320px] border-r bg-gray-50 overflow-y-auto h-full ${activeCat ? "hidden md:block" : "block"}`}>
-              {catalogData.map(cat => (
-                <div key={cat.id}
-                  onClick={() => { setActiveCat(cat); setActiveSub(null); }}
-                  onMouseEnter={() => { if (window.innerWidth > 768) { setActiveCat(cat); setActiveSub(cat.subCategories[0]); } }}
-                  className={`px-5 py-4 flex justify-between items-center cursor-pointer text-[11px] font-bold uppercase border-b border-gray-100 transition-all ${activeCat?.id === cat.id ? "bg-blue-600 text-white" : "text-gray-700 hover:bg-gray-100"}`}>
-                  <span className="pr-2">{cat.name}</span>
-                  <FaChevronRight size={12} className="shrink-0" />
-                </div>
-              ))}
+            {/* 1-Ustun: Asosiy Kategoriyalar (Chap tomon) */}
+            <div className={`w-full md:w-[300px] border-r border-gray-100 bg-white overflow-y-auto h-full shrink-0 ${activeCat ? "hidden md:block" : "block"}`}>
+              {catalogData.map(cat => {
+                const isSelected = activeCat?.id === cat.id;
+                return (
+                  <div key={cat.id}
+                    onClick={() => { setActiveCat(cat); setActiveSub(cat.subCategories[0] || null); }}
+                    onMouseEnter={() => { if (window.innerWidth > 768) { setActiveCat(cat); setActiveSub(cat.subCategories[0] || null); } }}
+                    className={`px-5 py-3.5 flex justify-between items-center cursor-pointer text-[11px] font-bold uppercase transition-all tracking-wide border-b border-gray-50 ${isSelected ? "bg-blue-600 text-white font-black" : "text-gray-700 hover:bg-gray-50 hover:text-blue-600"}`}>
+                    <span className="pr-4 break-words line-clamp-2">{cat.name}</span>
+                    <FaChevronRight size={10} className={`shrink-0 ${isSelected ? "text-white" : "text-gray-400"}`} />
+                  </div>
+                );
+              })}
             </div>
 
-            {activeCat && !activeSub && (
-              <div className="w-full md:w-80 border-r bg-white overflow-y-auto h-full">
-                <div onClick={() => setActiveCat(null)}
-                  className="md:hidden p-4 bg-gray-100 flex items-center text-blue-600 font-bold border-b cursor-pointer sticky top-0 z-10">
-                  <FaChevronLeft className="mr-2" /> Kategoriyalar
-                </div>
-                {activeCat.subCategories.map(sub => (
-                  <div key={sub.id} onClick={() => setActiveSub(sub)}
-                    className="px-6 py-4 flex justify-between items-center cursor-pointer text-sm font-bold border-b border-gray-50 text-gray-800 hover:bg-gray-50">
-                    {sub.name}<FaChevronRight size={12} className="shrink-0" />
+            {/* 2-Ustun: Sub-Kategoriyalar (O'rta qism) */}
+            <div className={`w-full md:w-[280px] border-r border-gray-100 bg-gray-50/50 overflow-y-auto h-full shrink-0 ${activeCat ? "block" : "hidden md:block"}`}>
+              {activeCat && (
+                <>
+                  <div onClick={() => setActiveCat(null)}
+                    className="md:hidden p-4 bg-gray-100 flex items-center text-blue-600 font-bold border-b text-xs cursor-pointer sticky top-0 z-10">
+                    <FaChevronLeft className="mr-2" /> Orqaga
                   </div>
-                ))}
-              </div>
-            )}
+                  <div className="py-2">
+                    {activeCat.subCategories.map(sub => {
+                      const isSubSelected = activeSub?.id === sub.id;
+                      return (
+                        <div key={sub.id}
+                          onClick={() => setActiveSub(sub)}
+                          onMouseEnter={() => { if (window.innerWidth > 768) setActiveSub(sub); }}
+                          className={`px-6 py-3 flex justify-between items-center cursor-pointer text-xs font-bold transition-all ${isSubSelected ? "text-blue-600 bg-white" : "text-gray-700 hover:bg-white/60"}`}>
+                          <span className="pr-2">{sub.name}</span>
+                          <FaChevronRight size={10} className={`shrink-0 ${isSubSelected ? "text-blue-600" : "text-gray-300 md:hidden"}`} />
+                        </div>
+                      );
+                    })}
+                  </div>
+                </>
+              )}
+            </div>
 
-            {activeSub && (
-              <div className="w-full flex-1 bg-white overflow-y-auto h-full">
-                <div onClick={() => setActiveSub(null)}
-                  className="md:hidden p-4 bg-gray-100 flex items-center text-blue-600 font-bold border-b cursor-pointer sticky top-0 z-10">
-                  <FaChevronLeft className="mr-2" /> {activeCat?.name.slice(0, 20)}...
+            {/* 3-Ustun: Ichki Turlar / Items (O'ng tomon - Grid ko'rinishida) */}
+            <div className={`w-full flex-1 bg-white overflow-y-auto h-full ${activeSub ? "block" : "hidden md:block"}`}>
+              {activeSub ? (
+                <>
+                  <div onClick={() => setActiveSub(null)}
+                    className="md:hidden p-4 bg-gray-100 flex items-center text-blue-600 font-bold border-b text-xs cursor-pointer sticky top-0 z-10">
+                    <FaChevronLeft className="mr-2" /> Orqaga
+                  </div>
+                  {/* Rasmdagi kabi 2 ustunli joylashuv va chiroyli padinglar */}
+                  <div className="p-8 grid grid-cols-1 sm:grid-cols-2 gap-x-12 gap-y-3.5 content-start">
+                    {activeSub.items.map((item, i) => (
+                      <div key={i} className="text-gray-700 text-xs hover:text-blue-600 cursor-pointer font-medium transition-all py-1 border-b border-gray-50 sm:border-none">
+                        {item}
+                      </div>
+                    ))}
+                  </div>
+                </>
+              ) : (
+                <div className="hidden md:flex items-center justify-center h-full text-gray-400 text-xs italic">
+                  Bo'limni tanlang
                 </div>
-                <div className="p-6 grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-4 content-start">
-                  {activeSub.items.map((item, i) => (
-                    <div key={i} className="text-gray-600 text-[14px] hover:text-blue-600 cursor-pointer font-medium p-2 border-b border-gray-50 md:border-transparent transition-all">
-                      {item}
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
+              )}
+            </div>
+
           </div>
         </div>
       )}
