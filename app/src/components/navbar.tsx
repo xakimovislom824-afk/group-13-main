@@ -3,7 +3,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { FiGift } from "react-icons/fi";
-import { useState, useEffect, useCallback, useMemo, useRef } from "react";
+import { useState, useEffect, useCallback, useMemo, useRef, Suspense } from "react";
 import { BarChart2 } from "lucide-react";
 import {
   FaUser,
@@ -21,6 +21,8 @@ import { useGetWishlistQuery } from "../../../services/wishlistApi";
 import { useGetCartsQuery } from "../../../services/cartApi";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useProductSearch } from "../../hooks/useProductSearch";
+
+export const dynamic = "force-dynamic";
 
 // ─────────────────────────────────────────────
 // TYPES
@@ -215,11 +217,11 @@ const NavIcon = ({ href, icon, label, badge, className = "" }: NavIconProps) => 
 );
 
 // ─────────────────────────────────────────────
-// SearchBox
+// SearchBoxContent
 // ─────────────────────────────────────────────
 interface SearchBoxProps { isMobile?: boolean }
 
-function SearchBox({ isMobile = false }: SearchBoxProps) {
+function SearchBoxContent({ isMobile = false }: SearchBoxProps) {
   const router = useRouter();
   const pathname = usePathname();
   const urlSearchParams = useSearchParams();
@@ -238,7 +240,7 @@ function SearchBox({ isMobile = false }: SearchBoxProps) {
     if (!selected && searchQuery.trim().length >= 2) {
       setIsOpen(true);
     }
-  }, [results]);
+  }, [results, selected, searchQuery]);
 
   useEffect(() => {
     const handler = (e: MouseEvent) => {
@@ -259,7 +261,7 @@ function SearchBox({ isMobile = false }: SearchBoxProps) {
       setSelected(false);
       setIsOpen(false);
     }
-  }, [urlSearchParams, pathname]);
+  }, [urlSearchParams, pathname, inputValue]);
 
   const handleChange = (val: string) => {
     setInputValue(val);
@@ -404,6 +406,14 @@ function SearchBox({ isMobile = false }: SearchBoxProps) {
   );
 }
 
+function SearchBox({ isMobile = false }: SearchBoxProps) {
+  return (
+    <Suspense fallback={<div className="w-full h-10 bg-gray-100 animate-pulse rounded-sm" />}>
+      <SearchBoxContent isMobile={isMobile} />
+    </Suspense>
+  );
+}
+
 // ─────────────────────────────────────────────
 // MAIN NAVBAR
 // ─────────────────────────────────────────────
@@ -432,6 +442,7 @@ export default function Navbar() {
   const updateNavbarHeight = useCallback(() => {
     if (navbarRef.current) setNavbarHeight(navbarRef.current.getBoundingClientRect().bottom);
   }, []);
+
   useEffect(() => {
     updateNavbarHeight();
     window.addEventListener("resize", updateNavbarHeight);
@@ -441,13 +452,25 @@ export default function Navbar() {
       window.removeEventListener("scroll", updateNavbarHeight);
     };
   }, [updateNavbarHeight]);
+
   useEffect(() => { updateNavbarHeight(); }, [isKatalogOpen, updateNavbarHeight]);
+
+  // Katalog yoki Sidebar ochilganda fon skrollini bloklash
+  useEffect(() => {
+    if (isKatalogOpen || isSidebarOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "unset";
+    }
+    return () => { document.body.style.overflow = "unset"; };
+  }, [isKatalogOpen, isSidebarOpen]);
 
   const refreshAuth = useCallback(() => {
     const ok = checkIsLoggedIn();
     setIsLoggedIn(ok);
     setUserData(ok ? getUserDataFromStorage() : { username: null, avatar: null });
   }, []);
+
   useEffect(() => {
     refreshAuth();
     window.addEventListener("storage", refreshAuth);
@@ -461,9 +484,19 @@ export default function Navbar() {
   const toggleKatalog = useCallback(() => {
     setIsKatalogOpen(prev => {
       if (!prev) {
-        if (window.innerWidth <= 768) { setActiveCat(null); setActiveSub(null); }
-        else { setActiveCat(catalogData[3]); setActiveSub(catalogData[3].subCategories[5]); } // Standart "Instrument" -> "Elektroinstrument" yuklanadi rasmda turgandek
-      } else { setActiveCat(null); setActiveSub(null); }
+        if (window.innerWidth <= 768) {
+          setActiveCat(null);
+          setActiveSub(null);
+        } else {
+          // Xavfsiz tekshiruv bilan default elementlarni tanlash
+          const defaultCat = catalogData[3] || catalogData[0] || null;
+          setActiveCat(defaultCat);
+          setActiveSub(defaultCat?.subCategories?.[0] || null);
+        }
+      } else {
+        setActiveCat(null);
+        setActiveSub(null);
+      }
       return !prev;
     });
   }, []);
@@ -560,12 +593,12 @@ export default function Navbar() {
         </div>
       </div>
 
-      {/* ── RASMDAGIDEK KENGAYTIRILGAN 3 USTUNLI KATALOG DROPDOWN (DESKTOP) ── */}
+      {/* ── KATALOG DROPDOWN ── */}
       {isKatalogOpen && (
         <div className="fixed left-0 w-full bg-white shadow-2xl border-t border-gray-200 z-[1001]" style={{ top: `${navbarHeight}px` }}>
           <div className="max-w-[1440px] mx-auto flex flex-col md:flex-row h-[70vh] md:h-[520px] overflow-hidden bg-white items-start">
 
-            {/* 1-Ustun: Asosiy Kategoriyalar (Chap tomon) */}
+            {/* 1-Ustun: Asosiy Kategoriyalar */}
             <div className={`w-full md:w-[300px] border-r border-gray-100 bg-white overflow-y-auto h-full shrink-0 ${activeCat ? "hidden md:block" : "block"}`}>
               {catalogData.map(cat => {
                 const isSelected = activeCat?.id === cat.id;
@@ -581,7 +614,7 @@ export default function Navbar() {
               })}
             </div>
 
-            {/* 2-Ustun: Sub-Kategoriyalar (O'rta qism) */}
+            {/* 2-Ustun: Sub-Kategoriyalar */}
             <div className={`w-full md:w-[280px] border-r border-gray-100 bg-gray-50/50 overflow-y-auto h-full shrink-0 ${activeCat ? "block" : "hidden md:block"}`}>
               {activeCat && (
                 <>
@@ -607,7 +640,7 @@ export default function Navbar() {
               )}
             </div>
 
-            {/* 3-Ustun: Ichki Turlar / Items (O'ng tomon - Grid ko'rinishida) */}
+            {/* 3-Ustun: Ichki Turlar / Items */}
             <div className={`w-full flex-1 bg-white overflow-y-auto h-full ${activeSub ? "block" : "hidden md:block"}`}>
               {activeSub ? (
                 <>
@@ -615,7 +648,6 @@ export default function Navbar() {
                     className="md:hidden p-4 bg-gray-100 flex items-center text-blue-600 font-bold border-b text-xs cursor-pointer sticky top-0 z-10">
                     <FaChevronLeft className="mr-2" /> Orqaga
                   </div>
-                  {/* Rasmdagi kabi 2 ustunli joylashuv va chiroyli padinglar */}
                   <div className="p-8 grid grid-cols-1 sm:grid-cols-2 gap-x-12 gap-y-3.5 content-start">
                     {activeSub.items.map((item, i) => (
                       <div key={i} className="text-gray-700 text-xs hover:text-blue-600 cursor-pointer font-medium transition-all py-1 border-b border-gray-50 sm:border-none">

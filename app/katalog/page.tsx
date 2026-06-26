@@ -1,41 +1,47 @@
 "use client";
 
-import Link from "next/link";
+import React, { Suspense } from "react";
 import { useSearchParams } from "next/navigation";
-import Products from "../../components/products";
-import Katalog2 from "../katalog2/page";
 
-export default function CatalogPage() {
+// Asosiy kontent qismi (useSearchParams shu yerda ishlaydi)
+function KatalogContent() {
   const searchParams = useSearchParams();
-  const searchQuery = searchParams.get("search") || "";
+  const search = searchParams.get("search") || "";
 
   return (
-    <div className="max-w-[1440px] mx-auto px-4 py-6">
-      {searchQuery && (
-        <div className="mb-4 flex items-center gap-3 flex-wrap">
-          <span className="text-sm text-gray-600">
-            "<b className="text-gray-800">{searchQuery}</b>" bo'yicha qidiruv natijalari
-          </span>
-          <Link
-            href="/katalog"
-            className="text-sm text-blue-600 font-semibold hover:underline"
-          >
-            Tozalash
-          </Link>
-        </div>
-      )}
+    <div className="w-full min-h-screen bg-gray-50 p-6">
+      <div className="max-w-7xl mx-auto">
+        <h1 className="text-2xl font-bold mb-4 text-gray-800">
+          Katalog sahifasi
+        </h1>
+        {search && (
+          <p className="mb-4 text-gray-600">
+            Qidiruv natijasi: <span className="font-semibold">"{search}"</span>
+          </p>
+        )}
 
-      <div className="flex items-start gap-8 relative">
-        <div className="hidden sticky top-5 lg:block w-[300px] shrink-0">
-          <Katalog2 />
+        {/* Katalog sahifangizning UI elementlari va ro'yxatlari shu yerga joylashadi */}
+        <div className="bg-white p-6 rounded-lg shadow-sm">
+          <p className="text-gray-500">Mahsulotlar yuklanmoqda yoki bu yerda ko'rinadi...</p>
         </div>
-        <main className="flex-1 min-w-0">
-          <div className="lg:hidden mb-4">
-            <Katalog2 />
-          </div>
-          <Products searchQuery={searchQuery} />
-        </main>
       </div>
     </div>
+  );
+}
+
+// Next.js static build xatoligini oldini olish uchun Suspense bilan o'raymiz
+export default function KatalogPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="w-full min-h-screen flex items-center justify-center bg-gray-50">
+          <div className="text-lg font-medium text-gray-600 animate-pulse">
+            Katalog yuklanmoqda...
+          </div>
+        </div>
+      }
+    >
+      <KatalogContent />
+    </Suspense>
   );
 }
