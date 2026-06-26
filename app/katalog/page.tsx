@@ -1,14 +1,12 @@
 "use client";
 
+import React, { Suspense } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import Products from "../../components/products";
 import Katalog2 from "../katalog2/page";
 
-// Next.js build vaqtida useSearchParams xatosi bermasligi uchun dynamic rejimni yoqamiz
-export const dynamic = "force-dynamic";
-
-export default function CatalogPage() {
+function CatalogContent() {
   const searchParams = useSearchParams();
   const searchQuery = searchParams.get("search") || "";
 
@@ -40,5 +38,13 @@ export default function CatalogPage() {
         </main>
       </div>
     </div>
+  );
+}
+
+export default function CatalogPage() {
+  return (
+    <Suspense fallback={null}>
+      <CatalogContent />
+    </Suspense>
   );
 }
