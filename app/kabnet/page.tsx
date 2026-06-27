@@ -2,7 +2,7 @@
 
 import { useGetProfileQuery, useEditProfilMutation } from "../../services/editProfileApi";
 import { useChangeParolMutation } from "../../services/changePasswordApi";
-import { useState, useEffect, Suspense } from "react";
+import { useState, useEffect } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import {
   FaUserCircle, FaListUl, FaMapMarkerAlt, FaShieldAlt,
@@ -25,9 +25,9 @@ import {
   CreateOrderAddressBody,
 } from "../../services/orderAddressApi";
 
-// Next.js build vaqtida useSearchParams xatosi bermasligi uchun sahifani dynamic qilamiz
-export const dynamic = "force-dynamic";
-
+// ─────────────────────────────────────────────
+// TYPES
+// ─────────────────────────────────────────────
 type SavedOrder = {
   id: string;
   date: string;
@@ -50,6 +50,9 @@ type UserInfo = {
   last_name?: string;
 };
 
+// ─────────────────────────────────────────────
+// ADDRESS FORM CONFIG
+// ─────────────────────────────────────────────
 const EMPTY_ADDR: CreateOrderAddressBody = {
   first_name: "", last_name: "", phone: "", country: "O'zbekiston",
   region: "", city: "", district: "", street: "", house: "",
@@ -77,6 +80,9 @@ const ADDR_FIELDS: {
     { key: "note", label: "Izoh", placeholder: "Qo'shimcha ma'lumot", textarea: true },
   ];
 
+// ─────────────────────────────────────────────
+// ADDRESS TAB
+// ─────────────────────────────────────────────
 function AddressTab() {
   const { data: addresses = [], isLoading: addrLoading } = useGetOrderAddressesQuery();
   const [createAddress, { isLoading: creating }] = useCreateOrderAddressMutation();
@@ -131,11 +137,15 @@ function AddressTab() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h2 className="text-xl font-bold">Yetkazib berish manzillari</h2>
+      {/* FIX: 360px ekranda uzun sarlavha + "Yangi manzil" tugmasi bitta qatorga
+          sig'masdi va tugma siqilib chiqib ketardi. Endi mobilda ular ustma-ust
+          joylashadi, tugma to'liq kenglikni egallaydi; sm: dan boshlab (640px+)
+          avvalgidek bitta qatorda, o'ng tomonda joylashadi. */}
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+        <h2 className="text-lg sm:text-xl font-bold">Yetkazib berish manzillari</h2>
         <button
           onClick={openNew}
-          className="flex items-center gap-2 bg-[#1D71D4] text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-[#1659a8] transition-all"
+          className="flex items-center justify-center gap-2 bg-[#1D71D4] text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-[#1659a8] transition-all w-full sm:w-auto"
         >
           <FaPlus size={12} /> Yangi manzil
         </button>
@@ -274,9 +284,9 @@ function AddressTab() {
 }
 
 // ─────────────────────────────────────────────
-// MAIN CONTENT COMPONENT
+// MAIN COMPONENT
 // ─────────────────────────────────────────────
-function ShaxsiyKabinetContent() {
+export default function ShaxsiyKabinet() {
   const { data: payments = [] } = useGetPaymentsQuery();
   const { data: wishlists = [], isLoading: wishlistLoading } = useGetWishlistQuery();
   const [removeWishlist] = useRemoveWishlistMutation();
@@ -291,6 +301,7 @@ function ShaxsiyKabinetContent() {
   const [currentPage, setCurrentPage] = useState(1);
   const ITEMS_PER_PAGE = 5;
 
+  // ── localStorage dan user ma'lumotlari ──
   useEffect(() => {
     const keys = ["user", "userInfo", "userData", "authUser", "currentUser"];
     let found: UserInfo | null = null;
@@ -355,6 +366,7 @@ function ShaxsiyKabinetContent() {
     return "border-blue-300 text-blue-500 bg-blue-50";
   };
 
+  // ── Password state ──
   const [passValues, setPassValues] = useState({ old: "", new: "", confirm: "" });
   const [passError, setPassError] = useState("");
   const [passSuccess, setPassSuccess] = useState("");
@@ -373,6 +385,7 @@ function ShaxsiyKabinetContent() {
     }
   };
 
+  // ── Profile state ──
   const [profileValues, setProfileValues] = useState({ username: "", email: "", first_name: "", last_name: "" });
   const [profileSuccess, setProfileSuccess] = useState("");
   const [profileError, setProfileError] = useState("");
@@ -410,6 +423,7 @@ function ShaxsiyKabinetContent() {
     }
   };
 
+  // ── Nav items ──
   const navItems = [
     { id: "dashboard", label: "Mening hisobim", icon: <FaUserCircle size={18} /> },
     { id: "profile", label: "Profilni tahrirlash", icon: <LiaUserEditSolid size={18} /> },
@@ -435,12 +449,17 @@ function ShaxsiyKabinetContent() {
     setActiveTab(id); setMobileMenuOpen(false);
   };
 
+  // ─────────────────────────────────────────────
+  // RENDER
+  // ─────────────────────────────────────────────
   return (
     <div className="min-h-screen bg-[#F9FAFB] p-4 md:p-10 font-sans text-slate-900">
       <div className="max-w-6xl mx-auto">
+
         <p className="text-xs text-gray-400 mb-2">Bosh sahifa / Shaxsiy kabinet</p>
         <h1 className="text-2xl md:text-3xl font-bold mb-6 md:mb-8">Shaxsiy kabinet</h1>
 
+        {/* Foydalanuvchi kartochkasi */}
         {userInfo && (
           <div className="flex items-center gap-4 bg-white rounded-xl border border-gray-100 shadow-sm px-5 py-4 mb-6">
             <div className="w-12 h-12 rounded-full bg-[#1D71D4] flex items-center justify-center text-white font-bold text-lg shrink-0">
@@ -453,6 +472,7 @@ function ShaxsiyKabinetContent() {
           </div>
         )}
 
+        {/* Mobile menyu */}
         <div className="lg:hidden mb-4">
           <button
             onClick={() => setMobileMenuOpen((p) => !p)}
@@ -489,6 +509,8 @@ function ShaxsiyKabinetContent() {
         </div>
 
         <div className="flex flex-col lg:flex-row gap-8 items-start">
+
+          {/* Desktop sidebar */}
           <aside className="hidden lg:block w-[280px] shrink-0 bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden sticky top-5">
             {userInfo && (
               <div className="flex items-center gap-3 p-4 border-b border-gray-100 bg-gray-50">
@@ -526,8 +548,10 @@ function ShaxsiyKabinetContent() {
             </nav>
           </aside>
 
+          {/* Main content */}
           <main className="flex-1 min-w-0 w-full">
 
+            {/* ── DASHBOARD ── */}
             {activeTab === "dashboard" && (
               <div className="space-y-8">
                 <p className="text-lg md:text-xl font-medium">
@@ -604,6 +628,7 @@ function ShaxsiyKabinetContent() {
               </div>
             )}
 
+            {/* ── PROFILE ── */}
             {activeTab === "profile" && (
               <div className="bg-white p-5 md:p-8 rounded-xl shadow-sm border border-gray-100 w-full max-w-2xl">
                 <h2 className="text-xl font-bold mb-6">Profilni tahrirlash</h2>
@@ -643,16 +668,21 @@ function ShaxsiyKabinetContent() {
               </div>
             )}
 
+            {/* ── ORDERS ── */}
             {activeTab === "orders" && (
               <div className="w-full bg-white p-4 md:p-6 rounded-xl shadow-sm border border-gray-100">
                 <h2 className="text-xl font-bold mb-6 text-[#1D2939]">Buyurtma tarixi</h2>
+
                 {userOrders.length === 0 ? (
                   <div className="text-center py-16">
                     <p className="text-5xl w-15 mx-auto mb-4 flex justify-center text-gray-300">
                       <FaShoppingCart />
                     </p>
                     <p className="text-gray-400 text-sm">Hozircha buyurtmalar yo'q</p>
-                    <Link href="/katalog" className="inline-block mt-4 text-blue-500 text-sm font-semibold hover:underline">
+                    <Link
+                      href="/katalog"
+                      className="inline-block mt-4 text-blue-500 text-sm font-semibold hover:underline"
+                    >
                       Xaridni boshlash →
                     </Link>
                   </div>
@@ -672,25 +702,37 @@ function ShaxsiyKabinetContent() {
                         <tbody className="divide-y divide-gray-100">
                           {currentOrders.map((o, index) => (
                             <tr key={index} className="hover:bg-gray-50/50 transition-colors">
-                              <td className="px-4 md:px-6 py-4 text-sm text-gray-600 font-medium">{o.id}</td>
-                              <td className="px-4 md:px-6 py-4 text-sm text-gray-600 whitespace-nowrap">{o.date}</td>
+                              <td className="px-4 md:px-6 py-4 text-sm text-gray-600 font-medium">
+                                {o.id}
+                              </td>
+                              <td className="px-4 md:px-6 py-4 text-sm text-gray-600 whitespace-nowrap">
+                                {o.date}
+                              </td>
                               <td className="px-4 md:px-6 py-4">
-                                <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 border rounded-md text-[10px] font-bold uppercase ${getStatusStyles(o.status)}`}>
+                                <span
+                                  className={`inline-flex items-center gap-1.5 px-2.5 py-1 border rounded-md text-[10px] font-bold uppercase ${getStatusStyles(o.status)}`}
+                                >
                                   <span className="w-1.5 h-1.5 rounded-full bg-current"></span>
                                   {o.status}
                                 </span>
                               </td>
-                              <td className="px-4 md:px-6 py-4 text-base font-semibold text-[#1D406E] whitespace-nowrap">{o.amount} so'm</td>
+                              <td className="px-4 md:px-6 py-4 text-base font-semibold text-[#1D406E] whitespace-nowrap">
+                                {o.amount} so'm
+                              </td>
                               <td className="px-4 md:px-6 py-4 text-right">
-                                <button className="p-2.5 bg-gray-50 text-blue-500 rounded-lg hover:bg-blue-500 hover:text-white transition-all">
-                                  <FaChevronRight size={12} />
-                                </button>
+                                <Link href={`/buyurtma/${encodeURIComponent(o.id.replace("#", ""))}`}>
+                                  <button className="p-2.5 bg-gray-50 text-blue-500 rounded-lg hover:bg-blue-500 hover:text-white transition-all">
+                                    <FaChevronRight size={12} />
+                                  </button>
+                                </Link>
                               </td>
                             </tr>
                           ))}
                         </tbody>
                       </table>
                     </div>
+
+                    {/* Pagination */}
                     {totalPages > 1 && (
                       <div className="flex items-center gap-2 mt-6">
                         <button
@@ -700,15 +742,20 @@ function ShaxsiyKabinetContent() {
                         >
                           ← Nazad
                         </button>
+
                         {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
                           <button
                             key={page}
                             onClick={() => setCurrentPage(page)}
-                            className={`w-9 h-9 rounded-lg text-sm font-semibold transition ${currentPage === page ? "bg-[#1a1a1a] text-white" : "border border-gray-200 text-gray-600 hover:bg-gray-50"}`}
+                            className={`w-9 h-9 rounded-lg text-sm font-semibold transition ${currentPage === page
+                              ? "bg-[#1a1a1a] text-white"
+                              : "border border-gray-200 text-gray-600 hover:bg-gray-50"
+                              }`}
                           >
                             {page}
                           </button>
                         ))}
+
                         <button
                           onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
                           disabled={currentPage === totalPages}
@@ -723,8 +770,50 @@ function ShaxsiyKabinetContent() {
               </div>
             )}
 
+            {activeTab === 'address' && (
+              <div className="space-y-6">
+                <h2 className="text-xl font-bold">Mening yetkazib berish manzilim</h2>
+                <div className="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
+                  <div className="flex flex-col md:flex-row justify-between p-5 md:p-6 gap-4 md:gap-6">
+                    <div className="flex-1">
+                      <h3 className="text-lg font-bold mb-4">{getUserDisplayName()}</h3>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 md:gap-6 text-sm">
+                        <div>
+                          <p className="text-gray-400 mb-1">Manzil</p>
+                          <p className="text-gray-700 font-medium leading-relaxed">056734, Toshkent, O'zbekiston, Amir Temur ko'chasi, 37/5</p>
+                        </div>
+                        <div>
+                          <p className="text-gray-400 mb-1">Telefon</p>
+                          <p className="text-gray-700 font-medium">{userInfo?.phone || '+998 (90) 123-45-67'}</p>
+                        </div>
+                        <div>
+                          <p className="text-gray-400 mb-1">Email</p>
+                          <p className="text-gray-700 font-medium break-all">{userInfo?.email || 'example@gmail.com'}</p>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="bg-[#F4F7FE] text-[#1D71D4] h-fit px-4 py-2 rounded flex items-center gap-2 text-[10px] font-extrabold uppercase tracking-widest border border-blue-50 self-start">
+                      <Link href="/aloqa" className="flex justify-center gap-2 items-center">
+                        <FaMapMarkerAlt /> Tasdiqlangan manzil
+                      </Link>
+                    </div>
+                  </div>
+                  <div className="flex border-t border-gray-50 bg-gray-50/20 font-bold text-[10px] uppercase tracking-widest">
+                    <button className="flex-1 p-4 flex items-center justify-center gap-2 text-gray-400 hover:bg-white hover:text-blue-500 border-r transition-all">
+                      <FaEdit size={14} /> Tahrirlash
+                    </button>
+                    <button className="flex-1 p-4 flex items-center justify-center gap-2 text-gray-400 hover:bg-red-50 hover:text-red-500 transition-all">
+                      <FaTrash size={14} /> O'chirish
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* ── ADDRESS ── */}
             {activeTab === "address" && <AddressTab />}
 
+            {/* ── FAVORITES ── */}
             {activeTab === "favorites" && (
               <div className="bg-white p-5 rounded-xl shadow-sm border border-gray-100">
                 <h2 className="text-xl font-bold mb-4">Sevimlilar</h2>
@@ -757,6 +846,7 @@ function ShaxsiyKabinetContent() {
               </div>
             )}
 
+            {/* ── PASSWORD ── */}
             {activeTab === "password" && (
               <div className="bg-white p-5 md:p-8 rounded-xl shadow-sm border border-gray-100 w-full max-w-2xl">
                 <h2 className="text-xl font-bold mb-8 text-[#1D2939]">Parolni o'zgartirish</h2>
@@ -805,16 +895,5 @@ function ShaxsiyKabinetContent() {
         </div>
       </div>
     </div>
-  );
-}
-
-// ─────────────────────────────────────────────
-// DEFAULT EXPORT — Suspense wrapper
-// ─────────────────────────────────────────────
-export default function ShaxsiyKabinet() {
-  return (
-    <Suspense fallback={<div className="min-h-screen flex items-center justify-center text-gray-400">Yuklanmoqda...</div>}>
-      <ShaxsiyKabinetContent />
-    </Suspense>
   );
 }

@@ -34,6 +34,8 @@ const orderSchema = z.object({
 type OrderFormData = z.infer<typeof orderSchema>;
 
 // ── Toast komponenti ──
+// FIX: min-w-[300px] o'rniga ekran kengligiga moslashuvchan w-[calc(100vw-2rem)] + max-w
+// qo'shildi, shunda 360px ekranda toast chetlardan chiqib ketmaydi.
 function SuccessToast({ visible, onClose }: { visible: boolean; onClose: () => void }) {
   useEffect(() => {
     if (visible) {
@@ -44,20 +46,20 @@ function SuccessToast({ visible, onClose }: { visible: boolean; onClose: () => v
 
   return (
     <div
-      className={`fixed bottom-6 left-1/2 -translate-x-1/2 z-50 transition-all duration-500 ${visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6 pointer-events-none"
+      className={`fixed bottom-4 sm:bottom-6 left-1/2 -translate-x-1/2 z-50 w-[calc(100%-2rem)] max-w-[340px] transition-all duration-500 ${visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6 pointer-events-none"
         }`}
     >
-      <div className="flex items-center gap-3 bg-white border border-green-200 shadow-2xl shadow-green-100 rounded-2xl px-6 py-4 min-w-[300px]">
-        <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center shrink-0">
+      <div className="flex items-center gap-3 bg-white border border-green-200 shadow-2xl shadow-green-100 rounded-2xl px-4 sm:px-6 py-3 sm:py-4 w-full">
+        <div className="w-9 h-9 sm:w-10 sm:h-10 bg-green-100 rounded-full flex items-center justify-center shrink-0">
           <CheckCircle className="text-green-600 w-5 h-5" />
         </div>
-        <div>
-          <p className="text-sm font-bold text-gray-800">Buyurtma muvaffaqiyatli berildi!</p>
-          <p className="text-xs text-gray-400 mt-0.5">Buyurtmangiz qabul qilindi!</p>
+        <div className="min-w-0">
+          <p className="text-[13px] sm:text-sm font-bold text-gray-800 truncate">Buyurtma muvaffaqiyatli berildi!</p>
+          <p className="text-[11px] sm:text-xs text-gray-400 mt-0.5 truncate">Buyurtmangiz qabul qilindi!</p>
         </div>
         <button
           onClick={onClose}
-          className="ml-auto text-gray-300 hover:text-gray-500 transition text-lg leading-none"
+          className="ml-auto text-gray-300 hover:text-gray-500 transition text-lg leading-none shrink-0"
         >
           ×
         </button>
@@ -82,6 +84,7 @@ export default function BuyurtmaPage() {
     register,
     control,
     handleSubmit,
+    reset,
     formState: { errors },
   } = useForm<OrderFormData>({
     resolver: zodResolver(orderSchema),
@@ -130,6 +133,10 @@ export default function BuyurtmaPage() {
     // Faqat toast ko'rsatish, sahifa o'zgarmaydi
     setOrder(null);
     setShowToast(true);
+    // FIX: Buyurtma berilgandan so'ng Ism, Familiya, Email, Telefon
+    // maydonlari bo'shatiladi (PhoneInput ham reset() orqali tozalanadi,
+    // chunki u Controller bilan boshqariladi)
+    reset({ name: "", surname: "", phone: "", email: "" });
   };
 
   const deliveryOptions = [
@@ -139,37 +146,45 @@ export default function BuyurtmaPage() {
   ];
 
   return (
-    <div className="bg-[#f5f7fb] min-h-screen py-10">
+    // FIX: py-10 -> py-6 sm:py-10, kichik ekranda bo'sh joy kamaytirildi
+    <div className="bg-[#f5f7fb] min-h-screen py-6 sm:py-10">
       {/* Toast */}
       <SuccessToast visible={showToast} onClose={() => setShowToast(false)} />
 
+      {/* FIX: px-4 saqlanadi, lekin ichki konteynerlar endi mobil uchun moslashtirildi */}
       <div className="max-w-7xl mx-auto px-4">
-        <h1 className="text-3xl font-bold text-[#1a1a1a] mb-8">
+        {/* FIX: text-3xl -> text-2xl sm:text-3xl, 360px da sarlavha siqilmaydi */}
+        <h1 className="text-2xl sm:text-3xl font-bold text-[#1a1a1a] mb-6 sm:mb-8">
           Buyurtmani rasmiylashtirish
         </h1>
 
-        <form onSubmit={handleSubmit(onOrderSubmit)} className="flex flex-col lg:flex-row gap-8">
+        {/* FIX: gap-8 -> gap-6 sm:gap-8, mobil ustunlar orasidagi bo'shliq kamaytirildi */}
+        <form onSubmit={handleSubmit(onOrderSubmit)} className="flex flex-col lg:flex-row gap-6 sm:gap-8">
 
           {/* CHAP TOMON */}
-          <div className="flex-1 bg-white p-8 rounded-2xl shadow-sm border border-gray-100">
-            <p className="text-sm mb-6 text-gray-500">
+          {/* FIX: p-8 -> p-4 sm:p-6 lg:p-8, 360px ekranda ortiqcha padding forma kengligini kichraytirib qo'ydi, shu sabab mobilda kamaytirildi */}
+          <div className="flex-1 bg-white p-4 sm:p-6 lg:p-8 rounded-2xl shadow-sm border border-gray-100">
+            <p className="text-sm mb-5 sm:mb-6 text-gray-500">
               Hisobingiz bormi?{" "}
               <span className="text-blue-500 cursor-pointer hover:underline">Kirish</span>
             </p>
 
             <h2 className="text-base font-bold text-gray-800 mb-3">Yetkazib berish</h2>
-            <div className="grid grid-cols-3 gap-3 mb-8">
+            {/* FIX: grid-cols-3 -> grid-cols-1 sm:grid-cols-3.
+                360px kenglikda 3 ustun "Yetkazib berish" kabi uzun matnni sig'dira olmaydi,
+                shu sababli kichik ekranda variantlar vertikal joylashadi. */}
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 sm:gap-3 mb-6 sm:mb-8">
               {deliveryOptions.map((opt) => (
                 <label
                   key={opt.value}
-                  className={`flex items-center gap-2 border rounded-xl px-4 py-3 cursor-pointer transition text-sm font-medium ${delivery === opt.value
-                      ? "border-blue-500 bg-blue-50 text-blue-700"
-                      : "border-gray-200 text-gray-600 hover:border-gray-300"
+                  className={`flex items-center gap-2 border rounded-xl px-4 py-2.5 sm:py-3 cursor-pointer transition text-sm font-medium ${delivery === opt.value
+                    ? "border-blue-500 bg-blue-50 text-blue-700"
+                    : "border-gray-200 text-gray-600 hover:border-gray-300"
                     }`}
                 >
                   <input
                     type="radio"
-                    className="accent-blue-600"
+                    className="accent-blue-600 shrink-0"
                     checked={delivery === opt.value}
                     onChange={() => setDelivery(opt.value)}
                   />
@@ -179,16 +194,18 @@ export default function BuyurtmaPage() {
             </div>
 
             <h2 className="text-base font-bold text-gray-800 mb-3">To'lov</h2>
-            <div className="flex gap-4 mb-8">
+            {/* FIX: gap-4 -> gap-3 sm:gap-4 va flex-wrap qo'shildi, 360px da ikkita
+                tugma yonma-yon sig'masa ham siqilib chiqib ketmaydi */}
+            <div className="flex flex-wrap gap-3 sm:gap-4 mb-6 sm:mb-8">
               {[
                 { value: "card", label: "Kartadan" },
                 { value: "cash", label: "Naqd" },
               ].map((opt) => (
                 <label
                   key={opt.value}
-                  className={`flex items-center gap-2 border rounded-xl px-5 py-3 cursor-pointer transition text-sm font-medium ${payment === opt.value
-                      ? "border-blue-500 bg-blue-50 text-blue-700"
-                      : "border-gray-200 text-gray-600 hover:border-gray-300"
+                  className={`flex items-center gap-2 border rounded-xl px-4 sm:px-5 py-2.5 sm:py-3 cursor-pointer transition text-sm font-medium ${payment === opt.value
+                    ? "border-blue-500 bg-blue-50 text-blue-700"
+                    : "border-gray-200 text-gray-600 hover:border-gray-300"
                     }`}
                 >
                   <input
@@ -203,13 +220,16 @@ export default function BuyurtmaPage() {
             </div>
 
             <h2 className="text-base font-bold text-gray-800 mb-3">Shaxsiy ma'lumotlar</h2>
-            <div className="grid grid-cols-2 gap-4 mb-4">
+            {/* FIX: grid-cols-2 -> grid-cols-1 sm:grid-cols-2.
+                360px da Ism/Familiya inputlari juda torayib ketardi, endi mobilda
+                ustma-ust, kengroq ekranda yonma-yon joylashadi. */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
               <div className="flex flex-col gap-1">
                 <input
                   type="text"
                   placeholder="Ism"
                   {...register("name")}
-                  className="border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
+                  className="border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition w-full"
                 />
                 {errors.name && <p className="text-red-500 text-[11px]">{errors.name.message}</p>}
               </div>
@@ -218,13 +238,16 @@ export default function BuyurtmaPage() {
                   type="text"
                   placeholder="Familiya"
                   {...register("surname")}
-                  className="border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
+                  className="border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition w-full"
                 />
                 {errors.surname && <p className="text-red-500 text-[11px]">{errors.surname.message}</p>}
               </div>
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
+            {/* FIX: grid-cols-2 -> grid-cols-1 sm:grid-cols-2.
+                PhoneInput (mamlakat kodi + raqam) 360px da yarim kenglikka sig'maydi
+                va buzilib ko'rinardi, shu sababli mobilda to'liq kenglikda, ustma-ust joylashadi. */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="space-y-1.5">
                 <label className="text-[13px] font-medium text-gray-700">
                   Telefon raqami <span className="text-red-500">*</span>
@@ -237,6 +260,7 @@ export default function BuyurtmaPage() {
                       country={"uz"}
                       value={field.value}
                       onChange={(value) => field.onChange(value)}
+                      containerStyle={{ width: "100%" }}
                       inputStyle={{
                         width: "100%",
                         height: "48px",
@@ -252,12 +276,15 @@ export default function BuyurtmaPage() {
                 />
                 {errors.phone && <p className="text-red-500 text-[11px]">{errors.phone.message}</p>}
               </div>
-              <div className="flex flex-col gap-1 pt-6">
+              {/* FIX: pt-6 mobilda olib tashlandi (sm:pt-6), chunki endi email
+                  Telefon label'i bilan emas, alohida qatorda joylashadi va
+                  ortiqcha bo'sh joy kerak emas. */}
+              <div className="flex flex-col gap-1 sm:pt-6">
                 <input
                   type="email"
                   placeholder="Email"
                   {...register("email")}
-                  className="border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
+                  className="border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition w-full"
                 />
                 {errors.email && <p className="text-red-500 text-[11px]">{errors.email.message}</p>}
               </div>
@@ -265,10 +292,12 @@ export default function BuyurtmaPage() {
           </div>
 
           {/* O'NG TOMON */}
-          <div className="lg:w-[400px]">
+          {/* FIX: w-full qo'shildi (lg:w-[400px] bilan birga), shunda mobilda
+              ustun to'liq kenglikni egallashi aniq belgilanadi */}
+          <div className="w-full lg:w-[400px]">
             <div
               ref={orderRef}
-              className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 sticky top-6"
+              className="bg-white p-4 sm:p-6 rounded-2xl shadow-sm border border-gray-100 lg:sticky lg:top-6"
             >
               <div className="flex items-center justify-between mb-5">
                 <h2 className="text-lg font-bold text-gray-800">Buyurtma</h2>
@@ -287,9 +316,11 @@ export default function BuyurtmaPage() {
                     {order.items.map((item) => (
                       <div
                         key={item.id}
-                        className="flex items-center gap-4 pb-4 border-b border-gray-100 last:border-0 last:pb-0"
+                        className="flex items-center gap-3 sm:gap-4 pb-4 border-b border-gray-100 last:border-0 last:pb-0"
                       >
-                        <div className="w-16 h-16 bg-gray-50 rounded-lg border border-gray-100 flex items-center justify-center shrink-0 p-1.5">
+                        {/* FIX: w-16 h-16 -> w-14 h-14 sm:w-16 sm:h-16, 360px da rasm
+                            biroz kichraytirildi, matn uchun joy bo'shatildi */}
+                        <div className="w-14 h-14 sm:w-16 sm:h-16 bg-gray-50 rounded-lg border border-gray-100 flex items-center justify-center shrink-0 p-1.5">
                           <img src={item.image} alt={item.name} className="object-contain max-h-full max-w-full" />
                         </div>
                         <div className="flex-1 min-w-0">
@@ -298,7 +329,7 @@ export default function BuyurtmaPage() {
                             {item.quantity} dona × {item.price.toLocaleString()} so'm
                           </p>
                         </div>
-                        <p className="text-[14px] font-bold text-blue-600 whitespace-nowrap">
+                        <p className="text-[13px] sm:text-[14px] font-bold text-blue-600 whitespace-nowrap">
                           {(item.price * item.quantity).toLocaleString()} so'm
                         </p>
                       </div>
@@ -314,9 +345,12 @@ export default function BuyurtmaPage() {
                         </span>
                       </div>
                     )}
-                    <div className="flex justify-between items-end">
+                    {/* FIX: items-end -> flex-wrap qo'shilmadi, lekin matn o'lchami
+                        kichraytirildi (text-2xl -> text-xl sm:text-2xl) shunda
+                        360px da summa va "so'm" yozuvi bir qatorga sig'adi */}
+                    <div className="flex justify-between items-end gap-2">
                       <span className="text-base font-bold text-gray-800">Jami:</span>
-                      <span className="text-2xl font-black text-blue-600">
+                      <span className="text-xl sm:text-2xl font-black text-blue-600 text-right">
                         {order.finalTotal.toLocaleString()}{" "}
                         <span className="text-sm font-bold">so'm</span>
                       </span>
@@ -327,7 +361,7 @@ export default function BuyurtmaPage() {
 
               <button
                 type="submit"
-                className="mt-6 w-full bg-blue-600 text-white font-bold py-4 rounded-xl hover:bg-blue-700 shadow-lg shadow-blue-200 transition-all uppercase text-xs tracking-[2px] disabled:opacity-60"
+                className="mt-6 w-full bg-blue-600 text-white font-bold py-3.5 sm:py-4 rounded-xl hover:bg-blue-700 shadow-lg shadow-blue-200 transition-all uppercase text-xs tracking-[1.5px] sm:tracking-[2px] disabled:opacity-60"
                 disabled={showToast}
               >
                 Buyurtma berish
@@ -344,7 +378,8 @@ export default function BuyurtmaPage() {
         {/* ── FAQ bo'limi ── */}
         {faqs.length > 0 && (
           <div className="mt-10">
-            <h2 className="text-2xl font-bold text-[#1a1a1a] mb-6">Ko'p so'raladigan savollar</h2>
+            {/* FIX: text-2xl -> text-xl sm:text-2xl */}
+            <h2 className="text-xl sm:text-2xl font-bold text-[#1a1a1a] mb-5 sm:mb-6">Ko'p so'raladigan savollar</h2>
             <div className="space-y-3">
               {faqs.map((faq) => (
                 <div
@@ -354,7 +389,7 @@ export default function BuyurtmaPage() {
                   <button
                     type="button"
                     onClick={() => setOpenFaq(openFaq === faq.id ? null : faq.id)}
-                    className="w-full flex items-center justify-between px-6 py-4 text-left"
+                    className="w-full flex items-center justify-between px-4 sm:px-6 py-4 text-left"
                   >
                     <span className="text-sm font-semibold text-gray-800 pr-4">
                       {faq.question}
@@ -367,7 +402,7 @@ export default function BuyurtmaPage() {
                     </span>
                   </button>
                   {openFaq === faq.id && (
-                    <div className="px-6 pb-4 text-sm text-gray-500 leading-relaxed border-t border-gray-50">
+                    <div className="px-4 sm:px-6 pb-4 text-sm text-gray-500 leading-relaxed border-t border-gray-50">
                       <p className="pt-3">{faq.answer}</p>
                     </div>
                   )}
