@@ -2,7 +2,7 @@
 
 import { useGetProfileQuery, useEditProfilMutation } from "../../services/editProfileApi";
 import { useChangeParolMutation } from "../../services/changePasswordApi";
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import {
   FaUserCircle, FaListUl, FaMapMarkerAlt, FaShieldAlt,
@@ -286,7 +286,7 @@ function AddressTab() {
 // ─────────────────────────────────────────────
 // MAIN COMPONENT
 // ─────────────────────────────────────────────
-export default function ShaxsiyKabinet() {
+function ShaxsiyKabinetContent() {
   const { data: payments = [] } = useGetPaymentsQuery();
   const { data: wishlists = [], isLoading: wishlistLoading } = useGetWishlistQuery();
   const [removeWishlist] = useRemoveWishlistMutation();
@@ -895,5 +895,21 @@ export default function ShaxsiyKabinet() {
         </div>
       </div>
     </div>
+  );
+}
+
+// FIX: useSearchParams() Next.js'da Suspense boundary ichida bo'lishini talab qiladi,
+// aks holda "useSearchParams() should be wrapped in a suspense boundary" xatosi bilan
+// build muvaffaqiyatsiz tugaydi. Shu sababli asosiy komponent endi Suspense ichiga
+// o'ralgan holda export qilinadi.
+export default function ShaxsiyKabinet() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-[#F9FAFB] flex items-center justify-center text-gray-400 text-sm">
+        Yuklanmoqda...
+      </div>
+    }>
+      <ShaxsiyKabinetContent />
+    </Suspense>
   );
 }
