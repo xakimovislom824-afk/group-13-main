@@ -898,10 +898,7 @@ function ShaxsiyKabinetContent() {
   );
 }
 
-// FIX: useSearchParams() Next.js'da Suspense boundary ichida bo'lishini talab qiladi,
-// aks holda "useSearchParams() should be wrapped in a suspense boundary" xatosi bilan
-// build muvaffaqiyatsiz tugaydi. Shu sababli asosiy komponent endi Suspense ichiga
-// o'ralgan holda export qilinadi.
+
 export default function ShaxsiyKabinet() {
   return (
     <Suspense fallback={

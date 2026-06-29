@@ -519,11 +519,12 @@ export default function Navbar() {
     <div ref={navbarRef} className="w-full border-b bg-white relative z-[1000]">
 
       {/* ── TOP BAR ── */}
-      <div className="flex justify-between items-center px-4 md:px-6 py-2 text-[12px] text-gray-500 bg-gray-100 border-b">
-        <div className="flex items-center gap-2 lg:hidden">
-          <button onClick={openSidebar} className="flex items-center gap-1 text-gray-800" aria-label="Menyuni ochish">
-            <IoMenu size={24} />
-            <span className="font-bold text-[14px] hidden sm:block">Menyu</span>
+      <div className="flex justify-between items-center px-3 sm:px-4 md:px-6 py-2 text-[12px] text-gray-500 bg-gray-100 border-b">
+        <div className="flex items-center gap-1.5 lg:hidden">
+          <button onClick={openSidebar} className="flex items-center gap-1.5 text-gray-800" aria-label="Menyuni ochish">
+            <IoMenu size={20} className="sm:hidden" />
+            <IoMenu size={24} className="hidden sm:block" />
+            <span className="font-bold text-[12px] sm:text-[14px] whitespace-nowrap">Menyu</span>
           </button>
         </div>
         <nav className="hidden lg:flex gap-4 font-medium">
@@ -534,8 +535,8 @@ export default function Navbar() {
             </Link>
           ))}
         </nav>
-        <div className="flex gap-4 items-center">
-          <span className="font-bold text-black text-[14px]">8 800 444 00 65</span>
+        <div className="flex gap-2 sm:gap-4 items-center">
+          <span className="font-bold text-black text-[11px] sm:text-[14px] whitespace-nowrap">8 800 444 00 65</span>
           <button onClick={openModal}
             className="hidden sm:block cursor-pointer text-blue-600 font-bold border-b border-blue-600 border-dotted text-[10px] uppercase">
             Qo'ng'iroq qilishni so'rang
@@ -582,11 +583,11 @@ export default function Navbar() {
       </div>
 
       {/* ── MOBILE: KATALOG + SEARCH ── */}
-      <div className="flex md:hidden items-center gap-2 px-4 pb-4">
+      <div className="flex md:hidden items-center gap-1.5 sm:gap-2 px-3 sm:px-4 pb-4">
         <button onClick={toggleKatalog} aria-expanded={isKatalogOpen}
-          className="bg-blue-600 text-white rounded-sm flex items-center justify-center gap-2 shrink-0 h-11 px-3">
+          className="bg-blue-600 text-white rounded-sm flex items-center justify-center gap-1.5 shrink-0 h-11 px-2.5 sm:px-3">
           {isKatalogOpen ? <IoClose size={18} /> : <FaGripLines size={16} />}
-          <span className="tracking-wider text-xs font-bold whitespace-nowrap">KATALOG</span>
+          <span className="tracking-wider text-[11px] sm:text-xs font-bold whitespace-nowrap">KATALOG</span>
         </button>
         <div className="flex-1 min-w-0">
           <SearchBox isMobile />
