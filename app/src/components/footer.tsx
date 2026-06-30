@@ -227,29 +227,29 @@ export default function Footer() {
             <div className="col-span-1">
               <h3 className="font-bold text-black mb-4 text-[15px]">Katalog</h3>
               <div className="flex flex-col gap-2 text-[14px]">
-                <Link href="/qurilishMateriallari" className="hover:text-blue-600 transition-colors">Umumqurilish materiallari</Link>
-                <Link href="/saunaUchun" className="hover:text-blue-600 transition-colors">Sauna va hammom uchun</Link>
-                <Link href="/asbobUskunalar" className="hover:text-blue-600 transition-colors">Asbob-uskunalar</Link>
-                <Link href="/otdelka" className="hover:text-blue-600 transition-colors">Pardozlash materiallari</Link>
-                <Link href="/uyBog" className="hover:text-blue-600 transition-colors">Uy, bog&apos; va hovli uchun mahsulotlar</Link>
+                <span className="hover:text-blue-600 transition-colors">Umumqurilish materiallari</span>
+                <span className="hover:text-blue-600 transition-colors">Sauna va hammom uchun</span>
+                <span className="hover:text-blue-600 transition-colors">Asbob-uskunalar</span>
+                <span className="hover:text-blue-600 transition-colors">Pardozlash materiallari</span>
+                <span className="hover:text-blue-600 transition-colors">Uy, bog&apos; va hovli uchun mahsulotlar</span>
               </div>
             </div>
 
             {/* Katalog — ikkinchi guruh */}
             <div className="col-span-1">
               <div className="flex flex-col gap-2 text-[14px] mt-[30px]">
-                <Link href="/elektr" className="hover:text-blue-600 transition-colors">Elektr tovarlar</Link>
-                <Link href="/santexnika" className="hover:text-blue-600 transition-colors">Santexnika</Link>
-                <Link href="/stolyar" className="hover:text-blue-600 transition-colors">Yog&apos;och buyumlari</Link>
-                <Link href="/spetsodejda" className="hover:text-blue-600 transition-colors">Maxsus kiyim va YHV vositalari</Link>
+                <span className="hover:text-blue-600 transition-colors">Elektr tovarlar</span>
+                <span className="hover:text-blue-600 transition-colors">Santexnika</span>
+                <span className="hover:text-blue-600 transition-colors">Yog&apos;och buyumlari</span>
+                <span className="hover:text-blue-600 transition-colors">Maxsus kiyim va YHV vositalari</span>
               </div>
             </div>
 
             {/* Katalog — uchinchi guruh */}
             <div className="col-span-1">
               <div className="flex flex-col gap-3 text-[14px] mt-[30px]">
-                <Link href="/suvGaz" className="hover:text-blue-600 transition-colors">Suv-gaz ta&apos;minoti, isitish, ventilyatsiya</Link>
-                <Link href="/metiz" className="hover:text-blue-600 transition-colors">Metiz, taqelama va skoba buyumlari</Link>
+                <span className="hover:text-blue-600 transition-colors">Suv-gaz ta&apos;minoti, isitish, ventilyatsiya</span>
+                <span className="hover:text-blue-600 transition-colors">Metiz, taqelama va skoba buyumlari</span>
               </div>
             </div>
           </div>
