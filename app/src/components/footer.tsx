@@ -34,28 +34,67 @@ export default function Footer() {
       <footer className="bg-gray-100 text-gray-600 border-t">
         <div className="w-full mx-auto px-4 sm:px-6 py-6 lg:py-10">
 
-          {/* Yuqori qism: Logo, Rekvizitlar, Email va Aloqa */}
-          <div className="flex flex-col lg:flex-row lg:justify-between items-start lg:items-center gap-4 lg:gap-8 border-b pb-6 lg:pb-8">
+          {/* ── DESKTOP: Yuqori qator (Logo / Rekvizit / Email / Aloqa) ── */}
+          <div className="hidden lg:flex justify-between items-center gap-8 border-b pb-8">
+
+            {/* Logo + Rekvizit */}
+            <div className="flex items-center gap-10">
+              <Link href={"/"} className="inline-block shrink-0">
+                <Image
+                  src={Logo}
+                  alt="Kompaniya logotipi"
+                  className="h-auto w-auto max-w-[180px]"
+                />
+              </Link>
+              <div className="text-[13px] leading-relaxed">
+                <p className="font-medium text-gray-800">OOO &quot;Stroyopttorg&quot;</p>
+                <p>INN: 0901051787</p>
+                <p>KPP: 090101001</p>
+              </div>
+            </div>
+
+            {/* Email */}
+            <div className="text-[13px] shrink-0">
+              <p className="text-gray-400 mb-1">Email:</p>
+              <a href="mailto:info@stroyopttorg.ru" className="text-blue-600 hover:underline font-medium">
+                info@stroyopttorg.ru
+              </a>
+            </div>
+
+            {/* Aloqa */}
+            <div className="flex flex-col items-end gap-1 shrink-0">
+              <a href="tel:88004440065" className="font-bold text-xl text-gray-900 hover:text-red-600 transition-colors duration-300" >
+                8 800 444 00 65
+              </a>
+              <p className="text-[13px] text-gray-500 font-medium">
+                Har kuni, 8:00 dan 18:00 gacha
+              </p>
+              <button
+                onClick={openModal}
+                className="mt-2 px-5 py-2 text-sm font-semibold border-2 border-red-500 text-red-500 uppercase
+               rounded-full hover:bg-red-500 hover:text-white transition-all duration-300 active:scale-95 cursor-pointer"
+              >
+                Qo&apos;ng&apos;iroq qilishni so&apos;rang
+              </button>
+            </div>
+          </div>
+
+          {/* ── MOBIL: Yuqori qism (Logo, Email, Aloqa) ── */}
+          <div className="lg:hidden flex flex-col gap-4 border-b pb-6">
 
             {/* Logo + Email (mobil: yonma-yon) */}
-            <div className="flex w-full lg:w-auto justify-between items-start gap-4">
-              <div className="flex flex-col gap-3 lg:gap-4">
+            <div className="flex w-full justify-between items-start gap-4">
+              <div className="flex flex-col gap-3">
                 <Link href={"/"} className="inline-block">
                   <Image
                     src={Logo}
                     alt="Kompaniya logotipi"
-                    className="h-auto w-auto max-w-[150px] lg:max-w-[180px]"
+                    className="h-auto w-auto max-w-[150px]"
                   />
                 </Link>
-                <div className="text-[13px] leading-relaxed hidden lg:block">
-                  <p className="font-medium text-gray-800">OOO &quot;Stroyopttorg&quot;</p>
-                  <p>INN: 0901051787</p>
-                  <p>KPP: 090101001</p>
-                </div>
               </div>
 
-              {/* Email bo'limi (mobilda yuqori o'ngda) */}
-              <div className="text-[12px] lg:text-[13px] text-right lg:text-left shrink-0">
+              <div className="text-[12px] text-right shrink-0">
                 <p className="text-gray-400 mb-1">Email:</p>
                 <a href="mailto:info@stroyopttorg.ru" className="text-blue-600 hover:underline font-medium break-all">
                   info@stroyopttorg.ru
@@ -63,22 +102,17 @@ export default function Footer() {
               </div>
             </div>
 
-            {/* Aloqa */}
-            <div className="w-full lg:w-auto flex flex-col items-start lg:items-end gap-1">
-              {/* Telefon raqami */}
-              <a href="tel:88004440065" className="font-bold text-lg lg:text-xl text-gray-900 hover:text-red-600 transition-colors duration-300" >
+            {/* Aloqa (mobil) */}
+            <div className="w-full flex flex-col items-start gap-1">
+              <a href="tel:88004440065" className="font-bold text-lg text-gray-900 hover:text-red-600 transition-colors duration-300" >
                 8 800 444 00 65
               </a>
-
-              {/* Ish vaqti */}
-              <p className="text-[12px] lg:text-[13px] text-gray-500 font-medium">
+              <p className="text-[12px] text-gray-500 font-medium">
                 Har kuni, 8:00 dan 18:00 gacha
               </p>
-
-              {/* Tugma stili yaxshilandi */}
               <button
                 onClick={openModal}
-                className="w-full cursor-pointer sm:w-auto mt-2 px-5 py-2.5 lg:py-2 text-[12px] lg:text-sm font-semibold border-2 border-red-500 text-red-500 uppercase
+                className="w-full cursor-pointer sm:w-auto mt-2 px-5 py-2.5 text-[12px] font-semibold border-2 border-red-500 text-red-500 uppercase
                rounded-full hover:bg-red-500 hover:text-white transition-all duration-300 active:scale-95"
               >
                 Qo&apos;ng&apos;iroq qilishni so&apos;rang
@@ -233,7 +267,7 @@ export default function Footer() {
               Политика конфиденциальности
             </Link>
           </div>
-          </div>
+        </div >
       </footer >
     </>
   );
