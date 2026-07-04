@@ -233,6 +233,7 @@ function SearchBoxContent({ isMobile = false }: SearchBoxProps) {
 
   const wrapperRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const prevUrlSearchRef = useRef<string>("");
 
   const results = useProductSearch(searchQuery);
 
@@ -252,16 +253,23 @@ function SearchBoxContent({ isMobile = false }: SearchBoxProps) {
     return () => document.removeEventListener("mousedown", handler);
   }, []);
 
+  // Faqat URL'dagi "search" parametri TASHQARIDAN (masalan "Tozalash" havolasi orqali)
+  // bo'shatilganda inputni tozalaydi. inputValue endi dependency emas, shuning uchun
+  // foydalanuvchi yozayotganda bu effekt ishga tushmaydi va inputni to'sib qo'ymaydi.
   useEffect(() => {
-    if (pathname !== "/katalog") return;
+    if (pathname !== "/katalog") {
+      prevUrlSearchRef.current = "";
+      return;
+    }
     const urlSearch = urlSearchParams.get("search") || "";
-    if (urlSearch === "" && inputValue !== "") {
+    if (urlSearch === "" && prevUrlSearchRef.current !== "") {
       setInputValue("");
       setSearchQuery("");
       setSelected(false);
       setIsOpen(false);
     }
-  }, [urlSearchParams, pathname, inputValue]);
+    prevUrlSearchRef.current = urlSearch;
+  }, [urlSearchParams, pathname]);
 
   const handleChange = (val: string) => {
     setInputValue(val);
