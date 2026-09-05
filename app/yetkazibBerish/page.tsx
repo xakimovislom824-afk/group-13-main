@@ -1,16 +1,8 @@
 "use client";
-import Image from "next/image";
 import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import Skitka2 from "../src/assets/imgs/skitka2.png";
-import Skitka4 from "../src/assets/imgs/skitka4.png";
-import r3 from "../src/assets/imgs/rasmuz3.png";
-import r4 from "../src/assets/imgs/rasmuz4.png";
-import r5 from "../src/assets/imgs/rasmuz5.png";
-import r6 from "../src/assets/imgs/rasmuz6.png";
-import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useGetDeliveryQuery } from "../../services/deliveryApi";
 
 // 1. Zod sxemasi
@@ -104,68 +96,10 @@ function YetkazibBerish() {
               ))}
           </div>
 
-          {/* 🔥 SLIDER SECTION */}
-          <div className="relative mt-12 group">
-            {/* Image Grid */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              {[r5, r6, r3, r4].map((img, index) => (
-                <div key={index} className="relative overflow-hidden rounded-xl shadow-sm hover:shadow-md transition-all duration-300">
-                  <Image
-                    src={img}
-                    alt={`Gallery image ${index + 1}`}
-                    className="w-full h-auto object-cover transform hover:scale-110 transition-transform duration-500"
-                    width={300}
-                    height={200}
-                  />
-                </div>
-              ))}
-            </div>
-
-            {/* Chap tugma */}
-            <button
-              className="absolute left-[-12px] top-1/2 -translate-y-1/2 bg-white/90 hover:bg-white text-gray-800 border border-gray-100 rounded-full w-10 h-10 shadow-lg flex items-center justify-center transition-all duration-200 active:scale-90 opacity-0 group-hover:opacity-100 focus:opacity-100"
-              aria-label="Previous slide"
-            >
-              <ChevronLeft size={20} strokeWidth={2.5} />
-            </button>
-
-            {/* O'ng tugma */}
-            <button
-              className="absolute right-[-12px] top-1/2 -translate-y-1/2 bg-white/90 hover:bg-white text-gray-800 border border-gray-100 rounded-full w-10 h-10 shadow-lg flex items-center justify-center transition-all duration-200 active:scale-90 opacity-0 group-hover:opacity-100 focus:opacity-100"
-              aria-label="Next slide"
-            >
-              <ChevronRight size={20} strokeWidth={2.5} />
-            </button>
-          </div>
         </div>
 
         {/* O'NG TARAF: Bannerlar va Obuna */}
         <div className="w-full lg:w-[320px] shrink-0 flex flex-col gap-6">
-          {/* Banners */}
-          {[
-            { img: Skitka2, title: "Bo'yoq va lak\nmahsulotlari" },
-            { img: Skitka4, title: "Isitish\ntizimlari" },
-          ].map((banner, index) => (
-            <div
-              key={index}
-              className="relative overflow-hidden rounded-2xl h-48 cursor-pointer shadow-sm group"
-              style={{
-                backgroundImage: `url(${banner.img.src})`,
-                backgroundSize: "cover",
-                backgroundPosition: "center",
-              }}
-            >
-              <div className="absolute inset-0 bg-white/10 group-hover:bg-black/5 transition-all p-6 flex flex-col justify-start">
-                <h3 className="text-xl font-bold text-gray-900 leading-tight mb-3 whitespace-pre-line">
-                  {banner.title}
-                </h3>
-                <span className="inline-block w-fit bg-[#001220] text-white text-[11px] font-bold px-3 py-1.5 rounded-lg">
-                  -30% gacha
-                </span>
-              </div>
-            </div>
-          ))}
-
           {/* Obuna Formasi */}
           <div className="bg-[#F8F9FA] p-6 rounded-md border border-gray-100 shadow-sm">
             <h4 className="text-[15px] font-bold mb-2 uppercase">Yangiliklarga obuna bo'ling</h4>

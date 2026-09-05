@@ -8,8 +8,6 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 
-import vozrat1 from "../src/assets/imgs/skitka2.png";
-import vozrat2 from "../src/assets/imgs/skitka4.png";
 
 import { useSendFeedbackMutation, useGetFeedbacksQuery } from "../../services/feedbackApi";
 
@@ -421,34 +419,6 @@ export default function FikrlarSahifasi() {
 
         {/* SIDEBAR */}
         <aside className="w-full lg:w-[350px] space-y-6">
-          <div className="relative cursor-pointer border border-gray-50 rounded-sm overflow-hidden shadow-sm">
-            <div className="relative h-[220px]">
-              <Image src={vozrat1} alt="Isitish tizimlari" fill sizes="350px" className="object-cover" />
-              <div className="absolute top-1/2 left-6 -translate-y-1/2 max-w-[140px]">
-                <h3 className="font-bold text-[18px] leading-tight mb-2 text-gray-800">
-                  Isitish tizimlari uchun hammasi
-                </h3>
-                <span className="bg-[#1A202C] text-white text-[10px] px-2 py-1 font-bold rounded-sm uppercase">
-                  -30% gacha
-                </span>
-              </div>
-            </div>
-          </div>
-
-          <div className="relative cursor-pointer border border-gray-50 rounded-sm overflow-hidden shadow-sm">
-            <div className="relative h-[220px]">
-              <Image src={vozrat2} alt="Bo'yoqlar" fill sizes="350px" className="object-cover" />
-              <div className="absolute top-1/2 left-6 -translate-y-1/2 max-w-[140px]">
-                <h3 className="font-bold text-[18px] leading-tight mb-2 text-gray-800">
-                  Lok-bo'yoq materiallari
-                </h3>
-                <span className="bg-[#1A202C] text-white text-[10px] px-2 py-1 font-bold rounded-sm uppercase">
-                  -30% gacha
-                </span>
-              </div>
-            </div>
-          </div>
-
           <div className="bg-[#F8F9FA] p-6 rounded-md border border-gray-100 shadow-sm">
             <h4 className="text-[15px] font-bold mb-2 uppercase">Yangiliklarga obuna bo'ling</h4>
             <p className="text-[12px] text-gray-500 mb-4 leading-snug">

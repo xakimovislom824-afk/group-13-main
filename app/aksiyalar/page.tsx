@@ -32,7 +32,18 @@ const Aksiyalar = () => {
           {discounts.map((item) => (
             <div key={item.id} className="flex flex-col h-full group">
               <div className="relative w-full h-[180px] md:h-[200px] rounded-[12px] overflow-hidden bg-[#F7F9FC] mb-4 flex items-center justify-center p-2">
-                <img  src={item.image}  alt={item.title}  className="w-full h-full object-contain group-hover:scale-105 transition duration-300"/>
+                {item.image ? (
+                  <img
+                    src={item.image}
+                    alt={item.title}
+                    className="w-full h-full object-contain group-hover:scale-105 transition duration-300"
+                    onError={(event) => {
+                      event.currentTarget.style.display = "none";
+                    }}
+                  />
+                ) : (
+                  <span className="text-sm text-gray-400">Rasm mavjud emas</span>
+                )}
                 {item.discount_percent && (
                   <div className="absolute bottom-3 left-3 bg-[#0A111A] text-white text-[11px] font-bold px-2.5 py-1 rounded-[4px] uppercase tracking-wide">  -{item.discount_percent}% gacha</div>
                 )}

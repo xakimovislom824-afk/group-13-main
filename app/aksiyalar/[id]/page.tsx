@@ -55,7 +55,18 @@ const AktsiyaDetail = ({ params, searchParams }: PageProps) => {
               {discount.summary}
             </p>
             <div className="overflow-hidden rounded-[12px] mb-6 md:mb-8 bg-[#F7F9FC] border flex items-center justify-center p-2 w-full h-[240px] sm:h-[360px] md:h-[460px] lg:h-[500px]">
-              <img   src={displayImage || "https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?w=1200"}   alt={discount.title}   className="w-full h-full object-contain" />
+              {displayImage ? (
+                <img
+                  src={displayImage}
+                  alt={discount.title}
+                  className="w-full h-full object-contain"
+                  onError={(event) => {
+                    event.currentTarget.style.display = "none";
+                  }}
+                />
+              ) : (
+                <span className="text-sm text-gray-400">Rasm mavjud emas</span>
+              )}
             </div>
             <h2 className="text-[22px] md:text-[26px] font-bold text-[#2F3640] mb-4">   Biz sizga nimani taklif qilamiz: </h2>
             <p className="text-[15px] md:text-[16px] leading-[26px] md:leading-[28px] text-[#555B65] whitespace-pre-line mb-8">  {discount.content}</p>

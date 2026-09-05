@@ -6,13 +6,6 @@ import {
     useToggleWishlistMutation,
 } from "../services/wishlistApi";
 import {
-    useGetComparisonsQuery,
-    useCreateComparisonMutation,
-    useUpdateComparisonMutation,
-    useDeleteComparisonMutation,
-    parseProductsDetail,
-} from "../services/comparisonsApi";
-import {
     useGetCartsQuery,
     useAddToCartMutation,
     useUpdateCartMutation,
@@ -27,22 +20,34 @@ import { toast } from "react-toastify";
 function ProductCard({ product }: { product: IProduct }) {
     const [token, setToken] = useState<string | null>(null);
     const [localLiked, setLocalLiked] = useState<boolean | null>(null);
-    const [localInComparison, setLocalInComparison] = useState<boolean | null>(null);
+
+    const syncAuthState = () => {
+        if (typeof window === "undefined") return;
+        const tokenFromStorage = localStorage.getItem("access");
+        if (tokenFromStorage) {
+            setToken(tokenFromStorage);
+            return;
+        }
+
+        const cookieToken = document.cookie
+            .split("; ")
+            .find((row) => row.startsWith("access="))
+            ?.split("=")[1];
+
+        setToken(cookieToken || null);
+    };
 
     useEffect(() => {
-        setToken(localStorage.getItem("access"));
+        syncAuthState();
+        window.addEventListener("authChange", syncAuthState);
+        return () => window.removeEventListener("authChange", syncAuthState);
     }, []);
 
     const { data: wishlist = [] } = useGetWishlistQuery(undefined, { skip: !token });
     const [toggleWishlist] = useToggleWishlistMutation();
 
-    const { data: comparisons = [] } = useGetComparisonsQuery(undefined, { skip: !token });
-    const [createComparison] = useCreateComparisonMutation();
-    const [updateComparison] = useUpdateComparisonMutation();
-    const [deleteComparison] = useDeleteComparisonMutation();
-
-    // ✅ Cart
-    const { data: carts = [] } = useGetCartsQuery(undefined, { skip: !token });
+    // ✅ Cart (demo mode: ishlashi uchun auth cheklovini olib tashlaymiz)
+    const { data: carts = [] } = useGetCartsQuery();
     const [addToCart, { isLoading: addLoading }] = useAddToCartMutation();
     const [updateCart, { isLoading: updateLoading }] = useUpdateCartMutation();
     const [deleteCart] = useDeleteCartMutation();
@@ -57,12 +62,16 @@ function ProductCard({ product }: { product: IProduct }) {
 
     // ✅ Savatdagi shu mahsulotning item'ini topamiz
     const cartList = Array.isArray(carts) ? carts : [carts];
-    const allItems = cartList.flatMap((c: any) => c?.items ?? []);
+    const allItems = cartList.flatMap((c: any) => {
+        if (Array.isArray(c?.items)) return c.items;
+        if (c && (c.product !== undefined || c.product_data || c.product_detail)) return [c];
+        return [];
+    });
     const cartItem = allItems.find(
         (it: any) =>
-            it.product === product.id ||
-            it.product_data?.id === product.id ||
-            it.product_detail?.id === product.id
+            Number(it.product) === Number(product.id) ||
+            Number(it.product_data?.id) === Number(product.id) ||
+            Number(it.product_detail?.id) === Number(product.id)
     );
     const inCart = !!cartItem;
     const cartBusy = addLoading || updateLoading;
@@ -71,22 +80,6 @@ function ProductCard({ product }: { product: IProduct }) {
         (item) => item.product === product.id || item.product_detail?.id === product.id
     );
     const liked = localLiked !== null ? localLiked : !!wishlistItem;
-
-    // 📊 Taqqoslash (Comparison) - TOʻGʻRILANGAN VA XAVFSIZ VERSIYASI
-    const comparisonItem = comparisons.find((c) => {
-        // 1. Agar products to'g'ridan-to'g'ri ID'lar massivi bo'lsa (ma'lumot turini Number qilib tekshiramiz)
-        if (Array.isArray(c.products)) {
-            const hasId = c.products.map(Number).includes(Number(product.id));
-            if (hasId) return true;
-        }
-        // 2. Agar products_detail ichidan qidirish kerak bo'lsa
-        if (c.products_detail) {
-            const details = parseProductsDetail(c.products_detail);
-            return details.some((d) => Number(d.id) === Number(product.id));
-        }
-        return false;
-    });
-    const inComparison = localInComparison !== null ? localInComparison : !!comparisonItem;
 
     const requireAuth = () => {
         if (!token) {
@@ -103,7 +96,10 @@ function ProductCard({ product }: { product: IProduct }) {
         if (!requireAuth()) return;
         setLocalLiked(!liked);
         try {
-            await toggleWishlist({ product_id: product.id }).unwrap();
+            await toggleWishlist({
+                product_id: product.id,
+                product_detail: product,
+            }).unwrap();
         } catch {
             setLocalLiked(liked);
         } finally {
@@ -111,59 +107,10 @@ function ProductCard({ product }: { product: IProduct }) {
         }
     };
 
-    // 📊 Taqqoslashga qo'shish/o'chirish
-    const handleToggleComparison = async (e: React.MouseEvent) => {
-        e.preventDefault();
-        e.stopPropagation();
-        if (!requireAuth()) return;
-        setLocalInComparison(!inComparison);
-        try {
-            if (inComparison && comparisonItem) {
-                const currentProducts = Array.isArray(comparisonItem.products)
-                    ? comparisonItem.products.map(Number)
-                    : parseProductsDetail(comparisonItem.products_detail).map((d) => d.id);
-                const updatedProducts = currentProducts.filter((id) => id !== product.id);
-                if (updatedProducts.length < 2) {
-                    await deleteComparison(comparisonItem.id).unwrap();
-                    toast.success("Taqqoslash ro'yxati o'chirildi", { autoClose: 1200 });
-                } else {
-                    await updateComparison({ id: comparisonItem.id, products: updatedProducts });
-                }
-            } else {
-                if (comparisons.length > 0) {
-                    const existing = comparisons[0];
-                    const currentProducts = Array.isArray(existing.products)
-                        ? existing.products.map(Number)
-                        : parseProductsDetail(existing.products_detail).map((d) => d.id);
-                    await updateComparison({ id: existing.id, products: [...currentProducts, product.id] });
-                } else {
-                    const pending = JSON.parse(localStorage.getItem("pendingComparison") || "[]");
-                    if (!pending.includes(product.id)) {
-                        const updated = [...pending, product.id];
-                        localStorage.setItem("pendingComparison", JSON.stringify(updated));
-
-                        if (updated.length >= 2) {
-                            await createComparison({ name: "Taqqoslash", products: updated });
-                            localStorage.removeItem("pendingComparison");
-                            toast.success("Taqqoslash guruhi yaratildi!", { autoClose: 1200 });
-                        } else {
-                            toast.info("Taqqoslash uchun yana 1 ta mahsulot tanlang", { autoClose: 2000 });
-                        }
-                    }
-                }
-            }
-        } catch {
-            setLocalInComparison(inComparison);
-        } finally {
-            setTimeout(() => setLocalInComparison(null), 500);
-        }
-    };
-
     // ✅ Birinchi marta savatga qo'shish
     const handleAddToCart = async (e: React.MouseEvent) => {
         e.preventDefault();
         e.stopPropagation();
-        if (!requireAuth()) return;
         if (cartBusy) return;
         try {
             await addToCart({ product: product.id, quantity: 1 }).unwrap();
@@ -214,7 +161,7 @@ function ProductCard({ product }: { product: IProduct }) {
     return (
         <Card className="w-full relative transition-all flex-shrink-0 flex flex-col justify-between rounded-xl shadow-none! ring-0 overflow-hidden group">
             <Link href={`/detail/${product.id}`} className="flex flex-col h-full">
-                <div className="relative h-44 w-full bg-gray-50 rounded-xl mb-3 overflow-hidden p-3">
+                <div className="product-image-panel relative h-44 w-full bg-gray-50 rounded-xl mb-3 overflow-hidden p-3">
                     {product.image ? (
                         <Image
                             src={product.image}
@@ -314,6 +261,7 @@ function ProductCard({ product }: { product: IProduct }) {
 
                         <button
                             onClick={handleToggleFavorite}
+                            className="favorite-button"
                             style={{
                                 border: liked ? "1.5px solid #ff4d6d" : "1px solid #e5e7eb",
                                 background: liked ? "#fff0f3" : "transparent",
@@ -343,24 +291,6 @@ function ProductCard({ product }: { product: IProduct }) {
                             </svg>
                         </button>
 
-                        <button
-                            onClick={handleToggleComparison}
-                            style={{
-                                border: inComparison ? "1.5px solid #185FA5" : "1px solid #e5e7eb",
-                                background: inComparison ? "#e6f1fb" : "transparent",
-                                borderRadius: "8px",
-                                width: "36px",
-                                height: "36px",
-                                display: "flex",
-                                alignItems: "center",
-                                justifyContent: "center",
-                                cursor: "pointer",
-                                transition: "all 0.15s",
-                                flexShrink: 0,
-                            }}
-                        >
-                            <BarChart2 className="w-4 h-4" style={{ color: inComparison ? "#185FA5" : "#9ca3af" }} />
-                        </button>
                     </div>
                 </div>
             </Link>

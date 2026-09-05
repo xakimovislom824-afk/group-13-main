@@ -81,6 +81,12 @@ const CallbackModal = () => {
                     margin: 20px auto;
                 }
 
+                html.dark .modal-card {
+                    background: #1f2937;
+                    color: #f3f4f6;
+                    box-shadow: 0 24px 80px rgba(0,0,0,0.55), 0 4px 20px rgba(0,0,0,0.35);
+                }
+
                 @keyframes modalEnter {
                     from { opacity: 0; transform: scale(0.88) translateY(20px); }
                     to   { opacity: 1; transform: scale(1) translateY(0); }
@@ -107,6 +113,8 @@ const CallbackModal = () => {
                     color: #64748b;
                 }
                 .close-btn:hover { background: #e2e8f0; transform: rotate(90deg); color: #1e293b; }
+                html.dark .close-btn { background: #374151; color: #d1d5db; }
+                html.dark .close-btn:hover { background: #4b5563; color: #ffffff; }
 
                 .modal-icon {
                     width: 52px;
@@ -127,6 +135,7 @@ const CallbackModal = () => {
                     margin: 0 0 4px;
                     letter-spacing: -0.4px;
                 }
+                html.dark .modal-title { color: #f9fafb; }
                 .modal-subtitle {
                     font-size: 13px;
                     color: #94a3b8;
@@ -141,6 +150,7 @@ const CallbackModal = () => {
                     background: #f1f5f9;
                     margin: 0 -32px 24px;
                 }
+                html.dark .modal-divider { background: #374151; }
 
                 .field-group { margin-bottom: 18px; }
                 .field-label {
@@ -152,6 +162,7 @@ const CallbackModal = () => {
                     text-transform: uppercase;
                     letter-spacing: 0.5px;
                 }
+                html.dark .field-label { color: #d1d5db; }
                 .field-required { color: #ef4444; margin-left: 2px; }
 
                 .input-wrapper { position: relative; }
@@ -177,12 +188,19 @@ const CallbackModal = () => {
                     transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
                     background: #f8fafc;
                 }
+                html.dark .form-input {
+                    color: #f9fafb;
+                    background: #111827;
+                    border-color: #4b5563;
+                }
                 .form-input::placeholder { color: #cbd5e1; font-weight: 500; }
+                html.dark .form-input::placeholder { color: #9ca3af; }
                 .form-input:focus {
                     border-color: #1e6fd9;
                     box-shadow: 0 0 0 3px rgba(30,111,217,0.12);
                     background: #ffffff;
                 }
+                html.dark .form-input:focus { background: #111827; border-color: #60a5fa; }
                 .form-input.has-error { border-color: #ef4444; }
                 .form-input.has-error:focus { box-shadow: 0 0 0 3px rgba(239,68,68,0.12); }
                 .form-input.phone-input { padding-left: 40px; }
@@ -218,6 +236,7 @@ const CallbackModal = () => {
                     cursor: pointer;
                     font-weight: 500;
                 }
+                html.dark .privacy-label { color: #cbd5e1; }
                 .privacy-label a { color: #1e6fd9; text-decoration: none; }
                 .privacy-label a:hover { text-decoration: underline; }
 

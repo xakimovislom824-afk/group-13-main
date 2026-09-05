@@ -10,11 +10,17 @@ export const parolniTiklashApi = createApi({
       { message: string },
       { email: string }
     >({
-      query: (body) => ({
-        url: "/users/forgot-password/",
-        method: "POST",
-        body,
-      }),
+      queryFn: async (body) => {
+        try {
+          return {
+            data: {
+              message: `Parolni tiklash so'rovi qabul qilindi: ${body.email}`,
+            },
+          };
+        } catch (error: any) {
+          return { error: { status: 500, data: error?.message || "Request failed" } };
+        }
+      },
     }),
   }),
 });

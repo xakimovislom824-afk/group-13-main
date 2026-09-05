@@ -42,10 +42,14 @@ export default function CallbackModalWrapper() {
                     from { opacity: 0; }
                     to   { opacity: 1; }
                 }
+                html.dark .callback-overlay {
+                    background: rgba(0, 0, 0, 0.78) !important;
+                }
             `}</style>
 
             {/* Overlay — scrollbar kengligini ham qoplaydi, layout siljimaydi */}
             <div
+                className="callback-overlay"
                 style={{
                     position: 'fixed',
                     top: 0,

@@ -8,24 +8,13 @@ import { BarChart2, ChevronLeft, ChevronRight, CreditCard, Heart, Package, Perce
 import { Button } from "../components/ui/button";
 import Link from "next/link";
 import Carousel from "../components/Carousel";
-import KatalogaUtish from "../components/kataloggaUtish";
 import HomAksiya from "../components/homAksiya";
 import Tabs1 from "../components/engKopSotilganlar";
 import Tabs2 from "../components/engYaxshiTakliflar";
 import MashhurBrendlar from "../components/brendlar";
-import KompaniyaHaqida from "../components/homKampaniya";
 import SungiYangliklar from "../components/homYanglik";
 
 export default function Home() {
-  const stats = [
-    { number: '17 805,3 м²', label: 'торговых и складских помещений' },
-    { number: '50 000+', label: 'наименований товара' },
-    { number: '2 500+', label: 'постоянных клиентов' },
-    { number: '440', label: 'опытных сотрудников' },
-  ];
-
-
-  
   return (
     <div>
       <Carousel />
@@ -64,12 +53,10 @@ export default function Home() {
         </div>
       </div>
 
-      <KatalogaUtish />
       <HomAksiya />
       <Tabs1 />
       <MashhurBrendlar />
       <Tabs2 />
-      <KompaniyaHaqida />
       <SungiYangliklar />
 
     </div>

@@ -17,11 +17,21 @@ export interface IVerifyResponse {
 export const verifyApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
     verifyUser: builder.mutation<IVerifyResponse, IVerify>({
-      query: (body) => ({
-        url: "/users/verify/",
-        method: "POST",
-        body,
-      }),
+      queryFn: async (body) => {
+        try {
+          return {
+            data: {
+              id: Date.now(),
+              username: body.email.split("@")[0] || "user",
+              email: body.email,
+              first_name: "",
+              last_name: "",
+            },
+          };
+        } catch (error: any) {
+          return { error: { status: 500, data: error?.message || "Verification failed" } };
+        }
+      },
     }),
   }),
 });

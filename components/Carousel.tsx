@@ -1,31 +1,21 @@
 "use client"
 import Image from "next/image"
 import { useState } from "react"
-import BgRasim from "../app/src/assets/imgs/Rectangle 38.png"
-import BgRasim2 from "../app/src/assets/imgs/carusel.png"
 import Link from "next/link"
 import { ChevronLeft, ChevronRight } from "lucide-react"
-
-const slides = [
-    {
-        img: BgRasim,
-        alt: "Elektr asboblari",
-        title: "Har qanday ehtiyoj uchun elektr asboblari",
-        desc: "Bizda santexnika, vanna xonasi uchun mebellar, shuningdek, boshqa barcha turdagi qurilish mahsulotlari assortimenti yangilandi.",
-    },
-    {
-        img: BgRasim2,
-        alt: "Qurilish mollari",
-        title: "Har qanday ehtiyoj uchun qurilish mollari",
-        desc: "Bizda santexnika, vanna xonasi uchun mebellar, shuningdek, boshqa barcha turdagi qurilish mahsulotlari assortimenti yangilandi.",
-    },
-];
+import { useGetProductsQuery } from "../services/productApi"
 
 function Carousell() {
     const [current, setCurrent] = useState(0);
+    const { data: products = [], isLoading } = useGetProductsQuery();
+    const slides = products.slice(0, 4);
 
-    const prev = () => setCurrent((c) => (c === 0 ? slides.length - 1 : c - 1));
+    const prev = () => setCurrent((c) => (c === 0 ? Math.max(slides.length - 1, 0) : c - 1));
     const next = () => setCurrent((c) => (c === slides.length - 1 ? 0 : c + 1));
+
+    if (isLoading || slides.length === 0) {
+        return <section className="relative mb-6 md:mb-12 h-[360px] sm:h-[380px] md:h-[460px] lg:h-[540px] bg-slate-100" />;
+    }
 
     return (
         <section className="relative mb-6 md:mb-12 overflow-hidden">
@@ -37,15 +27,18 @@ function Carousell() {
                         key={i}
                         className={`absolute inset-0 transition-opacity duration-500 ${i === current ? "opacity-100 z-10" : "opacity-0 z-0"}`}
                     >
-                        <Image
-                            src={slide.img}
-                            alt={slide.alt}
-                            fill
-                            priority={i === 0}
-                            className="object-cover object-[70%_center] sm:object-center"
-                        />
-                        {/* Gradient */}
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent sm:bg-gradient-to-r sm:from-black/60 sm:via-black/20 sm:to-transparent" />
+                        <div className="absolute inset-0 bg-slate-100" />
+                        <div className="absolute inset-y-0 right-0 w-full sm:w-1/2 flex items-center justify-center p-8 md:p-12">
+                            <Image
+                                src={slide.image}
+                                alt={slide.name}
+                                width={520}
+                                height={520}
+                                priority={i === 0}
+                                className="max-h-full w-auto max-w-full object-contain"
+                            />
+                        </div>
+                        <div className="absolute inset-0 bg-gradient-to-r from-slate-900/85 via-slate-900/35 to-transparent sm:from-slate-900/75 sm:via-slate-900/15 sm:to-transparent" />
                     </div>
                 ))}
 
@@ -53,10 +46,10 @@ function Carousell() {
                 <div className="absolute inset-0 z-20 flex flex-col justify-end sm:justify-center pb-14 sm:pb-0 px-5 sm:px-10 md:px-16 lg:px-20">
                     <div className="max-w-xs sm:max-w-md lg:max-w-lg text-white">
                         <h2 className="font-bold leading-tight uppercase text-xl sm:text-3xl md:text-4xl lg:text-5xl">
-                            {slides[current].title}
+                            {slides[current].name}
                         </h2>
                         <p className="hidden sm:block mt-3 md:mt-4 text-gray-200 text-sm md:text-base leading-relaxed">
-                            {slides[current].desc}
+                            {slides[current].description}
                         </p>
                         <Link href="/katalog" className="inline-block mt-4 md:mt-8">
                             <button className="bg-[#001220] text-white rounded-md flex items-center gap-2 hover:bg-gray-800 transition-all font-medium uppercase tracking-wide text-xs md:text-sm px-5 py-2.5 md:px-8 md:py-4">

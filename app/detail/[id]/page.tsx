@@ -668,7 +668,10 @@ export default function ProductDetail({
     const wasInList = inWishlist;
     setInWishlist(!wasInList);
     try {
-      await toggleWishlist({ product_id: productId }).unwrap();
+      await toggleWishlist({
+        product_id: productId,
+        product_detail: product,
+      }).unwrap();
       notify(wasInList ? "Sevimlilardan olib tashlandi" : "Sevimlilarga qo'shildi!", "wish");
     } catch (err: any) {
       setInWishlist(wasInList);

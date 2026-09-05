@@ -2,8 +2,6 @@
 import { useState } from "react";
 import { FaPlus } from "react-icons/fa";
 import { CiCirclePlus } from "react-icons/ci";
-import Skitka2 from "../src/assets/imgs/skitka2.png";
-import Skitka4 from "../src/assets/imgs/skitka4.png";
 
 export default function savolJavob() {
   // Qaysi savol ochiq ekanligini saqlash uchun state
@@ -104,44 +102,6 @@ export default function savolJavob() {
 
         {/* O'NG TOMON: BANNERLAR VA OBUNA BO'LISH */}
         <div className="w-full lg:w-[320px] flex flex-col gap-6">
-
-          <div
-            className="relative overflow-hidden rounded-2xl h-48 cursor-pointer shadow-sm"
-            style={{
-              backgroundImage: `url(${Skitka4.src})`,
-              backgroundSize: "cover",
-              backgroundPosition: "center",
-              backgroundRepeat: "no-repeat",
-            }}
-          >
-            <div className="absolute inset-0 bg-white/20 p-6 flex flex-col justify-start">
-              <h3 className="text-xl font-bold text-gray-900 leading-tight mb-3">
-                Isitish <br /> tizimlari
-              </h3>
-              <span className="inline-block w-fit bg-[#001220] text-white text-[11px] font-bold px-3 py-1.5 rounded-lg">
-                -30% gacha
-              </span>
-            </div>
-          </div>
-
-          <div
-            className="relative overflow-hidden rounded-2xl h-48 cursor-pointer shadow-sm"
-            style={{
-              backgroundImage: `url(${Skitka2.src})`,
-              backgroundSize: "cover",
-              backgroundPosition: "center",
-              backgroundRepeat: "no-repeat",
-            }}
-          >
-            <div className="absolute inset-0 bg-white/20 p-6 flex flex-col justify-start">
-              <h3 className="text-xl font-bold text-gray-900 leading-tight mb-3">
-                Bo'yoq va lak <br /> mahsulotlari
-              </h3>
-              <span className="inline-block w-fit bg-[#001220] text-white text-[11px] font-bold px-3 py-1.5 rounded-lg">
-                -30% gacha
-              </span>
-            </div>
-          </div>
 
           {/* Obuna bo'lish formasi */}
           <div className="bg-gray-50 rounded-xl p-6 border border-gray-100">

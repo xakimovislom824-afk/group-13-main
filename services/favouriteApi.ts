@@ -1,26 +1,43 @@
 import { baseApi } from "./baseApi";
 
+const readFavorites = () => {
+  if (typeof window === "undefined") return [] as number[];
+  try {
+    return JSON.parse(localStorage.getItem("favorites") || "[]") as number[];
+  } catch {
+    return [] as number[];
+  }
+};
+
+const writeFavorites = (items: number[]) => {
+  if (typeof window !== "undefined") {
+    localStorage.setItem("favorites", JSON.stringify(items));
+  }
+};
+
 export const favoriteApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
-    getFavorites: builder.query({
-      query: () => "/favorites",
+    getFavorites: builder.query<number[], void>({
+      queryFn: async () => ({ data: readFavorites() }),
       providesTags: ["Favorite"],
     }),
 
-    addFavorite: builder.mutation({
-      query: (productId) => ({
-        url: "/favorites",
-        method: "POST",
-        body: { product: productId },
-      }),
+    addFavorite: builder.mutation<number[], number>({
+      queryFn: async (productId) => {
+        const list = readFavorites();
+        const next = list.includes(productId) ? list : [...list, productId];
+        writeFavorites(next);
+        return { data: next };
+      },
       invalidatesTags: ["Favorite"],
     }),
 
-    removeFavorite: builder.mutation({
-      query: (id) => ({
-        url: `/favorites/${id}`,
-        method: "DELETE",
-      }),
+    removeFavorite: builder.mutation<number[], number>({
+      queryFn: async (id) => {
+        const list = readFavorites().filter((productId) => productId !== id);
+        writeFavorites(list);
+        return { data: list };
+      },
       invalidatesTags: ["Favorite"],
     }),
   }),

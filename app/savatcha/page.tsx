@@ -26,7 +26,11 @@ export default function SavatchaPage() {
   const [updateCart] = useUpdateCartMutation();
   const [deleteCart] = useDeleteCartMutation();
 
-  const rawItems = carts.flatMap((cart) => cart.items ?? []);
+  const rawItems = carts.flatMap((cart: any) => {
+    if (Array.isArray(cart?.items)) return cart.items;
+    if (cart && (cart.product !== undefined || cart.product_data || cart.product_detail)) return [cart];
+    return [];
+  });
 
   const items: ICartItemWithDetails[] = rawItems.map((item) => {
     const matchedProduct = products.find((p) => Number(p.id) === Number(item.product));
@@ -64,11 +68,6 @@ export default function SavatchaPage() {
     ? Math.round((cartTotal * PROMO_DISCOUNT_PERCENT) / 100)
     : 0;
   const finalTotal = cartTotal - promoDiscount;
-
-  const progressPercent = Math.min((cartTotal / 500000) * 100, 100);
-  const getProgressColor = (p: number) =>
-    p >= 80 ? "#ef4444" : p >= 50 ? "#eab308" : "#22c55e";
-  const progressColor = getProgressColor(progressPercent);
 
   const handleApplyPromo = () => {
     if (promoInput.trim() === PROMO_CODE) {
@@ -137,35 +136,6 @@ export default function SavatchaPage() {
 
             {/* CHAP TOMON */}
             <div className="flex-1 space-y-4 sm:space-y-6">
-
-              {/* Progress bar */}
-              <div className="bg-white p-4 sm:p-6 rounded-xl border border-gray-100 shadow-sm">
-                <p className="text-sm font-medium mb-2 sm:mb-3">
-                  Xarid summasidan chegirmangiz:{" "}
-                  <span className="font-bold" style={{ color: progressColor }}>
-                    0 so'm
-                  </span>
-                </p>
-                <div className="relative w-full h-2 bg-gray-100 rounded-full overflow-hidden mb-3 sm:mb-4">
-                  <div
-                    className="absolute top-0 left-0 h-full transition-all duration-500 rounded-full"
-                    style={{
-                      width: `${progressPercent}%`,
-                      backgroundColor: progressColor,
-                    }}
-                  />
-                </div>
-                <p className="text-xs text-gray-500">
-                  Yana{" "}
-                  <span className="font-bold text-gray-800">
-                    {cartTotal < 500000
-                      ? (500000 - cartTotal).toLocaleString()
-                      : 0}{" "}
-                    so'm
-                  </span>
-                  lik mahsulot qo'shing va 7% chegirmaga ega bo'ling!
-                </p>
-              </div>
 
               {/* Mobile: Card list | Desktop: Table */}
               <>

@@ -453,7 +453,7 @@ function ShaxsiyKabinetContent() {
   // RENDER
   // ─────────────────────────────────────────────
   return (
-    <div className="min-h-screen bg-[#F9FAFB] p-4 md:p-10 font-sans text-slate-900">
+    <div className="kabinet-page min-h-screen bg-[#F9FAFB] p-4 md:p-10 font-sans text-slate-900">
       <div className="max-w-6xl mx-auto">
 
         <p className="text-xs text-gray-400 mb-2">Bosh sahifa / Shaxsiy kabinet</p>

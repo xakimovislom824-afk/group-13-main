@@ -9,8 +9,7 @@ interface ProductsProps {
 }
 
 const Products = ({ searchQuery = "" }: ProductsProps) => {
-  const { data, isLoading, isError } = useGetProductsQuery();
-  const products = data || [];
+  const { data: products = [], isLoading, isError } = useGetProductsQuery();
 
   const filteredProducts = useMemo(() => {
     if (!searchQuery.trim()) return products;

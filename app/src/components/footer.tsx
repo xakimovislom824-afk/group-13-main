@@ -2,10 +2,10 @@
 import { useState } from "react";
 import Image from 'next/image';
 import Link from "next/link";
-import Logo from "../assets/imgs/logo1.png";
 import CallbackModal from "./CallbackModalWrapper";
 import { useModal } from "../../context/ModalContext";
 import { FiChevronDown } from "react-icons/fi";
+import Logo from "../assets/icons/logo-transparent.png";
 import tulov1 from "../assets/icons/Group 46.png"
 import tulov2 from "../assets/icons/Group 47.png"
 import tulov3 from "../assets/icons/Group 48.png"
@@ -39,17 +39,8 @@ export default function Footer() {
 
             {/* Logo */}
             <Link href={"/"} className="inline-block shrink-0">
-              <Image
-                src={Logo}
-                alt="Kompaniya logotipi"
-                className="h-auto w-auto max-w-[170px]"
-              />
+              <Image src={Logo} alt="Logo" width={126} height={48} className="h-12 w-auto object-contain" />
             </Link>
-
-            {/* Kompaniya nomi */}
-            <div className="text-[13px] text-gray-700 shrink-0">
-              <p>OOO &quot;Stroyopttorg&quot;</p>
-            </div>
 
             {/* INN / KPP */}
             <div className="text-[13px] text-gray-600 shrink-0">
@@ -89,11 +80,7 @@ export default function Footer() {
           <div className="lg:hidden flex flex-col gap-4 border-b pb-6">
             <div className="flex w-full justify-between items-start gap-4">
               <Link href={"/"} className="inline-block">
-                <Image
-                  src={Logo}
-                  alt="Kompaniya logotipi"
-                  className="h-auto w-auto max-w-[150px]"
-                />
+                <Image src={Logo} alt="Logo" width={105} height={40} className="h-10 w-auto object-contain" />
               </Link>
 
               <div className="text-[12px] text-right shrink-0">
@@ -136,13 +123,11 @@ export default function Footer() {
               <div className={`grid overflow-hidden transition-all duration-300 ${isInfoOpen ? "grid-rows-[1fr] opacity-100 pb-4" : "grid-rows-[0fr] opacity-0"}`}>
                 <div className="overflow-hidden">
                   <div className="grid grid-cols-2 gap-x-4 gap-y-3 text-[14px]">
-                    <Link href="/kompaneyaHaqida" className="hover:text-blue-600 transition-colors">Kompaniya haqida</Link>
                     <Link href="/savolJavob" className="hover:text-blue-600 transition-colors">Savol-javob</Link>
                     <Link href="/tulov" className="hover:text-blue-600 transition-colors">To&apos;lov</Link>
                     <Link href="/blog" className="hover:text-blue-600 transition-colors">Yangiliklar</Link>
                     <Link href="/yetkazibBerish" className="hover:text-blue-600 transition-colors">Yetkazib berish</Link>
                     <Link href="/aloqa" className="hover:text-blue-600 transition-colors">Aloqa</Link>
-                    <Link href="/qaytarish" className="hover:text-blue-600 transition-colors">Qaytarish</Link>
                     <Link href="/login" className="hover:text-blue-600 transition-colors">Kirish / Ro&apos;yxat</Link>
                     <Link href="/fikrlar" className="hover:text-blue-600 transition-colors">Fikrlar</Link>
                     <Link href="/aksiyalar" className="hover:text-blue-600 transition-colors">Barcha aksiyalar</Link>
@@ -163,17 +148,12 @@ export default function Footer() {
               <div className={`grid overflow-hidden transition-all duration-300 ${isCatalogOpen ? "grid-rows-[1fr] opacity-100 pb-4" : "grid-rows-[0fr] opacity-0"}`}>
                 <div className="overflow-hidden">
                   <div className="flex flex-col gap-3 text-[14px]">
-                    <Link href="/qurilishMateriallari" className="hover:text-blue-600 transition-colors">Umumqurilish materiallari</Link>
-                    <Link href="/saunaUchun" className="hover:text-blue-600 transition-colors">Sauna va hammom uchun</Link>
-                    <Link href="/asbobUskunalar" className="hover:text-blue-600 transition-colors">Asbob-uskunalar</Link>
-                    <Link href="/otdelka" className="hover:text-blue-600 transition-colors">Pardozlash materiallari</Link>
-                    <Link href="/uyBog" className="hover:text-blue-600 transition-colors">Uy, bog&apos; va hovli uchun mahsulotlar</Link>
-                    <Link href="/elektr" className="hover:text-blue-600 transition-colors">Elektr tovarlar</Link>
-                    <Link href="/santexnika" className="hover:text-blue-600 transition-colors">Santexnika</Link>
-                    <Link href="/stolyar" className="hover:text-blue-600 transition-colors">Yog&apos;och buyumlari</Link>
-                    <Link href="/spetsodejda" className="hover:text-blue-600 transition-colors">Maxsus kiyim va YHV vositalari</Link>
-                    <Link href="/suvGaz" className="hover:text-blue-600 transition-colors">Suv-gaz ta&apos;minoti, isitish, ventilyatsiya</Link>
-                    <Link href="/metiz" className="hover:text-blue-600 transition-colors">Metiz, taqelama va skoba buyumlari</Link>
+                    <Link href="/qurilishMateriallari" className="hover:text-blue-600 transition-colors">Home-decoration</Link>
+                    <Link href="/asbobUskunalar" className="hover:text-blue-600 transition-colors">Laptops & electronics</Link>
+                    <Link href="/elektr" className="hover:text-blue-600 transition-colors">Smartphones</Link>
+                    <Link href="/santexnika" className="hover:text-blue-600 transition-colors">Fragrances & skincare</Link>
+                    <Link href="/uyBog" className="hover:text-blue-600 transition-colors">Furniture & home goods</Link>
+                    <Link href="/blog" className="hover:text-blue-600 transition-colors">Groceries</Link>
                   </div>
                 </div>
               </div>
@@ -205,10 +185,8 @@ export default function Footer() {
             <div className="col-span-1">
               <h3 className="font-bold text-black mb-4 text-[15px]">Ma&apos;lumot</h3>
               <div className="grid grid-cols-1 gap-2 text-[14px]">
-                <Link href="/kompaneyaHaqida" className="hover:text-blue-600 transition-colors">Kompaniya haqida</Link>
                 <Link href="/tulov" className="hover:text-blue-600 transition-colors">To&apos;lov</Link>
                 <Link href="/yetkazibBerish" className="hover:text-blue-600 transition-colors">Yetkazib berish</Link>
-                <Link href="/qaytarish" className="hover:text-blue-600 transition-colors">Qaytarish</Link>
                 <Link href="/fikrlar" className="hover:text-blue-600 transition-colors">Fikrlar</Link>
               </div>
             </div>
@@ -227,29 +205,29 @@ export default function Footer() {
             <div className="col-span-1">
               <h3 className="font-bold text-black mb-4 text-[15px]">Katalog</h3>
               <div className="flex flex-col gap-2 text-[14px]">
-                <span className="hover:text-blue-600 transition-colors">Umumqurilish materiallari</span>
-                <span className="hover:text-blue-600 transition-colors">Sauna va hammom uchun</span>
-                <span className="hover:text-blue-600 transition-colors">Asbob-uskunalar</span>
-                <span className="hover:text-blue-600 transition-colors">Pardozlash materiallari</span>
-                <span className="hover:text-blue-600 transition-colors">Uy, bog&apos; va hovli uchun mahsulotlar</span>
+                <span className="hover:text-blue-600 transition-colors">Home-decoration</span>
+                <span className="hover:text-blue-600 transition-colors">Furniture</span>
+                <span className="hover:text-blue-600 transition-colors">Laptops</span>
+                <span className="hover:text-blue-600 transition-colors">Smartphones</span>
+                <span className="hover:text-blue-600 transition-colors">Lighting</span>
               </div>
             </div>
 
             {/* Katalog — ikkinchi guruh */}
             <div className="col-span-1">
               <div className="flex flex-col gap-2 text-[14px] mt-[30px]">
-                <span className="hover:text-blue-600 transition-colors">Elektr tovarlar</span>
-                <span className="hover:text-blue-600 transition-colors">Santexnika</span>
-                <span className="hover:text-blue-600 transition-colors">Yog&apos;och buyumlari</span>
-                <span className="hover:text-blue-600 transition-colors">Maxsus kiyim va YHV vositalari</span>
+                <span className="hover:text-blue-600 transition-colors">Fragrances</span>
+                <span className="hover:text-blue-600 transition-colors">Skincare</span>
+                <span className="hover:text-blue-600 transition-colors">Groceries</span>
+                <span className="hover:text-blue-600 transition-colors">Automotive</span>
               </div>
             </div>
 
             {/* Katalog — uchinchi guruh */}
             <div className="col-span-1">
               <div className="flex flex-col gap-3 text-[14px] mt-[30px]">
-                <span className="hover:text-blue-600 transition-colors">Suv-gaz ta&apos;minoti, isitish, ventilyatsiya</span>
-                <span className="hover:text-blue-600 transition-colors">Metiz, taqelama va skoba buyumlari</span>
+                <span className="hover:text-blue-600 transition-colors">Motorcycle</span>
+                <span className="hover:text-blue-600 transition-colors">Womens-dresses</span>
               </div>
             </div>
           </div>

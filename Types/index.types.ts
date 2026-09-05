@@ -5,6 +5,7 @@ export interface IProduct {
   price: string;
   old_price: string;
   image: string;
+  brand?: string;
   is_hit: boolean;
   is_new: boolean;
   is_sale: boolean;

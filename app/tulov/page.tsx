@@ -4,8 +4,6 @@ import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import Skitka2 from "../src/assets/imgs/skitka2.png";
-import Skitka4 from "../src/assets/imgs/skitka4.png";
 
 // 1. Zod sxemasi
 const subscribeSchema = z.object({
@@ -172,31 +170,6 @@ export default function TulovSahifasi() {
 
         {/* O'NG TARAF: Bannerlar va Obuna */}
         <div className="w-full lg:w-[320px] shrink-0 flex flex-col gap-6">
-          {/* Banners */}
-          {[
-            { img: Skitka2, title: "Bo'yoq va lak\nmahsulotlari" },
-            { img: Skitka4, title: "Isitish\ntizimlari" },
-          ].map((banner, index) => (
-            <div
-              key={index}
-              className="relative overflow-hidden rounded-2xl h-48 cursor-pointer shadow-sm group"
-              style={{
-                backgroundImage: `url(${banner.img.src})`,
-                backgroundSize: "cover",
-                backgroundPosition: "center",
-              }}
-            >
-              <div className="absolute inset-0 bg-white/10 group-hover:bg-black/5 transition-all p-6 flex flex-col justify-start">
-                <h3 className="text-xl font-bold text-gray-900 leading-tight mb-3 whitespace-pre-line">
-                  {banner.title}
-                </h3>
-                <span className="inline-block w-fit bg-[#001220] text-white text-[11px] font-bold px-3 py-1.5 rounded-lg">
-                  -30% gacha
-                </span>
-              </div>
-            </div>
-          ))}
-
           {/* Obuna Formasi (Zod bilan) */}
           <div className="bg-[#F8F9FA] p-6 rounded-md border border-gray-100 shadow-sm">
             <h4 className="text-[15px] font-bold mb-2 uppercase">Yangiliklarga obuna bo'ling</h4>

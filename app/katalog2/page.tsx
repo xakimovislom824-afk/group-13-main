@@ -2,8 +2,6 @@
 import { ChevronDown, SlidersHorizontal, X } from "lucide-react";
 import { useState, useEffect } from "react";
 import Image from "next/image";
-import Sikitka from "../src/assets/imgs/skitka2.png";
-import Sikitka2 from "../src/assets/imgs/skitka4.png";
 
 function Katalog2() {
   const [drawerOpen, setDrawerOpen] = useState(false);
@@ -28,10 +26,10 @@ function Katalog2() {
   }, [drawerOpen]);
 
   const filterContent = (
-    <div className="select-none">
+    <div className="catalog-filter select-none">
       <h1 className="text-2xl font-bold mb-8 text-[#0f172a] hidden lg:block">
         {" "}
-        Elektr asbob-uskunalari
+        DummyJSON mahsulotlari
       </h1>
 
       {/* Narxi */}
@@ -84,7 +82,7 @@ function Katalog2() {
             }`}
         >
           <div className="space-y-3.5">
-            {["Toʻplam", "Takko (Shtativ)", "Adapter", "Ushlagich", "Filtr"].map(
+            {["smartphones", "laptops", "fragrances", "skincare", "groceries"].map(
               (item, i) => (
                 <label key={item} className="flex items-center gap-3 cursor-pointer">
                   <input
@@ -301,48 +299,6 @@ function Katalog2() {
 
       <br />
 
-      {/* Reklama bannerlari */}
-      <div className="space-y-4 mb-6">
-        <div className="relative rounded-lg overflow-hidden shadow-sm border border-gray-100 cursor-pointer group">
-          <div className="relative h-48 sm:h-52">
-            <Image
-              src={Sikitka}
-              alt="Isitish tizimi"
-              fill
-              className="object-cover group-hover:scale-105 transition-transform duration-300"
-            />
-            <div className="absolute inset-0 bg-black/10" />
-            <div className="absolute top-1/2 left-5 -translate-y-1/2 max-w-[140px]">
-              <h3 className="font-bold text-[16px] sm:text-[18px] leading-tight mb-2 text-gray-800">
-                Isitish tizimi uchun barcha narsalar
-              </h3>
-              <span className="bg-[#1A202C] text-white text-[10px] px-2 py-1 font-bold rounded-sm uppercase">
-                -30% gacha
-              </span>
-            </div>
-          </div>
-        </div>
-
-        <div className="relative rounded-lg overflow-hidden shadow-sm border border-gray-100 cursor-pointer group">
-          <div className="relative h-48 sm:h-52">
-            <Image
-              src={Sikitka2}
-              alt="Bo'yoqlar"
-              fill
-              className="object-cover group-hover:scale-105 transition-transform duration-300"
-            />
-            <div className="absolute inset-0 bg-black/10" />
-            <div className="absolute top-1/2 left-5 -translate-y-1/2 max-w-[140px]">
-              <h3 className="font-bold text-[16px] sm:text-[18px] leading-tight mb-2 text-gray-800">
-                Lok-bo'yoq materiallari
-              </h3>
-              <span className="bg-[#1A202C] text-white text-[10px] px-2 py-1 font-bold rounded-sm uppercase">
-                -30% gacha
-              </span>
-            </div>
-          </div>
-        </div>
-      </div>
     </div>
   );
 

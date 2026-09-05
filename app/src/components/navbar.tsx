@@ -3,6 +3,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { FiGift } from "react-icons/fi";
+import { FiMoon, FiSun } from "react-icons/fi";
 import { useState, useEffect, useCallback, useMemo, useRef, Suspense } from "react";
 import { BarChart2 } from "lucide-react";
 import {
@@ -10,25 +11,20 @@ import {
   FaHeart,
   FaShoppingCart,
   FaSearch,
-  FaGripLines,
-  FaChevronRight,
-  FaChevronLeft,
 } from "react-icons/fa";
 import { IoClose, IoMenu } from "react-icons/io5";
-import Logo from "../assets/imgs/logo1.png";
 import { useModal } from "../../context/ModalContext";
 import { useGetWishlistQuery } from "../../../services/wishlistApi";
 import { useGetCartsQuery } from "../../../services/cartApi";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useProductSearch } from "../../hooks/useProductSearch";
+import Logo from "../assets/icons/logo-transparent.png";
 
 export const dynamic = "force-dynamic";
 
 // ─────────────────────────────────────────────
 // TYPES
 // ─────────────────────────────────────────────
-interface SubCategory { id: number; name: string; items: string[] }
-interface Category { id: number; name: string; subCategories: SubCategory[] }
 interface UserData { username: string | null; avatar: string | null }
 
 // ─────────────────────────────────────────────
@@ -40,98 +36,11 @@ const STORAGE_KEYS = {
 };
 
 const topLinks = [
-  { href: "/kompaneyaHaqida", label: "Kompaniya haqida" },
   { href: "/tulov", label: "To'lov" },
   { href: "/yetkazibBerish", label: "Yetkazib berish" },
-  { href: "/qaytarish", label: "Qaytarish" },
   { href: "/fikrlar", label: "Fikrlar" },
   { href: "/blog", label: "Yangiliklar" },
   { href: "/aloqa", label: "Aloqa" },
-];
-
-const catalogData: Category[] = [
-  {
-    id: 1, name: "VODO-GAZOSNABJENIE, OTOPLENIE, VENTILYATSIYA",
-    subCategories: [
-      { id: 11, name: "Isitish tizimlari", items: ["Radiatorlar", "Kotellar", "Issiq pol", "Nasoslar"] },
-      { id: 12, name: "Suv ta'minoti", items: ["Polipropilen quvurlar", "Filtrlar", "Jo'mraklar", "Baklar"] },
-      { id: 13, name: "Ventilyatsiya", items: ["Havo haydagichlar", "Gofra quvurlar", "Reshotkalar"] },
-    ]
-  },
-  {
-    id: 2, name: "OBSHCHESTROITELNIYE MATERIALI",
-    subCategories: [
-      { id: 21, name: "Quruq aralashmalar", items: ["Sement", "Gipsli suvoq", "Kafel yelimi", "Shpaklyovka"] },
-      { id: 22, name: "G'isht va bloklar", items: ["Pishgan g'isht", "Gazoblok", "Penoblok"] },
-      { id: 23, name: "Izolyatsiya", items: ["Penoplast", "Shisha paxta", "Gidroizolyatsiya"] },
-    ]
-  },
-  {
-    id: 3, name: "VSYO DLYA SAUNI I BANI",
-    subCategories: [
-      { id: 31, name: "Pechlar", items: ["Elektr pechlar", "O'tinli pechlar", "Pech toshlari"] },
-      { id: 32, name: "Jihozlar", items: ["Yog'och chelaklar", "Termometrlar", "Supa uchun yog'ochlar"] },
-    ]
-  },
-  {
-    id: 4, name: "INSTRUMENT",
-    subCategories: [
-      { id: 41, name: "Izmeritelno-razmetochniy instrument", items: ["Ruletkalar", "Lazer sathlar", "Nivelirlar"] },
-      { id: 42, name: "Ruchnoy instrument", items: ["Bolg'alar", "Atvertkalar", "Kalitlar", "Ombirlar"] },
-      { id: 43, name: "Svarochnoye oborudovanie", items: ["Invertorlar", "Payvandlash niqoblari", "Elektrodlar"] },
-      { id: 44, name: "Stroitelnoye oborudovanie", items: ["Betonmeshalkalar", "Vibratorlar", "Lestnisalar"] },
-      { id: 45, name: "Shtukaturno-otdelochniye instrumenti", items: ["Shpatellar", "Kelmalar", "Valiklar", "Shetkalar"] },
-      { id: 46, name: "Elektroinstrument", items: ["Vibrotexnika i komplektuyushchie", "Generatori i komplektuyushchie", "Dreli, shurupoverti i gaykoverti", "Kraskopulti elektricheskie, kompressori, gvozdezabivateli", "Mikseri stroitelnie", "Otboynie molotki", "Perforatori", "Graveri", "Frezeri", "Shlifovalnie mashini i mnogofunktsionalniy instrument", "Shtroborezi i prisposobleniya", "Elektrolobtseri", "Motopompi i komplektuyushchie", "Multimetri", "Pili", "Plitkorez", "Pnevmoinstrumenti, kompressori i komplektuyushchie", "Pusko-zaryadnie i zaryadnie ustroystva", "Rasxodnie materiali i osnastka dlya elektroinstrumenta", "Stabilizatori napryajeniya"] },
-    ]
-  },
-  {
-    id: 5, name: "OTDELOCHNIYE MATERIALI",
-    subCategories: [
-      { id: 51, name: "Devor va ship", items: ["Oboylar", "Kraskalar", "Gipsokarton", "Dekorativ suvoq"] },
-      { id: 52, name: "Pol qoplamalari", items: ["Laminat", "Linoleum", "Kafel", "Plintuslar"] },
-    ]
-  },
-  {
-    id: 6, name: "SANTEXNIKA",
-    subCategories: [
-      { id: 61, name: "Keramika", items: ["Unitazlar", "Rakovinalar", "Vannalar", "Dush kabinalari"] },
-      { id: 62, name: "Mebel va aksessuarlar", items: ["Vanna shkaflari", "Oynalar", "Smeshitelar"] },
-    ]
-  },
-  {
-    id: 7, name: "METIZNIYE, TAKELAJNIYE I SKOBYANIYE IZDELIYA",
-    subCategories: [
-      { id: 71, name: "Metizlar", items: ["Samorezdlar", "Boltlar", "Gaykalar", "Ankerlar"] },
-      { id: 72, name: "Qulflar", items: ["Eshik qulflari", "Osma qulflar", "Tutqichlar"] },
-    ]
-  },
-  {
-    id: 8, name: "SPETSODEJDA I SREDSTVA INDIVIDUALNOY ZASHCHITI",
-    subCategories: [
-      { id: 81, name: "Kiyimlar", items: ["Kombinezonlar", "Nimchalar", "Maxsus poyabzallar"] },
-      { id: 82, name: "Himoya", items: ["Kaskalar", "Qo'lqoplar", "Ko'zoynaklar", "Respiratorlar"] },
-    ]
-  },
-  {
-    id: 9, name: "STOLYARNIYE IZDELIYA",
-    subCategories: [
-      { id: 91, name: "Yog'och mahsulotlari", items: ["Eshiklar", "Zinapoyalar", "Fanera", "DSP / MDF"] },
-    ]
-  },
-  {
-    id: 10, name: "TOVARI DLYA DOMA, SADA I OGORODA",
-    subCategories: [
-      { id: 101, name: "Bog' asboblari", items: ["Lopatkalar", "Tokqaychilar", "Suv sepkichlar"] },
-      { id: 102, name: "Texnika", items: ["O't o'rgichlar", "Kultivatorlar", "Zanjirli arralar"] },
-    ]
-  },
-  {
-    id: 11, name: "ELEKTROTOVARI",
-    subCategories: [
-      { id: 111, name: "Yoritish", items: ["Lustralar", "LED lampalar", "Projektorlar"] },
-      { id: 112, name: "Elektromontaj", items: ["Kabellar", "Avtomatlar", "Rozetkalar", "Stabilizatorlar"] },
-    ]
-  },
 ];
 
 // ─────────────────────────────────────────────
@@ -430,10 +339,8 @@ export default function Navbar() {
   const navbarRef = useRef<HTMLDivElement>(null);
   const [navbarHeight, setNavbarHeight] = useState(0);
 
-  const [isKatalogOpen, setIsKatalogOpen] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const [activeCat, setActiveCat] = useState<Category | null>(null);
-  const [activeSub, setActiveSub] = useState<SubCategory | null>(null);
+  const [isDarkMode, setIsDarkMode] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [userData, setUserData] = useState<UserData>({ username: null, avatar: null });
 
@@ -442,9 +349,13 @@ export default function Navbar() {
   const { data: cart } = useGetCartsQuery();
 
   const cartCount = Array.isArray(cart)
-    ? cart.reduce((sum, c) => sum + (Array.isArray(c?.items) ? c.items.length : 0), 0)
-    : Array.isArray(cart?.items)
-      ? cart.items.length
+    ? cart.reduce((sum, c) => {
+        if (Array.isArray((c as any)?.items)) return sum + (c as any).items.length;
+        if (c && ((c as any).product !== undefined || (c as any).product_data || (c as any).product_detail)) return sum + 1;
+        return sum;
+      }, 0)
+    : Array.isArray((cart as any)?.items)
+      ? (cart as any).items.length
       : 0;
 
   const updateNavbarHeight = useCallback(() => {
@@ -461,17 +372,14 @@ export default function Navbar() {
     };
   }, [updateNavbarHeight]);
 
-  useEffect(() => { updateNavbarHeight(); }, [isKatalogOpen, updateNavbarHeight]);
-
-  // Katalog yoki Sidebar ochilganda fon skrollini bloklash
   useEffect(() => {
-    if (isKatalogOpen || isSidebarOpen) {
+    if (isSidebarOpen) {
       document.body.style.overflow = "hidden";
     } else {
       document.body.style.overflow = "unset";
     }
     return () => { document.body.style.overflow = "unset"; };
-  }, [isKatalogOpen, isSidebarOpen]);
+  }, [isSidebarOpen]);
 
   const refreshAuth = useCallback(() => {
     const ok = checkIsLoggedIn();
@@ -489,23 +397,29 @@ export default function Navbar() {
     };
   }, [refreshAuth]);
 
-  const toggleKatalog = useCallback(() => {
-    setIsKatalogOpen(prev => {
-      if (!prev) {
-        if (window.innerWidth <= 768) {
-          setActiveCat(null);
-          setActiveSub(null);
-        } else {
-          // Xavfsiz tekshiruv bilan default elementlarni tanlash
-          const defaultCat = catalogData[3] || catalogData[0] || null;
-          setActiveCat(defaultCat);
-          setActiveSub(defaultCat?.subCategories?.[0] || null);
-        }
-      } else {
-        setActiveCat(null);
-        setActiveSub(null);
-      }
-      return !prev;
+  useEffect(() => {
+    const savedTheme = localStorage.getItem("theme");
+    let themeMode = "light";
+
+    try {
+      const parsedTheme = savedTheme ? JSON.parse(savedTheme) : null;
+      themeMode = parsedTheme?.mode === "dark" ? "dark" : "light";
+    } catch {
+      themeMode = savedTheme === "dark" ? "dark" : "light";
+    }
+
+    const dark = themeMode === "dark";
+    setIsDarkMode(dark);
+    document.documentElement.classList.toggle("dark", dark);
+    localStorage.setItem("theme", JSON.stringify({ mode: themeMode }));
+  }, []);
+
+  const toggleDarkMode = useCallback(() => {
+    setIsDarkMode((current) => {
+      const next = !current;
+      document.documentElement.classList.toggle("dark", next);
+      localStorage.setItem("theme", JSON.stringify({ mode: next ? "dark" : "light" }));
+      return next;
     });
   }, []);
 
@@ -514,10 +428,8 @@ export default function Navbar() {
 
   const sidebarLinks = useMemo(() => [
     { href: "/aksiyalar", label: "Barcha aksiyalar", icon: <FiGift size={20} /> },
-    { href: "/kompaneyaHaqida", label: "Kompaniya haqida" },
     { href: "/tulov", label: "To'lov" },
     { href: "/yetkazibBerish", label: "Yetkazib berish" },
-    { href: "/qaytarish", label: "Qaytarish" },
     { href: "/fikrlar", label: "Fikrlar" },
     { href: "/blog", label: "Yangiliklar" },
     { href: "/aloqa", label: "Aloqa" },
@@ -544,10 +456,18 @@ export default function Navbar() {
           ))}
         </nav>
         <div className="flex gap-2 sm:gap-4 items-center">
-          <span className="font-bold text-black text-[11px] sm:text-[14px] whitespace-nowrap">8 800 444 00 65</span>
+          <button
+            type="button"
+            onClick={toggleDarkMode}
+            aria-label={isDarkMode ? "Yorug' rejimni yoqish" : "Tungi rejimni yoqish"}
+            title={isDarkMode ? "Yorug' rejim" : "Tungi rejim"}
+            className="flex h-9 w-9 items-center justify-center rounded-full text-gray-700 hover:bg-gray-200 hover:text-blue-600 transition-colors dark:text-gray-200 dark:hover:bg-gray-700"
+          >
+            {isDarkMode ? <FiSun size={19} /> : <FiMoon size={19} />}
+          </button>
           <button onClick={openModal}
-            className="hidden sm:block cursor-pointer text-blue-600 font-bold border-b border-blue-600 border-dotted text-[10px] uppercase">
-            Qo'ng'iroq qilishni so'rang
+            className="hidden sm:block cursor-pointer text-blue-600 font-bold border-b border-blue-600 border-dotted text-[10px] uppercase dark:text-blue-300 dark:border-blue-300">
+            Qo&apos;ng&apos;iroq qilishni so&apos;rang
           </button>
         </div>
       </div>
@@ -555,14 +475,8 @@ export default function Navbar() {
       {/* ── MAIN NAVBAR ── */}
       <div className="flex items-center justify-between gap-4 px-4 md:px-6 py-4">
         <Link href="/" className="shrink-0">
-          <Image src={Logo} alt="Logo" width={180} height={45} className="w-30 md:w-45" priority />
+          <Image src={Logo} alt="Logo" width={126} height={48} className="h-10 w-auto md:h-12 object-contain" priority />
         </Link>
-
-        <button onClick={toggleKatalog} aria-expanded={isKatalogOpen}
-          className="hidden md:flex items-center gap-2 px-5 py-2.5 rounded-sm font-bold bg-blue-600 text-white hover:bg-slate-800 transition-all shrink-0">
-          {isKatalogOpen ? <IoClose size={22} /> : <FaGripLines size={20} />}
-          <span className="tracking-wider text-sm">KATALOG</span>
-        </button>
 
         {/* Desktop SearchBox */}
         <div className="hidden md:flex flex-1 max-w-2xl mx-4">
@@ -571,7 +485,6 @@ export default function Navbar() {
 
         <div className="flex items-center gap-3 md:gap-6 text-gray-500">
           <NavIcon href="/aksiyalar" icon={<FiGift size={20} />} label="Barcha aksiyalar" className="hidden lg:flex ml-6" />
-          <NavIcon href="/taqqoslash" icon={<BarChart2 size={20} />} label="Taqqoslash" />
           <NavIcon href="/wishlist" icon={<FaHeart size={20} />} label="Saralangan" badge={wishlist.length || ""} />
           <NavIcon href="/savatcha" icon={<FaShoppingCart size={20} />} label="Savat" badge={cartCount || ""} />
           {isLoggedIn ? (
@@ -590,91 +503,12 @@ export default function Navbar() {
         </div>
       </div>
 
-      {/* ── MOBILE: KATALOG + SEARCH ── */}
-      <div className="flex md:hidden items-center gap-1.5 sm:gap-2 px-3 sm:px-4 pb-4">
-        <button onClick={toggleKatalog} aria-expanded={isKatalogOpen}
-          className="bg-blue-600 text-white rounded-sm flex items-center justify-center gap-1.5 shrink-0 h-11 px-2.5 sm:px-3">
-          {isKatalogOpen ? <IoClose size={18} /> : <FaGripLines size={16} />}
-          <span className="tracking-wider text-[11px] sm:text-xs font-bold whitespace-nowrap">KATALOG</span>
-        </button>
+      {/* ── MOBILE SEARCH ── */}
+      <div className="flex md:hidden items-center px-3 sm:px-4 pb-4">
         <div className="flex-1 min-w-0">
           <SearchBox isMobile />
         </div>
       </div>
-
-      {/* ── KATALOG DROPDOWN ── */}
-      {isKatalogOpen && (
-        <div className="fixed left-0 w-full bg-white shadow-2xl border-t border-gray-200 z-[1001]" style={{ top: `${navbarHeight}px` }}>
-          <div className="max-w-[1440px] mx-auto flex flex-col md:flex-row h-[70vh] md:h-[520px] overflow-hidden bg-white items-start">
-
-            {/* 1-Ustun: Asosiy Kategoriyalar */}
-            <div className={`w-full md:w-[300px] border-r border-gray-100 bg-white overflow-y-auto h-full shrink-0 ${activeCat ? "hidden md:block" : "block"}`}>
-              {catalogData.map(cat => {
-                const isSelected = activeCat?.id === cat.id;
-                return (
-                  <div key={cat.id}
-                    onClick={() => { setActiveCat(cat); setActiveSub(cat.subCategories[0] || null); }}
-                    onMouseEnter={() => { if (window.innerWidth > 768) { setActiveCat(cat); setActiveSub(cat.subCategories[0] || null); } }}
-                    className={`px-5 py-3.5 flex justify-between items-center cursor-pointer text-[11px] font-bold uppercase transition-all tracking-wide border-b border-gray-50 ${isSelected ? "bg-blue-600 text-white font-black" : "text-gray-700 hover:bg-gray-50 hover:text-blue-600"}`}>
-                    <span className="pr-4 break-words line-clamp-2">{cat.name}</span>
-                    <FaChevronRight size={10} className={`shrink-0 ${isSelected ? "text-white" : "text-gray-400"}`} />
-                  </div>
-                );
-              })}
-            </div>
-
-            {/* 2-Ustun: Sub-Kategoriyalar */}
-            <div className={`w-full md:w-[280px] border-r border-gray-100 bg-gray-50/50 overflow-y-auto h-full shrink-0 ${activeCat ? "block" : "hidden md:block"}`}>
-              {activeCat && (
-                <>
-                  <div onClick={() => setActiveCat(null)}
-                    className="md:hidden p-4 bg-gray-100 flex items-center text-blue-600 font-bold border-b text-xs cursor-pointer sticky top-0 z-10">
-                    <FaChevronLeft className="mr-2" /> Orqaga
-                  </div>
-                  <div className="py-2">
-                    {activeCat.subCategories.map(sub => {
-                      const isSubSelected = activeSub?.id === sub.id;
-                      return (
-                        <div key={sub.id}
-                          onClick={() => setActiveSub(sub)}
-                          onMouseEnter={() => { if (window.innerWidth > 768) setActiveSub(sub); }}
-                          className={`px-6 py-3 flex justify-between items-center cursor-pointer text-xs font-bold transition-all ${isSubSelected ? "text-blue-600 bg-white" : "text-gray-700 hover:bg-white/60"}`}>
-                          <span className="pr-2">{sub.name}</span>
-                          <FaChevronRight size={10} className={`shrink-0 ${isSubSelected ? "text-blue-600" : "text-gray-300 md:hidden"}`} />
-                        </div>
-                      );
-                    })}
-                  </div>
-                </>
-              )}
-            </div>
-
-            {/* 3-Ustun: Ichki Turlar / Items */}
-            <div className={`w-full flex-1 bg-white overflow-y-auto h-full ${activeSub ? "block" : "hidden md:block"}`}>
-              {activeSub ? (
-                <>
-                  <div onClick={() => setActiveSub(null)}
-                    className="md:hidden p-4 bg-gray-100 flex items-center text-blue-600 font-bold border-b text-xs cursor-pointer sticky top-0 z-10">
-                    <FaChevronLeft className="mr-2" /> Orqaga
-                  </div>
-                  <div className="p-8 grid grid-cols-1 sm:grid-cols-2 gap-x-12 gap-y-3.5 content-start">
-                    {activeSub.items.map((item, i) => (
-                      <div key={i} className="text-gray-700 text-xs hover:text-blue-600 cursor-pointer font-medium transition-all py-1 border-b border-gray-50 sm:border-none">
-                        {item}
-                      </div>
-                    ))}
-                  </div>
-                </>
-              ) : (
-                <div className="hidden md:flex items-center justify-center h-full text-gray-400 text-xs italic">
-                  Bo'limni tanlang
-                </div>
-              )}
-            </div>
-
-          </div>
-        </div>
-      )}
 
       {/* ── SIDEBAR ── */}
       <div className={`fixed inset-0 bg-black/60 z-[2000] transition-opacity duration-300 ${isSidebarOpen ? "opacity-100 visible" : "opacity-0 invisible pointer-events-none"}`}>
@@ -709,7 +543,14 @@ export default function Navbar() {
               )}
             </nav>
             <div className="p-6 text-center border-t mt-4 mb-8">
-              <div className="text-[22px] font-bold text-[#0c1c2b] mb-3">8 800 444 00 65</div>
+              <button
+                type="button"
+                onClick={toggleDarkMode}
+                aria-label={isDarkMode ? "Yorug' rejimni yoqish" : "Tungi rejimni yoqish"}
+                className="mx-auto mb-3 flex h-11 w-11 items-center justify-center rounded-full bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-200 dark:hover:bg-gray-700"
+              >
+                {isDarkMode ? <FiSun size={21} /> : <FiMoon size={21} />}
+              </button>
               <button onClick={openModal} className="w-full py-4 px-4 bg-[#f0f4f8] text-blue-600 font-bold rounded-md uppercase text-[13px] tracking-widest mb-3">
                 Qo'ng'iroq qilishni so'rang
               </button>
@@ -720,12 +561,6 @@ export default function Navbar() {
         <div className="w-full h-full" onClick={closeSidebar} />
       </div>
 
-      {/* Overlay */}
-      {isKatalogOpen && (
-        <div className="fixed left-0 w-full bg-black/20 backdrop-blur-[1px] z-[999]"
-          style={{ top: `${navbarHeight}px`, bottom: 0 }}
-          onClick={() => setIsKatalogOpen(false)} />
-      )}
     </div>
   );
 }
