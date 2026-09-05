@@ -3,7 +3,7 @@ import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 export const parolniTiklashApi = createApi({
   reducerPath: "parolniTiklashApi",
   baseQuery: fetchBaseQuery({
-    baseUrl: process.env.NEXT_PUBLIC_API_URL,
+    baseUrl: process.env.NEXT_PUBLIC_API_URLX,
   }),
   endpoints: (builder) => ({
     forgotPassword: builder.mutation<
