@@ -5,7 +5,7 @@ export const baseApi = createApi({
   reducerPath: "baseApi",
 
   baseQuery: fetchBaseQuery({
-    baseUrl: process.env.ISLOM_PUBLIC_API_URL,
+    baseUrl: "https://dummyjson.com",   // ← shu yerni o‘zgartirdik
     prepareHeaders: (headers) => {
       const token = localStorage.getItem("access");
       if (token) {
@@ -14,6 +14,21 @@ export const baseApi = createApi({
       return headers;
     },
   }),
-  tagTypes: ["Wishlist", "Comparisons", "Profile", "Payments", "Product", "User", "Favorite", "Cart", "Feedback", "Contact", "ProductDetail","OrderAddress"], // ✅ shu qatorni qo'shing
+
+  tagTypes: [
+    "Wishlist",
+    "Comparisons",
+    "Profile",
+    "Payments",
+    "Product",
+    "User",
+    "Favorite",
+    "Cart",
+    "Feedback",
+    "Contact",
+    "ProductDetail",
+    "OrderAddress",
+  ],
+
   endpoints: () => ({}),
 });
