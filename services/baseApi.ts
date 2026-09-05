@@ -5,11 +5,14 @@ export const baseApi = createApi({
   reducerPath: "baseApi",
 
   baseQuery: fetchBaseQuery({
-    baseUrl: "https://dummyjson.com",   // ← shu yerni o‘zgartirdik
+    baseUrl: "https://dummyjson.com",   // ← faqat shu qator muhim
     prepareHeaders: (headers) => {
-      const token = localStorage.getItem("access");
-      if (token) {
-        headers.set("Authorization", `Bearer ${token}`);
+      // localStorage faqat brauzerda ishlaydi
+      if (typeof window !== "undefined") {
+        const token = localStorage.getItem("access");
+        if (token) {
+          headers.set("Authorization", `Bearer ${token}`);
+        }
       }
       return headers;
     },
