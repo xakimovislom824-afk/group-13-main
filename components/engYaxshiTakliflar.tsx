@@ -3,19 +3,26 @@ import { useState } from "react";
 import { useGetProductsQuery } from "../services/productApi";
 import { useGetCategoriesQuery } from "../services/categoryApi";
 import ProductCard from "./ProductCard";
+import ProductSkeleton from "./ProductSkeleton";
 
 function EngYaxshiTakliflar() {
     const [selectedCategory, setSelectedCategory] = useState<number | null>(null);
 
-    const { data: productList = [], isLoading: productsLoading } = useGetProductsQuery();
-    const { data: categories = [], isLoading: categoriesLoading } = useGetCategoriesQuery();
+    const { data: productList = [], isLoading: productsLoading, isError: productsError, refetch: refetchProducts } = useGetProductsQuery();
+    const { data: categories = [], isLoading: categoriesLoading, isError: categoriesError, refetch: refetchCategories } = useGetCategoriesQuery();
 
     const isLoading = productsLoading || categoriesLoading;
+    const isError = productsError || categoriesError;
 
     if (isLoading) {
+        return <div className="bg-[var(--surface)] p-4 rounded-xl"><ProductSkeleton /></div>;
+    }
+
+    if (isError) {
         return (
-            <div className="bg-white p-8 rounded-xl font-sans text-center py-20 text-gray-500">
-                Mahsulotlar yuklanmoqda...
+            <div className="rounded-xl border border-[var(--border)] bg-[var(--surface)] p-8 text-center">
+                <p className="text-[var(--text-muted)]">Mahsulotlarni yuklashda xatolik yuz berdi.</p>
+                <button onClick={() => { void refetchProducts(); void refetchCategories(); }} className="mt-4 rounded-[10px] bg-[var(--primary)] px-5 py-2.5 font-semibold text-white transition-colors hover:bg-[var(--primary-hover)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--secondary)]">Qayta urinib ko&apos;rish</button>
             </div>
         );
     }
