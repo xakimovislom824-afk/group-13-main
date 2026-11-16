@@ -45,7 +45,7 @@ export default function Aloqa() {
         priority: "low",
       }).unwrap();
       reset();
-    } catch (_) {}
+    } catch {}
   };
 
   return (
@@ -107,56 +107,28 @@ export default function Aloqa() {
               </div>
             </div>
             <button onClick={openModal} className="w-full bg-[#1E74D2] text-white py-3 px-4 text-xs font-bold uppercase tracking-wider hover:bg-blue-700 transition-colors flex items-center justify-center gap-2 rounded shadow-sm mt-2">
-              <Headphones size={15} /> Qo'ng'iroq buyurtma qilish
+              <Headphones size={15} /> Qo&apos;ng&apos;iroq buyurtma qilish
             </button>
           </div>
         </div>
 
-        {/* DEPARTMENTS & REQUISITES */}
-        <div className="bg-[#F3F4F6] p-4 md:p-6 rounded-xl space-y-6">
-          <div className="grid grid-cols-1 lg:grid-cols-5 gap-4">
-            <div className="lg:col-span-4 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-3">
-              {[
-                "Bosh direktor", "Ta'minot bo'limi", "Sotuv bo'limi", "Yuridik bo'lim",
-                "Buxgalteriya", "Yetkazib berish", "Kredit bo'limi", "Kadrlar bo'limi", "Omborxona",
-              ].map((title, i) => (
-                <div key={i} className="bg-white rounded-lg p-3.5 border border-gray-200/60 flex items-start gap-3 shadow-sm">
-                  <Phone className="text-gray-300 mt-0.5 shrink-0" size={14} />
-                  <div>
-                    <p className="text-[11px] font-medium text-gray-400 mb-0.5">{title}:</p>
-                    <p className="text-sm font-semibold text-gray-800">8 (8782) 28-42-67</p>
-                  </div>
-                </div>
-              ))}
+        <section aria-label="Aloqa ma'lumotlari" className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          {[
+            { label: "Telefon", value: "+998 90 123 45 67", href: "tel:+998901234567" },
+            { label: "Elektron pochta", value: "info@islomx7.uz", href: "mailto:info@islomx7.uz" },
+            { label: "Manzil", value: "Toshkent sh., Chilonzor tumani, 1-uy" },
+            { label: "Ish vaqti", value: "Har kuni, 8:00 dan 18:00 gacha" },
+          ].map((item) => (
+            <div key={item.label} className="rounded-xl border border-[var(--border)] bg-[var(--surface)] p-5 shadow-sm">
+              <p className="text-sm font-semibold text-[var(--text-muted)]">{item.label}</p>
+              {item.href ? <a className="mt-2 block font-bold text-[var(--primary)] hover:text-[var(--secondary)]" href={item.href}>{item.value}</a> : <p className="mt-2 font-bold text-[var(--primary)]">{item.value}</p>}
             </div>
-            <div className="bg-white rounded-lg p-4 border border-gray-200/60 shadow-sm lg:col-span-1">
-              <p className="text-sm font-bold text-gray-800 mb-2 border-b pb-1.5 border-gray-100">Rekvizitlar:</p>
-              <p className="text-xs text-gray-600 leading-relaxed space-y-1">
-                <strong className="text-gray-700 block">MChJ "STROYOPTTORG"</strong>
-                INN: 090105187<br />
-                Cherkessk shahri<br />
-                Oktyabr ko'chasi 301/3<br />
-                Hisob raqam: 407028106000012415<br />
-                Bank: Sberbank<br />
-                BIK: 040702615
-              </p>
-            </div>
+          ))}
+          <div className="flex gap-3 sm:col-span-2 lg:col-span-4">
+            <a className="rounded-lg bg-[var(--secondary)] px-4 py-2 font-semibold text-white" href="https://t.me/islomx7" target="_blank" rel="noreferrer">Telegram</a>
+            <a className="rounded-lg border border-[var(--secondary)] px-4 py-2 font-semibold text-[var(--secondary)]" href="https://instagram.com/islomx7" target="_blank" rel="noreferrer">Instagram</a>
           </div>
-          
-          {/* REGIONS */}
-          <div className="border-t border-gray-200/80 pt-5">
-            <h3 className="text-sm font-bold text-gray-800 mb-3.5">Hududlar bo'yicha ishlaymiz:</h3>
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
-              {["Moskva", "Stavropol", "Krasnodar", "Grozniy", "Rostov-Don", "Samara"].map((city, i) => (
-                <div key={i} className="text-sm border-l-2 border-blue-400 pl-3 py-0.5">
-                  <p className="font-semibold text-gray-800 text-[13px]">{city}</p>
-                  <p className="text-gray-600 text-[12px] font-medium mt-0.5">+7 (800) 444-00-65</p>
-                  <a className="text-blue-600 text-[11px] hover:underline block mt-0.5 truncate">info@stroiopttorg.ru</a>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
+        </section>
 
         {/* FORM */}
         <div className="max-w-2xl mx-auto text-center space-y-6 py-10 mt-6 md:mt-10 px-2">
@@ -167,13 +139,13 @@ export default function Aloqa() {
           {isSuccess && (
             <div className="flex items-center gap-2 bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-lg text-sm text-left">
               <CheckCircle className="shrink-0" size={18} />
-              <span>Xabaringiz muvaffaqiyatli yuborildi! Tez orada siz bilan bog'lanamiz.</span>
+              <span>Xabaringiz muvaffaqiyatli yuborildi! Tez orada siz bilan bog&apos;lanamiz.</span>
             </div>
           )}
           {isError && (
             <div className="flex items-center gap-2 bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-lg text-sm text-left">
               <AlertCircle className="shrink-0" size={18} />
-              <span>{(error as any)?.data?.detail || "Xabar yuborishda xatolik yuz berdi"}</span>
+              <span>{(error as { data?: { detail?: string } } | undefined)?.data?.detail || "Xabar yuborishda xatolik yuz berdi"}</span>
             </div>
           )}
 

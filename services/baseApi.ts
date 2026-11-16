@@ -5,7 +5,7 @@ export const baseApi = createApi({
   reducerPath: "baseApi",
 
   baseQuery: fetchBaseQuery({
-    baseUrl: "https://dummyjson.com",   // ← faqat shu qator muhim
+    baseUrl: process.env.ISLOM_PUBLIC_API_URL,
     prepareHeaders: (headers) => {
       // localStorage faqat brauzerda ishlaydi
       if (typeof window !== "undefined") {
