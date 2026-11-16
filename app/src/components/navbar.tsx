@@ -18,7 +18,8 @@ import { useGetWishlistQuery } from "../../../services/wishlistApi";
 import { useGetCartsQuery } from "../../../services/cartApi";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useProductSearch } from "../../hooks/useProductSearch";
-import Logo from "../assets/icons/logo-transparent.png";
+import { categories, siteConfig } from "../../../lib/site-config";
+import { useGetCompanyInfoQuery } from "../../../services/companyApi";
 
 export const dynamic = "force-dynamic";
 
@@ -36,8 +37,8 @@ const STORAGE_KEYS = {
 };
 
 const topLinks = [
-  { href: "/tulov", label: "To'lov" },
-  { href: "/yetkazibBerish", label: "Yetkazib berish" },
+  { href: "/tolov", label: "To'lov" },
+  { href: "/yetkazib-berish", label: "Yetkazib berish" },
   { href: "/fikrlar", label: "Fikrlar" },
   { href: "/blog", label: "Yangiliklar" },
   { href: "/aloqa", label: "Aloqa" },
@@ -347,6 +348,7 @@ export default function Navbar() {
   const { openModal } = useModal();
   const { data: wishlist = [] } = useGetWishlistQuery();
   const { data: cart } = useGetCartsQuery();
+  const { data: companyInfo } = useGetCompanyInfoQuery();
 
   const cartCount = Array.isArray(cart)
     ? cart.reduce((sum, c) => {
@@ -436,47 +438,59 @@ export default function Navbar() {
   ], []);
 
   return (
-    <div ref={navbarRef} className="w-full border-b bg-white relative z-[1000]">
+    <div ref={navbarRef} className="sticky top-0 z-[1000] w-full border-b border-[var(--border)] bg-[var(--surface)]">
 
       {/* ── TOP BAR ── */}
-      <div className="flex justify-between items-center px-3 sm:px-4 md:px-6 py-2 text-[12px] text-gray-500 bg-gray-100 border-b">
-        <div className="flex items-center gap-1.5 lg:hidden">
-          <button onClick={openSidebar} className="flex items-center gap-1.5 text-gray-800" aria-label="Menyuni ochish">
-            <IoMenu size={20} className="sm:hidden" />
-            <IoMenu size={24} className="hidden sm:block" />
-            <span className="font-bold text-[12px] sm:text-[14px] whitespace-nowrap">Menyu</span>
-          </button>
+      <div className="flex items-center justify-between border-b border-[var(--border)] bg-[var(--primary)] px-3 py-2 text-xs text-white sm:px-4 md:px-6">
+        <div className="flex items-center gap-4">
+          <div className="flex items-center gap-1.5 lg:hidden">
+            <button onClick={openSidebar} className="flex items-center gap-1.5" aria-label="Menyuni ochish">
+              <IoMenu size={20} className="sm:hidden" />
+              <IoMenu size={24} className="hidden sm:block" />
+              <span className="whitespace-nowrap text-xs font-bold sm:text-sm">Menyu</span>
+            </button>
+          </div>
+          <a href={`tel:${siteConfig.phone.replace(/[^+\\d]/g, "")}`} className="hidden font-semibold hover:text-[var(--accent)] sm:inline">{siteConfig.phone}</a>
+          <span className="hidden text-white/75 md:inline">{siteConfig.hours}</span>
         </div>
-        <nav className="hidden lg:flex gap-4 font-medium">
-          {topLinks.map(l => (
-            <Link key={l.href} href={l.href}
-              className={`transition-colors ${pathname === l.href ? "text-red-600 border-b-2 border-red-600 pb-0.5" : "hover:text-red-600"}`}>
-              {l.label}
+        <nav className="hidden items-center gap-4 font-medium lg:flex" aria-label="Yordam havolalari">
+          {topLinks.map((link) => (
+            <Link key={link.href} href={link.href} className={`transition-colors ${pathname === link.href ? "text-[var(--accent)]" : "hover:text-[var(--accent)]"}`}>
+              {link.label}
             </Link>
           ))}
         </nav>
-        <div className="flex gap-2 sm:gap-4 items-center">
+        <div className="flex items-center gap-2 sm:gap-4">
+          <span aria-label="Tanlangan til: O'zbekcha" className="hidden font-semibold sm:inline">UZ</span>
           <button
             type="button"
             onClick={toggleDarkMode}
             aria-label={isDarkMode ? "Yorug' rejimni yoqish" : "Tungi rejimni yoqish"}
             title={isDarkMode ? "Yorug' rejim" : "Tungi rejim"}
-            className="flex h-9 w-9 items-center justify-center rounded-full text-gray-700 hover:bg-gray-200 hover:text-blue-600 transition-colors dark:text-gray-200 dark:hover:bg-gray-700"
+            className="flex size-9 items-center justify-center rounded-full transition-colors hover:bg-white/10 hover:text-[var(--accent)]"
           >
             {isDarkMode ? <FiSun size={19} /> : <FiMoon size={19} />}
           </button>
-          <button onClick={openModal}
-            className="hidden sm:block cursor-pointer text-blue-600 font-bold border-b border-blue-600 border-dotted text-[10px] uppercase dark:text-blue-300 dark:border-blue-300">
+          <button onClick={openModal} className="hidden cursor-pointer border-b border-dotted border-[var(--accent)] font-bold uppercase text-[10px] text-[var(--accent)] sm:block">
             Qo&apos;ng&apos;iroq qilishni so&apos;rang
           </button>
         </div>
       </div>
 
       {/* ── MAIN NAVBAR ── */}
-      <div className="flex items-center justify-between gap-4 px-4 md:px-6 py-4">
-        <Link href="/" className="shrink-0">
-          <Image src={Logo} alt="Logo" width={126} height={48} className="h-10 w-auto md:h-12 object-contain" priority />
+      <div className="flex items-center justify-between gap-3 px-4 py-3 md:gap-4 md:px-6">
+        <Link href="/" aria-label="Islomx7 bosh sahifasi" className="flex shrink-0 items-center gap-2 text-[var(--primary)]">
+          <span className="flex size-10 items-center justify-center rounded-xl bg-[var(--accent)] text-[var(--primary)]"><FaShoppingCart size={20} /></span>
+          <span className="font-heading text-xl font-extrabold tracking-tight md:text-2xl">Islomx7</span>
         </Link>
+        <details className="group relative hidden shrink-0 sm:block">
+          <summary className="flex cursor-pointer list-none items-center gap-2 rounded-[10px] bg-[var(--accent)] px-4 py-3 font-semibold text-[var(--primary)] hover:bg-[var(--accent-hover)]">
+            Katalog <span aria-hidden="true">⌄</span>
+          </summary>
+          <div className="absolute left-0 top-full z-[1100] mt-2 grid w-[min(90vw,520px)] grid-cols-2 gap-1 rounded-xl border border-[var(--border)] bg-[var(--surface)] p-3 shadow-xl">
+            {categories.map((category) => <Link key={category.href} href={category.href} className="rounded-lg px-3 py-2 text-sm text-[var(--text)] hover:bg-[var(--secondary-soft)] hover:text-[var(--primary)]">{category.label}</Link>)}
+          </div>
+        </details>
 
         {/* Desktop SearchBox */}
         <div className="hidden md:flex flex-1 max-w-2xl mx-4">
