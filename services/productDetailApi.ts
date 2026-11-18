@@ -22,7 +22,11 @@ export interface IProductDetail {
   category: number;
 }
 
-const normalizeDummyProductDetail = (item: any): IProductDetail => {
+const isRecord = (value: unknown): value is Record<string, unknown> =>
+  typeof value === "object" && value !== null && !Array.isArray(value);
+
+const normalizeDummyProductDetail = (value: unknown): IProductDetail => {
+  const item = isRecord(value) ? value : {};
   const categoryName = String(item.category ?? "").toLowerCase();
   const categoryId =
     dummyCategories.findIndex((name) => name.toLowerCase() === categoryName) + 1 || 1;
@@ -31,20 +35,20 @@ const normalizeDummyProductDetail = (item: any): IProductDetail => {
     id: Number(item.id ?? 0),
     has_discount: Number(item.discountPercentage ?? 0) > 0,
     discounted_price: String(item.price ?? "0"),
-    name: item.title ?? item.name ?? "",
-    description: item.description ?? "",
+    name: String(item.title ?? item.name ?? ""),
+    description: String(item.description ?? ""),
     price: String(item.price ?? "0"),
     old_price: item.oldPrice ? String(item.oldPrice) : String(item.price ?? "0"),
     discount_percent: Number(item.discountPercentage ?? 0),
-    image: Array.isArray(item.images) ? item.images[0] ?? "" : item.thumbnail ?? item.image ?? "",
+    image: String(Array.isArray(item.images) ? item.images[0] ?? "" : item.thumbnail ?? item.image ?? ""),
     specifications: "",
     advantages: "",
     is_hit: false,
     is_new: false,
     is_sale: Number(item.discountPercentage ?? 0) > 0,
     stock: Number(item.stock ?? 0),
-    created_at: item.createdAt ?? new Date().toISOString(),
-    updated_at: item.updatedAt ?? new Date().toISOString(),
+    created_at: String(item.createdAt ?? new Date().toISOString()),
+    updated_at: String(item.updatedAt ?? new Date().toISOString()),
     category: categoryId,
   };
 };
@@ -53,7 +57,7 @@ const productDetailApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
     getProductById: builder.query<IProductDetail, number>({
       query: (id) => `/products/${id}`,
-      transformResponse: (response: any) => normalizeDummyProductDetail(response),
+      transformResponse: (response: unknown) => normalizeDummyProductDetail(response),
       providesTags: (_result, _error, id) => [{ type: "ProductDetail", id }],
     }),
   }),

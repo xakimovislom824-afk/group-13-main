@@ -86,11 +86,14 @@ export default function LoginPage() {
       const params = new URLSearchParams(window.location.search);
       const next = params.get("next") || "/kabnet";
       router.push(next);
-    } catch (error: any) {
-      const errorMessage =
-        error?.data?.detail ||
-        error?.data?.message ||
-        "Login yoki parol noto'g'ri!";
+    } catch (error: unknown) {
+      const data = error && typeof error === "object" && "data" in error
+        && error.data && typeof error.data === "object"
+        ? error.data as Record<string, unknown>
+        : {};
+      const errorMessage = [data.detail, data.message].find(
+        (value): value is string => typeof value === "string" && value.length > 0
+      ) || "Login yoki parol noto'g'ri!";
       alert(errorMessage);
     }
   };

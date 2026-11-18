@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
 import { FaChevronLeft, FaBoxOpen } from "react-icons/fa";
 
 type OrderItem = {
@@ -60,20 +61,23 @@ export default function BuyurtmaDetailPage() {
     const [notFound, setNotFound] = useState(false);
 
     useEffect(() => {
-        const raw = localStorage.getItem("userOrders");
-        if (!raw) { setNotFound(true); return; }
-        try {
-            const orders: SavedOrder[] = JSON.parse(raw);
-            // URL da "#" belgisi bo'lishi mumkin, shuning uchun ikkalasini tekshiramiz
-            const rawId = decodeURIComponent(params.id as string);
-            const found = orders.find(
-                (o) => o.id === rawId || o.id === `#${rawId}` || o.id.replace("#", "") === rawId
-            );
-            if (found) setOrder(found);
-            else setNotFound(true);
-        } catch {
-            setNotFound(true);
-        }
+        const timeoutId = window.setTimeout(() => {
+            const raw = localStorage.getItem("userOrders");
+            if (!raw) { setNotFound(true); return; }
+            try {
+                const orders: SavedOrder[] = JSON.parse(raw);
+                // URL da "#" belgisi bo'lishi mumkin, shuning uchun ikkalasini tekshiramiz
+                const rawId = decodeURIComponent(params.id as string);
+                const found = orders.find(
+                    (o) => o.id === rawId || o.id === `#${rawId}` || o.id.replace("#", "") === rawId
+                );
+                if (found) setOrder(found);
+                else setNotFound(true);
+            } catch {
+                setNotFound(true);
+            }
+        }, 0);
+        return () => window.clearTimeout(timeoutId);
     }, [params.id]);
 
     if (notFound) {
@@ -157,9 +161,12 @@ export default function BuyurtmaDetailPage() {
                                         {/* Rasm */}
                                         <div className="w-18 h-18 w-[72px] h-[72px] bg-gray-50 border border-gray-100 rounded-xl flex items-center justify-center shrink-0 p-2">
                                             {item.image ? (
-                                                <img
+                                                <Image
                                                     src={item.image}
                                                     alt={item.name}
+                                                    width={64}
+                                                    height={64}
+                                                    unoptimized
                                                     className="object-contain max-h-full max-w-full"
                                                 />
                                             ) : (

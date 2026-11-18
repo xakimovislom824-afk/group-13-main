@@ -120,13 +120,17 @@ export default function AddressTab() {
         setShowForm(false);
         setFormSuccess("");
       }, 1200);
-    } catch (err: any) {
-      setFormError(
-        err?.data?.detail ||
-        err?.data?.phone?.[0] ||
-        err?.data?.non_field_errors?.[0] ||
-        "Xatolik yuz berdi"
-      );
+    } catch (err: unknown) {
+      const data = err && typeof err === "object" && "data" in err
+        && err.data && typeof err.data === "object"
+        ? err.data as Record<string, unknown>
+        : {};
+      const messages = [
+        data.detail,
+        Array.isArray(data.phone) ? data.phone[0] : undefined,
+        Array.isArray(data.non_field_errors) ? data.non_field_errors[0] : undefined,
+      ];
+      setFormError(messages.find((message): message is string => typeof message === "string") || "Xatolik yuz berdi");
     }
   };
 

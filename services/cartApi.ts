@@ -1,27 +1,31 @@
 // services/cartApi.ts
 import { baseApi } from "./baseApi";
 
-const normalizeCartItems = (source: any[]) => {
-  if (!Array.isArray(source)) return [];
+type CartItem = Record<string, unknown>;
 
-  return source.flatMap((item) => {
-    if (Array.isArray(item?.items)) return item.items;
-    if (item && (item.product !== undefined || item.product_data || item.product_detail)) return [item];
+const isRecord = (value: unknown): value is CartItem =>
+  typeof value === "object" && value !== null && !Array.isArray(value);
+
+const normalizeCartItems = (source: unknown[]): CartItem[] => {
+  return source.flatMap((value) => {
+    if (!isRecord(value)) return [];
+    if (Array.isArray(value.items)) return value.items.filter(isRecord);
+    if (value.product !== undefined || value.product_data || value.product_detail) return [value];
     return [];
   });
 };
 
 const readCart = () => {
-  if (typeof window === "undefined") return [] as any[];
+  if (typeof window === "undefined") return [] as CartItem[];
   try {
-    const raw = JSON.parse(localStorage.getItem("cart") || "[]");
+    const raw: unknown = JSON.parse(localStorage.getItem("cart") || "[]");
     return Array.isArray(raw) ? normalizeCartItems(raw) : [];
   } catch {
-    return [] as any[];
+    return [] as CartItem[];
   }
 };
 
-const writeCart = (items: any[]) => {
+const writeCart = (items: CartItem[]) => {
   if (typeof window !== "undefined") {
     localStorage.setItem("cart", JSON.stringify(items));
   }
@@ -29,18 +33,18 @@ const writeCart = (items: any[]) => {
 
 export const cartApi = baseApi.injectEndpoints({
     endpoints: (builder) => ({
-        getCarts: builder.query<any[], void>({
+        getCarts: builder.query<CartItem[], void>({
             queryFn: async () => ({ data: readCart() }),
             providesTags: ["Cart"],
         }),
-        addToCart: builder.mutation<any, { product: number; quantity: number }>({
+        addToCart: builder.mutation<CartItem[], { product: number; quantity: number }>({
             queryFn: async (body) => {
                 const carts = readCart();
                 const existing = carts.find(
                   (item) =>
                     Number(item.product) === Number(body.product) ||
-                    Number(item.product_data?.id) === Number(body.product) ||
-                    Number(item.product_detail?.id) === Number(body.product)
+                    Number(isRecord(item.product_data) ? item.product_data.id : undefined) === Number(body.product) ||
+                    Number(isRecord(item.product_detail) ? item.product_detail.id : undefined) === Number(body.product)
                 );
 
                 const next = existing
@@ -56,7 +60,7 @@ export const cartApi = baseApi.injectEndpoints({
             },
             invalidatesTags: ["Cart"],
         }),
-        updateCart: builder.mutation<any, { id: number; product: number; quantity: number }>({
+        updateCart: builder.mutation<CartItem | null, { id: number; product: number; quantity: number }>({
             queryFn: async ({ id, product, quantity }) => {
                 const carts = readCart().map((item) => item.id === id ? { ...item, product, quantity } : item);
                 writeCart(carts);
@@ -64,7 +68,7 @@ export const cartApi = baseApi.injectEndpoints({
             },
             invalidatesTags: ["Cart"],
         }),
-        deleteCart: builder.mutation<any, number>({
+        deleteCart: builder.mutation<CartItem[], number>({
             queryFn: async (id) => {
                 const carts = readCart().filter((item) => item.id !== id);
                 writeCart(carts);

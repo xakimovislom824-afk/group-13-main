@@ -3,7 +3,7 @@
 import Image from "next/image"
 import { useGetProductsQuery } from "../services/productApi"
 
-function homAksiya() {
+function HomAksiya() {
     const { data: products = [], isLoading } = useGetProductsQuery()
     const featuredProducts = products.slice(0, 4)
 
@@ -29,4 +29,4 @@ function homAksiya() {
     )
 }
 
-export default homAksiya
+export default HomAksiya

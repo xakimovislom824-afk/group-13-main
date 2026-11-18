@@ -8,7 +8,13 @@ const toSlug = (value: string) =>
     .replace(/[^a-z0-9]+/g, "-")
     .replace(/^-|-$/g, "");
 
-const normalizeDiscount = (product: any): IDiscount => {
+type ProductRecord = Record<string, unknown>;
+
+const isRecord = (value: unknown): value is ProductRecord =>
+  typeof value === "object" && value !== null && !Array.isArray(value);
+
+const normalizeDiscount = (value: unknown): IDiscount => {
+  const product = isRecord(value) ? value : {};
   const title = String(product.title ?? product.name ?? "Mahsulot aksiyasi");
   const discount = Math.round(Number(product.discountPercentage ?? 0));
 
@@ -34,10 +40,13 @@ export const discountApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
     getDiscounts: builder.query<IDiscount[], void>({
       query: () => "/products",
-      transformResponse: (response: any) => {
-        const products = Array.isArray(response) ? response : response?.products ?? [];
+      transformResponse: (response: unknown) => {
+        const responseRecord = isRecord(response) ? response : {};
+        const products: unknown[] = Array.isArray(response)
+          ? response
+          : Array.isArray(responseRecord.products) ? responseRecord.products : [];
         return products
-          .filter((product: any) => Number(product.discountPercentage ?? 0) > 0)
+          .filter((value) => isRecord(value) && Number(value.discountPercentage ?? 0) > 0)
           .map(normalizeDiscount);
       },
     }),
@@ -46,8 +55,14 @@ export const discountApi = baseApi.injectEndpoints({
         const result = await baseQuery("/products");
         if (result.error) return { error: result.error };
 
-        const products = Array.isArray(result.data) ? result.data : (result.data as any)?.products ?? [];
-        const product = products.find((item: any) => `${toSlug(String(item.title ?? item.name ?? ""))}-${item.id}` === slug);
+        const responseRecord = isRecord(result.data) ? result.data : {};
+        const products: unknown[] = Array.isArray(result.data)
+          ? result.data
+          : Array.isArray(responseRecord.products) ? responseRecord.products : [];
+        const product = products.find((value) => {
+          if (!isRecord(value)) return false;
+          return `${toSlug(String(value.title ?? value.name ?? ""))}-${value.id}` === slug;
+        });
 
         return product
           ? { data: normalizeDiscount(product) }

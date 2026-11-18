@@ -36,8 +36,9 @@ export const changePassword = baseApi.injectEndpoints({
                             password: body.new_password,
                         },
                     };
-                } catch (error: any) {
-                    return { error: { status: 500, data: error?.message || "Password change failed" } };
+                } catch (error: unknown) {
+                    const message = error instanceof Error ? error.message : "Password change failed";
+                    return { error: { status: 500, data: message } };
                 }
             },
         })

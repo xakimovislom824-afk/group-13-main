@@ -71,11 +71,15 @@ export default function RegisterPage() {
 
   const onSubmit = async (data: RegisterFormData) => {
     try {
-      const { termsAccepted, privacyAccepted, confirmPassword, ...registerData } = data;
-      await registerUser(registerData).unwrap();
+      const { username, email, first_name, last_name, password } = data;
+      await registerUser({ username, email, first_name, last_name, password }).unwrap();
       alert("Muvaffaqiyatli ro'yxatdan o'tdingiz!");
-    } catch (error: any) {
-      alert(error?.data?.message || "Xatolik yuz berdi. Qayta urinib ko'ring!");
+    } catch (error: unknown) {
+      const data = error && typeof error === "object" && "data" in error
+        && error.data && typeof error.data === "object"
+        ? error.data as Record<string, unknown>
+        : {};
+      alert(typeof data.message === "string" ? data.message : "Xatolik yuz berdi. Qayta urinib ko'ring!");
     }
   };
 

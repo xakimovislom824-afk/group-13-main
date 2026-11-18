@@ -2,6 +2,7 @@
 import { useState, useEffect } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
 import {
     FaChevronLeft, FaBoxOpen, FaTruck, FaCheckCircle,
     FaTimesCircle, FaMapMarkerAlt, FaCreditCard, FaMoneyBillWave
@@ -62,20 +63,23 @@ export default function BuyurtmaDetailPage() {
     const [notFound, setNotFound] = useState(false);
 
     useEffect(() => {
-        const orderId = searchParams.get("id");
-        if (!orderId) { setNotFound(true); return; }
+        const timeoutId = window.setTimeout(() => {
+            const orderId = searchParams.get("id");
+            if (!orderId) { setNotFound(true); return; }
 
-        const raw = localStorage.getItem("userOrders");
-        if (!raw) { setNotFound(true); return; }
+            const raw = localStorage.getItem("userOrders");
+            if (!raw) { setNotFound(true); return; }
 
-        try {
-            const orders: SavedOrder[] = JSON.parse(raw);
-            const found = orders.find(o => o.id === orderId);
-            if (found) setOrder(found);
-            else setNotFound(true);
-        } catch {
-            setNotFound(true);
-        }
+            try {
+                const orders: SavedOrder[] = JSON.parse(raw);
+                const found = orders.find(o => o.id === orderId);
+                if (found) setOrder(found);
+                else setNotFound(true);
+            } catch {
+                setNotFound(true);
+            }
+        }, 0);
+        return () => window.clearTimeout(timeoutId);
     }, [searchParams]);
 
     if (notFound) {
@@ -155,9 +159,12 @@ export default function BuyurtmaDetailPage() {
                                 {order.items.map((item) => (
                                     <div key={item.id} className="flex items-center gap-4 px-6 py-5">
                                         <div className="w-16 h-16 bg-gray-50 rounded-xl border border-gray-100 flex items-center justify-center shrink-0 p-1.5">
-                                            <img
+                                            <Image
                                                 src={item.image}
                                                 alt={item.name}
+                                                width={64}
+                                                height={64}
+                                                unoptimized
                                                 className="object-contain max-h-full max-w-full"
                                             />
                                         </div>

@@ -1,13 +1,7 @@
 "use client";
-import { useState } from "react";
-import { FaPlus } from "react-icons/fa";
 import { CiCirclePlus } from "react-icons/ci";
 
-export default function savolJavob() {
-  // Qaysi savol ochiq ekanligini saqlash uchun state
-  // null bo'lsa hamma yopiq, son bo'lsa o'sha tartibdagi savol ochiq
-  const [openIndex, setOpenIndex] = useState(5);
-
+export default function SavolJavob() {
   return (
     <div className="max-w-300 mx-auto p-6 font-sans bg-white">
       {/* Breadcrumbs (Yo'nalish ko'rsatkichi) */}

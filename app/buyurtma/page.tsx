@@ -1,11 +1,11 @@
 "use client";
 import React, { useState, useEffect, useRef } from "react";
-import { useRouter } from "next/navigation";
 import { Controller, useForm } from "react-hook-form";
 import PhoneInput from "react-phone-input-2";
 import "react-phone-input-2/lib/style.css";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
+import Image from "next/image";
 import { useGetFaqsQuery } from "../../services/faqApi";
 import { CheckCircle } from "lucide-react";
 
@@ -68,8 +68,11 @@ function SuccessToast({ visible, onClose }: { visible: boolean; onClose: () => v
   );
 }
 
+function generateOrderId() {
+  return `#${Math.floor(100000 + Math.random() * 900000)}`;
+}
+
 export default function BuyurtmaPage() {
-  const router = useRouter();
   const orderRef = useRef<HTMLDivElement>(null);
 
   const [order, setOrder] = useState<OrderSnapshot | null>(null);
@@ -92,11 +95,14 @@ export default function BuyurtmaPage() {
   });
 
   useEffect(() => {
-    const raw = sessionStorage.getItem("orderSnapshot");
-    if (raw) {
-      try { setOrder(JSON.parse(raw)); }
-      catch { setOrder(null); }
-    }
+    const timeoutId = window.setTimeout(() => {
+      const raw = sessionStorage.getItem("orderSnapshot");
+      if (raw) {
+        try { setOrder(JSON.parse(raw)); }
+        catch { setOrder(null); }
+      }
+    }, 0);
+    return () => window.clearTimeout(timeoutId);
   }, []);
 
   const scrollToOrder = () => {
@@ -110,7 +116,7 @@ export default function BuyurtmaPage() {
     }
 
     const newOrder = {
-      id: `#${Math.floor(100000 + Math.random() * 900000)}`,
+      id: generateOrderId(),
       date: new Date().toLocaleDateString("uz-UZ", {
         day: "2-digit",
         month: "2-digit",
@@ -321,7 +327,7 @@ export default function BuyurtmaPage() {
                         {/* FIX: w-16 h-16 -> w-14 h-14 sm:w-16 sm:h-16, 360px da rasm
                             biroz kichraytirildi, matn uchun joy bo'shatildi */}
                         <div className="w-14 h-14 sm:w-16 sm:h-16 bg-gray-50 rounded-lg border border-gray-100 flex items-center justify-center shrink-0 p-1.5">
-                          <img src={item.image} alt={item.name} className="object-contain max-h-full max-w-full" />
+                          <Image src={item.image} alt={item.name} width={64} height={64} unoptimized className="object-contain max-h-full max-w-full" />
                         </div>
                         <div className="flex-1 min-w-0">
                           <p className="text-[13px] font-semibold text-gray-800 truncate">{item.name}</p>

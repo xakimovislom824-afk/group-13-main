@@ -71,8 +71,9 @@ export const feedbackApi = baseApi.injectEndpoints({
           const next = [item, ...list];
           writeFeedbacks(next);
           return { data: item };
-        } catch (error: any) {
-          return { error: { status: 500, data: error?.message || "Feedback sending failed" } };
+        } catch (error: unknown) {
+          const message = error instanceof Error ? error.message : "Feedback sending failed";
+          return { error: { status: 500, data: message } };
         }
       },
       invalidatesTags: ["Feedback"],

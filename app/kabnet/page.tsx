@@ -2,7 +2,7 @@
 
 import { useGetProfileQuery, useEditProfilMutation } from "../../services/editProfileApi";
 import { useChangeParolMutation } from "../../services/changePasswordApi";
-import { useState, useEffect, Suspense } from "react";
+import { useState, useEffect, Suspense, type ReactNode } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import {
   FaUserCircle, FaListUl, FaMapMarkerAlt, FaShieldAlt,
@@ -14,6 +14,7 @@ import { FiUser } from "react-icons/fi";
 import { LiaUserEditSolid } from "react-icons/lia";
 import { Heart } from "lucide-react";
 import Link from "next/link";
+import Image from "next/image";
 import { useGetWishlistQuery, useRemoveWishlistMutation } from "../../services/wishlistApi";
 import { useGetPaymentsQuery } from "../../services/paymentsApi";
 import {
@@ -48,6 +49,24 @@ type UserInfo = {
   phone?: string;
   first_name?: string;
   last_name?: string;
+};
+
+type CabinetNavItem = {
+  id: string;
+  label: string;
+  icon: ReactNode;
+  badge?: number;
+};
+
+const getErrorData = (error: unknown): Record<string, unknown> => {
+  if (!error || typeof error !== "object" || !("data" in error)) return {};
+  const data = error.data;
+  return data && typeof data === "object" ? data as Record<string, unknown> : {};
+};
+
+const getFirstErrorMessage = (value: unknown): string | undefined => {
+  if (typeof value === "string") return value;
+  return Array.isArray(value) && typeof value[0] === "string" ? value[0] : undefined;
 };
 
 // ─────────────────────────────────────────────
@@ -124,8 +143,9 @@ function AddressTab() {
         setFormSuccess("Yangi manzil qo'shildi!");
       }
       setTimeout(() => { setShowForm(false); setFormSuccess(""); }, 1200);
-    } catch (err: any) {
-      setFormError(err?.data?.detail || err?.data?.phone?.[0] || "Xatolik yuz berdi");
+    } catch (err: unknown) {
+      const data = getErrorData(err);
+      setFormError(getFirstErrorMessage(data.detail) || getFirstErrorMessage(data.phone) || "Xatolik yuz berdi");
     }
   };
 
@@ -303,30 +323,47 @@ function ShaxsiyKabinetContent() {
 
   // ── localStorage dan user ma'lumotlari ──
   useEffect(() => {
-    const keys = ["user", "userInfo", "userData", "authUser", "currentUser"];
-    let found: UserInfo | null = null;
-    for (const key of keys) {
-      const raw = localStorage.getItem(key) || sessionStorage.getItem(key);
-      if (raw) {
-        try { found = JSON.parse(raw); break; }
-        catch { found = { username: raw }; break; }
+    const timeoutId = window.setTimeout(() => {
+      const keys = ["user", "userInfo", "userData", "authUser", "currentUser"];
+      let found: UserInfo | null = null;
+      for (const key of keys) {
+        const raw = localStorage.getItem(key) || sessionStorage.getItem(key);
+        if (raw) {
+          try {
+            const parsed: unknown = JSON.parse(raw);
+            found = parsed && typeof parsed === "object" ? parsed as UserInfo : null;
+            break;
+          } catch {
+            found = { username: raw };
+            break;
+          }
+        }
       }
-    }
-    setUserInfo(found);
+      setUserInfo(found);
+    }, 0);
+    return () => window.clearTimeout(timeoutId);
   }, []);
 
   useEffect(() => {
     const tab = searchParams.get("tab");
-    if (tab) setActiveTab(tab);
+    if (!tab) return;
+    const timeoutId = window.setTimeout(() => setActiveTab(tab), 0);
+    return () => window.clearTimeout(timeoutId);
   }, [searchParams]);
 
   useEffect(() => {
-    if (activeTab === "orders" || activeTab === "dashboard") {
+    if (activeTab !== "orders" && activeTab !== "dashboard") return;
+    const timeoutId = window.setTimeout(() => {
       const raw = localStorage.getItem("userOrders");
-      try { setUserOrders(raw ? JSON.parse(raw) : []); }
-      catch { setUserOrders([]); }
+      try {
+        const orders: unknown = raw ? JSON.parse(raw) : [];
+        setUserOrders(Array.isArray(orders) ? orders as SavedOrder[] : []);
+      } catch {
+        setUserOrders([]);
+      }
       setCurrentPage(1);
-    }
+    }, 0);
+    return () => window.clearTimeout(timeoutId);
   }, [activeTab]);
 
   const handleLogout = () => {
@@ -377,11 +414,12 @@ function ShaxsiyKabinetContent() {
     if (!passValues.old || !passValues.new || !passValues.confirm) { setPassError("Barcha maydonlarni to'ldiring"); return; }
     if (passValues.new !== passValues.confirm) { setPassError("Yangi parollar mos kelmadi"); return; }
     try {
-      await changeParol({ old_password: passValues.old, new_password: passValues.new } as any).unwrap();
+      await changeParol({ old_password: passValues.old, new_password: passValues.new }).unwrap();
       setPassSuccess("Parol muvaffaqiyatli o'zgartirildi!");
       setPassValues({ old: "", new: "", confirm: "" });
-    } catch (err: any) {
-      setPassError(err?.data?.detail || err?.data?.old_password?.[0] || "Xatolik yuz berdi");
+    } catch (err: unknown) {
+      const data = getErrorData(err);
+      setPassError(getFirstErrorMessage(data.detail) || getFirstErrorMessage(data.old_password) || "Xatolik yuz berdi");
     }
   };
 
@@ -393,12 +431,14 @@ function ShaxsiyKabinetContent() {
   const [editProfil, { isLoading: profileLoading }] = useEditProfilMutation();
 
   useEffect(() => {
-    if (profile) {
+    if (!profile) return;
+    const timeoutId = window.setTimeout(() => {
       setProfileValues({
         username: profile.username || "", email: profile.email || "",
         first_name: profile.first_name || "", last_name: profile.last_name || "",
       });
-    }
+    }, 0);
+    return () => window.clearTimeout(timeoutId);
   }, [profile]);
 
   const handleSaveProfile = async () => {
@@ -415,16 +455,18 @@ function ShaxsiyKabinetContent() {
     try {
       await editProfil(profileValues).unwrap();
       setProfileSuccess("Profil muvaffaqiyatli yangilandi!");
-    } catch (err: any) {
-      const d = err?.data;
-      if (d?.email?.[0]?.includes("already exists")) setProfileError("Bu email allaqachon ro'yxatdan o'tgan");
-      else if (d?.username?.[0]?.includes("already exists")) setProfileError("Bu username allaqachon band");
-      else setProfileError(d?.email?.[0] || d?.username?.[0] || d?.detail || "Xatolik yuz berdi");
+    } catch (err: unknown) {
+      const data = getErrorData(err);
+      const emailError = getFirstErrorMessage(data.email);
+      const usernameError = getFirstErrorMessage(data.username);
+      if (emailError?.includes("already exists")) setProfileError("Bu email allaqachon ro'yxatdan o'tgan");
+      else if (usernameError?.includes("already exists")) setProfileError("Bu username allaqachon band");
+      else setProfileError(emailError || usernameError || getFirstErrorMessage(data.detail) || "Xatolik yuz berdi");
     }
   };
 
   // ── Nav items ──
-  const navItems = [
+  const navItems: CabinetNavItem[] = [
     { id: "dashboard", label: "Mening hisobim", icon: <FaUserCircle size={18} /> },
     { id: "profile", label: "Profilni tahrirlash", icon: <LiaUserEditSolid size={18} /> },
     { id: "orders", label: "Mening buyurtmalarim", icon: <FaListUl size={18} />, badge: payments.length },
@@ -433,7 +475,7 @@ function ShaxsiyKabinetContent() {
     { id: "password", label: "Parolni o'zgartirish", icon: <FaShieldAlt size={18} /> },
   ];
 
-  const menuCards = [
+  const menuCards: CabinetNavItem[] = [
     { id: "orders", label: "MENING BUYURTMALARIM", icon: <FaListUl size={24} />, badge: payments.length },
     { id: "profile", label: "PROFILNI TAHRIRLASH", icon: <FiUser size={24} /> },
     { id: "address", label: "YETKAZIB BERISH MANZILI", icon: <FaMapMarkerAlt size={24} /> },
@@ -491,9 +533,9 @@ function ShaxsiyKabinetContent() {
                     }`}
                 >
                   <div className="flex items-center gap-3">{item.icon}<span>{item.label}</span></div>
-                  {(item as any).badge > 0 && (
+                  {item.badge > 0 && (
                     <span className={`text-[10px] px-2 py-0.5 rounded-full ${activeTab === item.id ? "bg-red-500 text-white" : "bg-red-100 text-red-500"}`}>
-                      {(item as any).badge}
+                      {item.badge}
                     </span>
                   )}
                 </button>
@@ -532,9 +574,9 @@ function ShaxsiyKabinetContent() {
                     }`}
                 >
                   <div className="flex items-center gap-3">{item.icon}<span>{item.label}</span></div>
-                  {(item as any).badge > 0 && (
+                  {item.badge > 0 && (
                     <span className={`text-[10px] px-2 py-0.5 rounded-full ${activeTab === item.id ? "bg-red-500 text-white" : "bg-red-100 text-red-500"}`}>
-                      {(item as any).badge}
+                      {item.badge}
                     </span>
                   )}
                 </button>
@@ -565,9 +607,9 @@ function ShaxsiyKabinetContent() {
                       className={`relative flex flex-col items-center justify-center p-4 md:p-6 rounded-lg border bg-white transition-all duration-200 group ${card.id === "logout" ? "hover:bg-red-50" : "hover:bg-blue-50"
                         }`}
                     >
-                      {(card as any).badge > 0 && (
+                      {card.badge > 0 && (
                         <span className="absolute top-2 right-2 bg-red-500 text-white text-[10px] font-bold w-5 h-5 flex items-center justify-center rounded-full">
-                          {(card as any).badge}
+                          {card.badge}
                         </span>
                       )}
                       <div className={`mb-3 text-gray-400 ${card.id === "logout" ? "group-hover:text-red-500" : "group-hover:text-blue-600"}`}>
@@ -828,7 +870,7 @@ function ShaxsiyKabinetContent() {
                         <div className="flex items-center gap-4">
                           <div className="h-14 w-14 bg-gray-100 rounded-lg flex items-center justify-center flex-shrink-0 overflow-hidden">
                             {item.product_detail?.image
-                              ? <img src={item.product_detail.image} alt={item.product_detail.name} className="object-contain w-full h-full p-1" />
+                              ? <Image src={item.product_detail.image} alt={item.product_detail.name} width={56} height={56} unoptimized className="object-contain w-full h-full p-1" />
                               : <span className="text-[10px] text-gray-400">Rasm</span>}
                           </div>
                           <div>
