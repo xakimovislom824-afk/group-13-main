@@ -35,8 +35,7 @@ export default function TulovSahifasi() {
     },
   });
 
-  const onSubscribe = async (data: SubscribeFormData) => {
-    console.log("Obuna ma'lumotlari:", data);
+  const onSubscribe = async () => {
     await new Promise((res) => setTimeout(res, 1000));
     setIsSubscribed(true);
     reset();

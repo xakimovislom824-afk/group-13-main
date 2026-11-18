@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo } from "react";
+import { Search } from "lucide-react";
 import { useGetProductsQuery } from "../services/productApi";
 import ProductCard from "./ProductCard";
 
@@ -9,7 +10,7 @@ interface ProductsProps {
 }
 
 const Products = ({ searchQuery = "" }: ProductsProps) => {
-  const { data: products = [], isLoading, isError } = useGetProductsQuery();
+  const { data: products = [], isLoading, isFetching, isError, refetch } = useGetProductsQuery();
 
   const filteredProducts = useMemo(() => {
     if (!searchQuery.trim()) return products;
@@ -29,8 +30,16 @@ const Products = ({ searchQuery = "" }: ProductsProps) => {
 
   if (isError) {
     return (
-      <div className="flex items-center justify-center py-20 text-red-500 text-sm">
-        Xatolik yuz berdi. Iltimos, qayta urinib ko'ring.
+      <div role="alert" className="flex flex-col items-center justify-center gap-4 py-20 text-center">
+        <p className="text-sm text-red-600">Mahsulotlarni yuklashda xatolik yuz berdi.</p>
+        <button
+          type="button"
+          onClick={() => void refetch()}
+          disabled={isFetching}
+          className="rounded-lg border border-[var(--border)] px-4 py-2 text-sm font-semibold text-[var(--primary)] transition-colors hover:bg-[var(--secondary-soft)] disabled:cursor-not-allowed disabled:opacity-60"
+        >
+          {isFetching ? "Qayta yuklanmoqda..." : "Qayta urinish"}
+        </button>
       </div>
     );
   }
@@ -38,12 +47,12 @@ const Products = ({ searchQuery = "" }: ProductsProps) => {
   if (searchQuery && filteredProducts.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center py-20 text-center">
-        <div className="text-5xl mb-4">🔍</div>
+        <Search aria-hidden="true" className="mb-4 h-10 w-10 text-slate-300" />
         <p className="text-lg font-bold text-gray-700 mb-1">
           «{searchQuery}» topilmadi
         </p>
         <p className="text-sm text-gray-400">
-          Boshqa kalit so'z bilan qidirib ko'ring
+          {"Boshqa kalit so'z bilan qidirib ko'ring"}
         </p>
       </div>
     );

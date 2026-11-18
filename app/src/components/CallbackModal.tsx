@@ -47,7 +47,6 @@ const CallbackModal = () => {
             return;
         }
 
-        console.log("Yuborilgan ma'lumotlar:", validation.data);
         setSubmitted(true);
         setTimeout(() => {
             setName('');
