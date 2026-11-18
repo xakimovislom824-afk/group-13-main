@@ -23,7 +23,7 @@ export default function AsbobUskunalarPage() {
         <div className="text-center py-20 text-gray-500">Yuklanmoqda...</div>
       ) : filteredProducts.length === 0 ? (
         <div className="bg-white border border-dashed border-slate-200 rounded-2xl py-16 text-center text-slate-500">
-          Bu bo'limga mos mahsulotlar topilmadi.
+          Bu bo&apos;limga mos mahsulotlar topilmadi.
         </div>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-6">

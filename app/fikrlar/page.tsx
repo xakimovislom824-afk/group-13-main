@@ -182,7 +182,7 @@ export default function FikrlarSahifasi() {
             <div className="space-y-6">
               {paginated.length === 0 ? (
                 <p className="text-gray-400 text-sm py-8 text-center">
-                  Hali fikrlar yo'q. Birinchi bo'lib yozing!
+                  Hali fikrlar yo&apos;q. Birinchi bo&apos;lib yozing!
                 </p>
               ) : (
                 paginated.map((review) => (
@@ -261,7 +261,7 @@ export default function FikrlarSahifasi() {
             {isSuccess && (
               <div className="flex items-center gap-2 bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded text-sm mb-6">
                 <CheckCircle size={18} />
-                Fikringiz muvaffaqiyatli yuborildi! Sahifada ko'rinib qoldi.
+                Fikringiz muvaffaqiyatli yuborildi! Sahifada ko&apos;rinib qoldi.
               </div>
             )}
 
@@ -405,7 +405,7 @@ export default function FikrlarSahifasi() {
                       id="form-agree"
                     />
                     <label htmlFor="form-agree" className="text-[10px] text-gray-400 leading-tight cursor-pointer">
-                      Maxfiylik siyosatiga muvofiq shaxsiy ma'lumotlarni qayta ishlashga roziman
+                      Maxfiylik siyosatiga muvofiq shaxsiy ma&apos;lumotlarni qayta ishlashga roziman
                     </label>
                   </div>
                   {commentErrors.agree && (
@@ -420,12 +420,12 @@ export default function FikrlarSahifasi() {
         {/* SIDEBAR */}
         <aside className="w-full lg:w-[350px] space-y-6">
           <div className="bg-[#F8F9FA] p-6 rounded-md border border-gray-100 shadow-sm">
-            <h4 className="text-[15px] font-bold mb-2 uppercase">Yangiliklarga obuna bo'ling</h4>
+            <h4 className="text-[15px] font-bold mb-2 uppercase">Yangiliklarga obuna bo&apos;ling</h4>
             <p className="text-[12px] text-gray-500 mb-4 leading-snug">
-              Doimiy chegirmalar va kompaniya yangiliklaridan xabardor bo'ling.
+              Doimiy chegirmalar va kompaniya yangiliklaridan xabardor bo&apos;ling.
             </p>
             {isSubscribed ? (
-              <div className="text-green-600 text-sm font-medium py-2">Muvaffaqiyatli obuna bo'ldingiz!</div>
+              <div className="text-green-600 text-sm font-medium py-2">Muvaffaqiyatli obuna bo&apos;ldingiz!</div>
             ) : (
               <form onSubmit={handleSubmit(onSubscribe)}>
                 <div className="mb-3">
@@ -446,7 +446,7 @@ export default function FikrlarSahifasi() {
                   type="submit"
                   className="w-full bg-[#2472d1] text-white font-bold py-3 rounded-sm text-[12px] uppercase tracking-wider hover:bg-blue-700 transition-colors"
                 >
-                  Obuna bo'lish
+                  Obuna bo&apos;lish
                 </button>
                 <div className="mt-4">
                   <div className="flex items-start gap-2">
@@ -461,7 +461,7 @@ export default function FikrlarSahifasi() {
                       className={`text-[10px] leading-tight cursor-pointer select-none ${errors.privacyConsent ? "text-red-500 font-medium" : "text-gray-400"
                         }`}
                     >
-                      Maxfiylik siyosatiga muvofiq shaxsiy ma'lumotlarni qayta ishlashga roziman.
+                      Maxfiylik siyosatiga muvofiq shaxsiy ma&apos;lumotlarni qayta ishlashga roziman.
                     </label>
                   </div>
                   {errors.privacyConsent && (

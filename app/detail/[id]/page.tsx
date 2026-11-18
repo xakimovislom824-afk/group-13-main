@@ -363,7 +363,7 @@ const Tabs = forwardRef<HTMLDivElement, TabsProps>(
                   </div>
                   {specs.length > 7 && (
                     <button onClick={() => setShowAll((v) => !v)} className="mt-4 text-stone-600 text-sm font-medium flex items-center gap-1.5 hover:text-stone-900 transition-colors group">
-                      {showAll ? (<><ChevronUp size={14} strokeWidth={2.5} />Yig'ish</>) : (<><ChevronDown size={14} strokeWidth={2.5} />Barcha xususiyatlar ({specs.length})</>)}
+                      {showAll ? (<><ChevronUp size={14} strokeWidth={2.5} />Yig&apos;ish</>) : (<><ChevronDown size={14} strokeWidth={2.5} />Barcha xususiyatlar ({specs.length})</>)}
                     </button>
                   )}
                 </>
@@ -442,7 +442,7 @@ function CartStepper({
         ) : (
           <>
             <ShoppingCart size={15} strokeWidth={2} />
-            Savatchaga qo'shish
+            Savatchaga qo&apos;shish
           </>
         )}
       </button>
@@ -717,7 +717,7 @@ export default function ProductDetail({
         </div>
         <div>
           <p className="text-stone-900 font-semibold text-lg">Mahsulot topilmadi</p>
-          <p className="text-stone-400 text-sm mt-1.5">Ushbu mahsulot mavjud emas yoki o'chirilgan.</p>
+          <p className="text-stone-400 text-sm mt-1.5">Ushbu mahsulot mavjud emas yoki o&apos;chirilgan.</p>
         </div>
         <a href="/katalog" className="bg-stone-900 text-white px-7 py-3.5 rounded-2xl font-medium hover:bg-black transition-colors text-sm shadow-lg">
           Katalogga qaytish
@@ -848,7 +848,7 @@ export default function ProductDetail({
                   {SPECS.length > 6 && (
                     <div className="px-6 py-4 border-t border-stone-50 select-none">
                       <button onClick={() => scrollToTabs(0)} className="text-xs text-stone-500 font-medium hover:text-stone-900 transition-colors flex items-center gap-1 group">
-                        Barchasini ko'rish
+                        Barchasini ko&apos;rish
                         <ChevronRight size={12} strokeWidth={2.5} className="group-hover:translate-x-0.5 transition-transform" />
                       </button>
                     </div>
