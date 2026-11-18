@@ -1,7 +1,6 @@
 "use client";
 import { ChevronDown, SlidersHorizontal, X } from "lucide-react";
 import { useState, useEffect } from "react";
-import Image from "next/image";
 
 function Katalog2() {
   const [drawerOpen, setDrawerOpen] = useState(false);

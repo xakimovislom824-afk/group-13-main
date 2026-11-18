@@ -1,5 +1,6 @@
 "use client";
 import Link from "next/link";
+import Image from "next/image";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import {
@@ -10,6 +11,9 @@ import {
 import { useGetProductsQuery } from "../../services/productApi";
 import { Trash2, Minus, Plus } from "lucide-react";
 import { IProduct } from "../../Types/index.types";
+
+const isRecord = (value: unknown): value is Record<string, unknown> =>
+  typeof value === "object" && value !== null && !Array.isArray(value);
 
 interface ICartItemWithDetails {
   id: number;
@@ -26,19 +30,21 @@ export default function SavatchaPage() {
   const [updateCart] = useUpdateCartMutation();
   const [deleteCart] = useDeleteCartMutation();
 
-  const rawItems = carts.flatMap((cart: any) => {
-    if (Array.isArray(cart?.items)) return cart.items;
-    if (cart && (cart.product !== undefined || cart.product_data || cart.product_detail)) return [cart];
+  const rawItems = carts.flatMap((value) => {
+    if (!isRecord(value)) return [];
+    if (Array.isArray(value.items)) return value.items.filter(isRecord);
+    if (value.product !== undefined || value.product_data || value.product_detail) return [value];
     return [];
   });
 
   const items: ICartItemWithDetails[] = rawItems.map((item) => {
-    const matchedProduct = products.find((p) => Number(p.id) === Number(item.product));
+    const productId = Number(item.product ?? (isRecord(item.product_data) ? item.product_data.id : undefined) ?? (isRecord(item.product_detail) ? item.product_detail.id : undefined));
+    const matchedProduct = products.find((product) => Number(product.id) === productId);
     return {
-      id: item.id,
-      cart: item.cart,
-      product: item.product,
-      quantity: item.quantity,
+      id: Number(item.id),
+      cart: Number(item.cart ?? 0),
+      product: productId,
+      quantity: Number(item.quantity ?? 1),
       product_details: matchedProduct,
     };
   });
@@ -154,9 +160,12 @@ export default function SavatchaPage() {
                           {/* Image */}
                           <div className="w-16 h-16 sm:w-20 sm:h-20 bg-gray-50 rounded-lg flex items-center justify-center border border-gray-100 p-2 shrink-0">
                             {item.product_details?.image ? (
-                              <img
+                              <Image
                                 src={item.product_details.image}
                                 alt={item.product_details?.name ?? ""}
+                                width={80}
+                                height={80}
+                                unoptimized
                                 className="object-contain max-h-full"
                               />
                             ) : (
@@ -257,9 +266,12 @@ export default function SavatchaPage() {
                               <div className="flex items-center gap-4">
                                 <div className="w-20 h-20 bg-gray-50 rounded-lg flex items-center justify-center border border-gray-100 p-2 shrink-0">
                                   {item.product_details?.image ? (
-                                    <img
+                                    <Image
                                       src={item.product_details.image}
                                       alt={item.product_details?.name ?? ""}
+                                      width={80}
+                                      height={80}
+                                      unoptimized
                                       className="object-contain max-h-full"
                                     />
                                   ) : (

@@ -34,13 +34,16 @@ export default function ParolniTiklash() {
     try {
       await forgotPassword({ email: data.email }).unwrap();
       setSuccess(true);
-    } catch (error: any) {
-      setServerError(
-        error?.data?.email?.[0] ||
-        error?.data?.detail ||
-        error?.data?.message ||
-        "Xatolik yuz berdi. Qayta urinib ko'ring."
+    } catch (error: unknown) {
+      const data = error && typeof error === "object" && "data" in error
+        && error.data && typeof error.data === "object"
+        ? error.data as Record<string, unknown>
+        : {};
+      const emailError = Array.isArray(data.email) ? data.email[0] : undefined;
+      const message = [emailError, data.detail, data.message].find(
+        (value): value is string => typeof value === "string" && value.length > 0
       );
+      setServerError(message || "Xatolik yuz berdi. Qayta urinib ko'ring.");
     }
   };
 

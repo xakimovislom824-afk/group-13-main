@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useGetNewsQuery } from "../../../services/newsApi";
 import { IBlog } from "../../../Types/index.types";
@@ -26,7 +27,8 @@ export default function BlogDetail({ params, searchParams }: BlogDetailProps) {
   const [isMounted, setIsMounted] = useState(false);
 
   useEffect(() => {
-    setIsMounted(true);
+    const timeoutId = window.setTimeout(() => setIsMounted(true), 0);
+    return () => window.clearTimeout(timeoutId);
   }, []);
 
   const currentTitle = title ? decodeURIComponent(title) : "Yangiliklar";
@@ -71,10 +73,13 @@ export default function BlogDetail({ params, searchParams }: BlogDetailProps) {
 
             {/* Rasm */}
             <div className="w-full h-[220px] sm:h-[320px] md:h-[420px] bg-[#F7F9FC] border relative rounded-[12px] overflow-hidden mb-6 flex items-center justify-center p-2">
-              <img
+              <Image
                 src={currentImage}
                 alt={currentTitle}
-                className="w-full h-full object-contain"
+                fill
+                sizes="(max-width: 768px) 100vw, 66vw"
+                unoptimized
+                className="object-contain"
               />
             </div>
 
@@ -132,10 +137,13 @@ export default function BlogDetail({ params, searchParams }: BlogDetailProps) {
                     className="flex flex-col bg-white border border-gray-100 rounded-[12px] p-3 shadow-sm hover:shadow-md transition group duration-300"
                   >
                     <div className="relative h-[160px] w-full bg-[#F7F9FC] rounded-[8px] overflow-hidden mb-3 flex items-center justify-center p-1">
-                      <img
+                      <Image
                         src={toggledImage}
                         alt={item.title}
-                        className="w-full h-full object-contain group-hover:scale-103 transition duration-300"
+                        fill
+                        sizes="(max-width: 768px) 100vw, 25vw"
+                        unoptimized
+                        className="object-contain group-hover:scale-103 transition duration-300"
                       />
                     </div>
                     <h3 className="text-[14px] md:text-[15px] font-bold text-[#2F3640] leading-snug mb-1.5 line-clamp-2 group-hover:text-[#1F6BFF] transition">

@@ -1,37 +1,12 @@
 "use client";
 
-import { ChevronLeft, ChevronRight } from "lucide-react";
-import { useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { useGetNewsQuery } from "../../services/newsApi";
 import { IBlog } from "../../Types/index.types";
 
 export default function BlogPage() {
-    const [currentPage, setCurrentPage] = useState<number>(1);
-    const totalPages: number = 10; // API-dan keladigan sahifalar soniga qarab dinamik boshqarish mumkin
-    const visiblePages: number = 5;
-    
     const { data: newsData, isLoading, isError } = useGetNewsQuery();
-
-    const handlePageChange = (page: number): void => {
-        if (page >= 1 && page <= totalPages) {
-            setCurrentPage(page);
-            window.scrollTo({ top: 0, behavior: "smooth" });
-        }
-    };     
-
-    let startPage: number = Math.max(1, currentPage - 2);
-    let endPage: number = startPage + visiblePages - 1;
-
-    if (endPage > totalPages) {
-        endPage = totalPages;
-        startPage = Math.max(1, endPage - visiblePages + 1);
-    }
-
-    const pages: number[] = [];
-    for (let i = startPage; i <= endPage; i++) {
-        pages.push(i);
-    }
 
     if (isLoading) return <div className="text-center py-20 font-sans text-gray-500">Yuklanmoqda...</div>;
     if (isError) return <div className="text-center py-20 font-sans text-red-500">Xatolik yuz berdi.</div>;
@@ -67,10 +42,13 @@ export default function BlogPage() {
                                 >
                                     <div className="flex flex-col h-full bg-white border border-gray-100 rounded-[12px] p-3 shadow-sm hover:shadow-md transition duration-300">
                                         <div className="bg-gray-50 relative h-[180px] w-full rounded-[8px] overflow-hidden mb-3.5 flex items-center justify-center p-1">
-                                            <img
+                                            <Image
                                                 src={itemImage}
                                                 alt={item.title}
-                                                className="w-full h-full object-contain group-hover:scale-103 transition duration-300"
+                                                fill
+                                                sizes="(max-width: 640px) 100vw, (max-width: 1280px) 50vw, 33vw"
+                                                unoptimized
+                                                className="object-contain group-hover:scale-103 transition duration-300"
                                             />
                                         </div>
                                         <h3 className="text-[15px] font-bold text-[#2F3640] leading-[20px] mb-2 group-hover:text-blue-600 transition line-clamp-2">

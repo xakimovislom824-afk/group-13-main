@@ -45,8 +45,9 @@ export const loginApi = baseApi.injectEndpoints({
               access: demoToken,
             },
           };
-        } catch (error: any) {
-          return { error: { status: 500, data: error?.message || "Login failed" } };
+        } catch (error: unknown) {
+          const message = error instanceof Error ? error.message : "Login failed";
+          return { error: { status: 500, data: message } };
         }
       },
     }),

@@ -1,5 +1,8 @@
 import { baseApi } from "./baseApi";
 
+const isRecord = (value: unknown): value is Record<string, unknown> =>
+  typeof value === "object" && value !== null && !Array.isArray(value);
+
 export interface CatalogItem {
   id: number;
   name: string;
@@ -12,18 +15,21 @@ export interface CatalogResponse {
   count: number;
 }
 
-const normalizeCatalog = (response: any): CatalogResponse => {
-  const raw = Array.isArray(response) ? response : response?.categories ?? response?.results ?? [];
+const normalizeCatalog = (response: unknown): CatalogResponse => {
+  const responseRecord = isRecord(response) ? response : {};
+  const candidate = responseRecord.categories ?? responseRecord.results;
+  const raw: unknown[] = Array.isArray(response) ? response : Array.isArray(candidate) ? candidate : [];
 
-  const categories = raw.map((item: any, index: number) => {
-    const name = typeof item === "string" ? item : item?.name ?? item?.title ?? `Category ${index + 1}`;
-    const slug = typeof item === "string" ? item : item?.slug ?? String(name).toLowerCase().replace(/\s+/g, "-");
+  const categories = raw.map((item, index) => {
+    const itemRecord = isRecord(item) ? item : {};
+    const name = typeof item === "string" ? item : itemRecord.name ?? itemRecord.title ?? `Category ${index + 1}`;
+    const slug = typeof item === "string" ? item : itemRecord.slug ?? String(name).toLowerCase().replace(/\s+/g, "-");
 
     return {
-      id: Number(item?.id ?? index + 1),
+      id: Number(itemRecord.id ?? index + 1),
       name: String(name).trim(),
       slug: String(slug).trim(),
-      image: item?.image ?? item?.thumbnail ?? "",
+      image: String(itemRecord.image ?? itemRecord.thumbnail ?? ""),
     };
   });
 

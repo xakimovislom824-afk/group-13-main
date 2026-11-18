@@ -39,10 +39,14 @@ export const categoryApi = baseApi.injectEndpoints({
     endpoints: (builder) => ({
         getCategories: builder.query<ICategory[], void>({
             query: () => "/products/categories",
-            transformResponse: (response: any) => {
-                const categories = Array.isArray(response) ? response : response?.categories ?? [];
+            transformResponse: (response: unknown) => {
+                const responseRecord = response && typeof response === "object" && !Array.isArray(response)
+                    ? response as Record<string, unknown>
+                    : {};
+                const candidate = responseRecord.categories;
+                const categories: unknown[] = Array.isArray(response) ? response : Array.isArray(candidate) ? candidate : [];
                 return categories
-                    .map((item: any, index: number) => {
+                    .map((item: unknown, index: number) => {
                         const name = formatCategoryName(item);
                         return {
                             id: index + 1,

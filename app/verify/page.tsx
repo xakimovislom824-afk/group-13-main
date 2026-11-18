@@ -1,15 +1,12 @@
 "use client";
 
 import React, { Suspense } from "react";
-import { useSearchParams, useRouter } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 
 // Asosiy kontent qismi
 function VerifyContent() {
   const searchParams = useSearchParams();
-  const router = useRouter();
-
-  // Masalan: /verify?token=123456 yoki /verify?email=test@test.com
-  const token = searchParams.get("token") || "";
+  // Masalan: /verify?email=test@test.com
   const email = searchParams.get("email") || "";
 
   return (

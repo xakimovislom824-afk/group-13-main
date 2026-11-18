@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react"; // 👈 useEffect qo'shildi
 import { Maximize2 } from "lucide-react";
+import Image from "next/image";
 
 interface ProductGalleryProps {
   gallery?: string[];
@@ -33,9 +34,12 @@ export default function ProductGallery({ gallery = [], productName }: ProductGal
     <>
       <div className="flex-1 flex items-center justify-center min-h-[280px] sm:min-h-[360px] lg:min-h-[420px] p-5 relative bg-white">
         {currentImg && (
-          <img
+          <Image
             src={currentImg}
             alt={productName}
+            width={600}
+            height={380}
+            unoptimized
             className="w-full max-w-[600px] max-h-[380px] border rounded-xl object-contain"
           />
         )}
@@ -56,7 +60,7 @@ export default function ProductGallery({ gallery = [], productName }: ProductGal
               activeImg === i ? "border-blue-500 shadow-sm" : "border-slate-200 hover:border-slate-300"
             }`}
           >
-            <img src={img} alt="" className="w-full h-full object-cover" />
+            <Image src={img} alt="" width={68} height={68} unoptimized className="w-full h-full object-cover" />
           </button>
         ))}
       </div>
@@ -65,7 +69,7 @@ export default function ProductGallery({ gallery = [], productName }: ProductGal
         <div className="fixed inset-0 z-[55000] bg-black/80 flex items-center justify-center">
           <div className="absolute inset-0" onClick={() => setIsZoomOpen(false)} />
           <div className="relative z-10 max-w-5xl w-full px-4">
-            <img src={currentImg} alt={productName} className="w-full max-h-[85vh] object-contain rounded-xl" />
+            <Image src={currentImg} alt={productName} width={1200} height={800} unoptimized className="w-full max-h-[85vh] object-contain rounded-xl" />
             <button
               onClick={() => setIsZoomOpen(false)}
               className="absolute top-2 right-2 bg-white p-2 rounded-md hover:bg-slate-100 transition"

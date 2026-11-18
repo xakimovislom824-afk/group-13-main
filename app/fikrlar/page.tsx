@@ -2,7 +2,6 @@
 
 import React, { useState } from "react";
 import Link from "next/link";
-import Image from "next/image";
 import { ChevronLeft, ChevronRight, Upload, CheckCircle, AlertCircle, X } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -63,6 +62,11 @@ export default function FikrlarSahifasi() {
 
   const [sendFeedback, { isLoading, isSuccess, isError, error, reset: resetMutation }] =
     useSendFeedbackMutation();
+  const errorData = error && typeof error === "object" && "data" in error ? error.data : null;
+  const errorDetails = errorData && typeof errorData === "object" ? errorData : null;
+  const feedbackErrorMessage = errorDetails && "detail" in errorDetails && typeof errorDetails.detail === "string"
+    ? errorDetails.detail
+    : errorData ? JSON.stringify(errorData) : "Xabar yuborishda xatolik yuz berdi";
 
   const {
     register,
@@ -84,7 +88,7 @@ export default function FikrlarSahifasi() {
     defaultValues: { name: "", email: "", comment: "", agree: false },
   });
 
-  const onSubscribe = async (data: SubscribeFormData) => {
+  const onSubscribe = async () => {
     await new Promise((res) => setTimeout(res, 1000));
     setIsSubscribed(true);
     reset();
@@ -106,7 +110,7 @@ export default function FikrlarSahifasi() {
       selectedFiles.forEach((item) => URL.revokeObjectURL(item.url));
       setSelectedFiles([]);
       setCurrentPage(1);
-    } catch (_) { }
+    } catch { }
   };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -268,9 +272,7 @@ export default function FikrlarSahifasi() {
             {isError && (
               <div className="flex items-center gap-2 bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded text-sm mb-6">
                 <AlertCircle size={18} />
-                {(error as any)?.data?.detail ||
-                  JSON.stringify((error as any)?.data) ||
-                  "Xabar yuborishda xatolik yuz berdi"}
+                {feedbackErrorMessage}
               </div>
             )}
 

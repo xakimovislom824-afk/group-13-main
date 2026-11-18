@@ -28,8 +28,9 @@ export const verifyApi = baseApi.injectEndpoints({
               last_name: "",
             },
           };
-        } catch (error: any) {
-          return { error: { status: 500, data: error?.message || "Verification failed" } };
+        } catch (error: unknown) {
+          const message = error instanceof Error ? error.message : "Verification failed";
+          return { error: { status: 500, data: message } };
         }
       },
     }),

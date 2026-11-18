@@ -5,7 +5,6 @@ import Image from "next/image";
 import { FiGift } from "react-icons/fi";
 import { FiMoon, FiSun } from "react-icons/fi";
 import { useState, useEffect, useCallback, useMemo, useRef, Suspense } from "react";
-import { BarChart2 } from "lucide-react";
 import {
   FaUser,
   FaHeart,
@@ -19,7 +18,6 @@ import { useGetCartsQuery } from "../../../services/cartApi";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useProductSearch } from "../../hooks/useProductSearch";
 import { categories, siteConfig } from "../../../lib/site-config";
-import { useGetCompanyInfoQuery } from "../../../services/companyApi";
 
 export const dynamic = "force-dynamic";
 
@@ -148,9 +146,9 @@ function SearchBoxContent({ isMobile = false }: SearchBoxProps) {
   const results = useProductSearch(searchQuery);
 
   useEffect(() => {
-    if (!selected && searchQuery.trim().length >= 2) {
-      setIsOpen(true);
-    }
+    if (selected || searchQuery.trim().length < 2 || results.length === 0) return;
+    const timeoutId = window.setTimeout(() => setIsOpen(true), 0);
+    return () => window.clearTimeout(timeoutId);
   }, [results, selected, searchQuery]);
 
   useEffect(() => {
@@ -337,9 +335,6 @@ function SearchBox({ isMobile = false }: SearchBoxProps) {
 // ─────────────────────────────────────────────
 export default function Navbar() {
   const pathname = usePathname();
-  const navbarRef = useRef<HTMLDivElement>(null);
-  const [navbarHeight, setNavbarHeight] = useState(0);
-
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -348,31 +343,7 @@ export default function Navbar() {
   const { openModal } = useModal();
   const { data: wishlist = [] } = useGetWishlistQuery();
   const { data: cart } = useGetCartsQuery();
-  const { data: companyInfo } = useGetCompanyInfoQuery();
-
-  const cartCount = Array.isArray(cart)
-    ? cart.reduce((sum, c) => {
-        if (Array.isArray((c as any)?.items)) return sum + (c as any).items.length;
-        if (c && ((c as any).product !== undefined || (c as any).product_data || (c as any).product_detail)) return sum + 1;
-        return sum;
-      }, 0)
-    : Array.isArray((cart as any)?.items)
-      ? (cart as any).items.length
-      : 0;
-
-  const updateNavbarHeight = useCallback(() => {
-    if (navbarRef.current) setNavbarHeight(navbarRef.current.getBoundingClientRect().bottom);
-  }, []);
-
-  useEffect(() => {
-    updateNavbarHeight();
-    window.addEventListener("resize", updateNavbarHeight);
-    window.addEventListener("scroll", updateNavbarHeight);
-    return () => {
-      window.removeEventListener("resize", updateNavbarHeight);
-      window.removeEventListener("scroll", updateNavbarHeight);
-    };
-  }, [updateNavbarHeight]);
+  const cartCount = cart?.length ?? 0;
 
   useEffect(() => {
     if (isSidebarOpen) {
@@ -390,30 +361,34 @@ export default function Navbar() {
   }, []);
 
   useEffect(() => {
-    refreshAuth();
+    const timeoutId = window.setTimeout(refreshAuth, 0);
     window.addEventListener("storage", refreshAuth);
     window.addEventListener("authChange", refreshAuth);
     return () => {
+      window.clearTimeout(timeoutId);
       window.removeEventListener("storage", refreshAuth);
       window.removeEventListener("authChange", refreshAuth);
     };
   }, [refreshAuth]);
 
   useEffect(() => {
-    const savedTheme = localStorage.getItem("theme");
-    let themeMode = "light";
+    const timeoutId = window.setTimeout(() => {
+      const savedTheme = localStorage.getItem("theme");
+      let themeMode = "light";
 
-    try {
-      const parsedTheme = savedTheme ? JSON.parse(savedTheme) : null;
-      themeMode = parsedTheme?.mode === "dark" ? "dark" : "light";
-    } catch {
-      themeMode = savedTheme === "dark" ? "dark" : "light";
-    }
+      try {
+        const parsedTheme = savedTheme ? JSON.parse(savedTheme) : null;
+        themeMode = parsedTheme?.mode === "dark" ? "dark" : "light";
+      } catch {
+        themeMode = savedTheme === "dark" ? "dark" : "light";
+      }
 
-    const dark = themeMode === "dark";
-    setIsDarkMode(dark);
-    document.documentElement.classList.toggle("dark", dark);
-    localStorage.setItem("theme", JSON.stringify({ mode: themeMode }));
+      const dark = themeMode === "dark";
+      setIsDarkMode(dark);
+      document.documentElement.classList.toggle("dark", dark);
+      localStorage.setItem("theme", JSON.stringify({ mode: themeMode }));
+    }, 0);
+    return () => window.clearTimeout(timeoutId);
   }, []);
 
   const toggleDarkMode = useCallback(() => {
@@ -438,7 +413,7 @@ export default function Navbar() {
   ], []);
 
   return (
-    <div ref={navbarRef} className="sticky top-0 z-[1000] w-full border-b border-[var(--border)] bg-[var(--surface)]">
+    <div className="sticky top-0 z-[1000] w-full border-b border-[var(--border)] bg-[var(--surface)]">
 
       {/* ── TOP BAR ── */}
       <div className="flex items-center justify-between border-b border-[var(--border)] bg-[var(--primary)] px-3 py-2 text-xs text-white sm:px-4 md:px-6">

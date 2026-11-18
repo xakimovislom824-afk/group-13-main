@@ -2,6 +2,8 @@
 
 import { use, useState, useCallback, useRef, useEffect, forwardRef } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
+import Image from "next/image";
 import {
   ShoppingCart, Heart, GitCompareArrows, CheckCircle,
   X, Plus, Minus, Zap, CreditCard, Truck,
@@ -29,6 +31,16 @@ interface ToastItem {
   message: string;
   type: ToastType;
 }
+
+type CartRecord = Record<string, unknown>;
+
+const isRecord = (value: unknown): value is CartRecord =>
+  typeof value === "object" && value !== null && !Array.isArray(value);
+
+const getRequestErrorMessage = (error: unknown, fallback: string) => {
+  if (!isRecord(error) || !isRecord(error.data)) return fallback;
+  return typeof error.data.detail === "string" ? error.data.detail : fallback;
+};
 
 function ToastContainer({ toasts, onRemove }: { toasts: ToastItem[]; onRemove: (id: number) => void }) {
   return (
@@ -213,7 +225,7 @@ export function BuyNowModal({
             {/* Mahsulot kartasi */}
             <div className="flex gap-4 bg-stone-50 border border-stone-100 rounded-2xl p-4">
               <div className="w-16 h-16 bg-white rounded-xl border border-stone-100 flex items-center justify-center shrink-0 p-2">
-                <img src={product.image} alt={product.name} className="w-full h-full object-contain" />
+                <Image src={product.image} alt={product.name} width={64} height={64} unoptimized className="w-full h-full object-contain" />
               </div>
               <div className="flex-1 min-w-0 flex flex-col justify-center">
                 <p className="text-xs text-stone-600 font-medium line-clamp-2 leading-snug mb-1">{product.name}</p>
@@ -569,33 +581,42 @@ export default function ProductDetail({
   // ── Sync wishlist state from API ──
   useEffect(() => {
     if (!wishlistData || !productId) return;
-    const inList = wishlistData.some((item: any) => {
-      const pId = typeof item.product === "object" ? item.product?.id : item.product;
-      return Number(pId) === productId;
-    });
-    setInWishlist(inList);
+    const timeoutId = window.setTimeout(() => {
+      const inList = wishlistData.some((value: unknown) => {
+        if (!isRecord(value)) return false;
+        const product = value.product;
+        const productIdValue = isRecord(product) ? product.id : product;
+        return Number(productIdValue) === productId;
+      });
+      setInWishlist(inList);
+    }, 0);
+    return () => window.clearTimeout(timeoutId);
   }, [wishlistData, productId]);
 
   // ── Helper: find cart item for this product ──
-  const getCartItem = useCallback(() => {
+  const getCartItem = useCallback((): CartRecord | null => {
     if (!cartData) return null;
-    let items: any[] = [];
-    if (Array.isArray(cartData)) {
-      items = cartData.flatMap((c: any) => c?.items ?? (c?.product ? [c] : []));
-    } else if (typeof cartData === "object") {
-      items = (cartData as any).items || [];
-    }
-    return items.find((item: any) => {
-      const pId = typeof item.product === "object" ? item.product?.id : item.product;
-      const pDetailId = item.product_detail?.id || item.product_data?.id;
-      return Number(pId) === productId || Number(pDetailId) === productId;
+    const items: CartRecord[] = cartData.flatMap((value: unknown) => {
+      if (!isRecord(value)) return [];
+      if (Array.isArray(value.items)) return value.items.filter(isRecord);
+      return value.product ? [value] : [];
     });
+    return items.find((item) => {
+      const pId = isRecord(item.product) ? item.product.id : item.product;
+      const pDetailId = isRecord(item.product_detail)
+        ? item.product_detail.id
+        : isRecord(item.product_data) ? item.product_data.id : undefined;
+      return Number(pId) === productId || Number(pDetailId) === productId;
+    }) ?? null;
   }, [cartData, productId]);
 
   // ── Sync cart qty from API ──
   useEffect(() => {
-    const cartItem = getCartItem();
-    setCartQty(cartItem ? cartItem.quantity : 0);
+    const timeoutId = window.setTimeout(() => {
+      const cartItem = getCartItem();
+      setCartQty(cartItem ? Number(cartItem.quantity ?? 0) : 0);
+    }, 0);
+    return () => window.clearTimeout(timeoutId);
   }, [getCartItem]);
 
   // ── Add to cart (first time) ──
@@ -606,9 +627,9 @@ export default function ProductDetail({
     try {
       await addToCart({ product: productId, quantity: 1 }).unwrap();
       notify("Savatchaga qo'shildi!", "success");
-    } catch (err: any) {
+    } catch (err: unknown) {
       setCartQty(0);
-      notify(err?.data?.detail || "Xatolik yuz berdi", "error");
+      notify(getRequestErrorMessage(err, "Xatolik yuz berdi"), "error");
     } finally {
       setCartLoading(false);
     }
@@ -622,7 +643,7 @@ export default function ProductDetail({
     setCartQty(newQty);
     setCartLoading(true);
     try {
-      await updateCart({ id: cartItem.id, product: productId, quantity: newQty }).unwrap();
+      await updateCart({ id: Number(cartItem.id), product: productId, quantity: newQty }).unwrap();
     } catch {
       setCartQty(cartQty);
       notify("Miqdorni oshirishda xatolik", "error");
@@ -640,7 +661,7 @@ export default function ProductDetail({
     if (newQty <= 0) {
       setCartQty(0);
       try {
-        await deleteCart(cartItem.id).unwrap();
+        await deleteCart(Number(cartItem.id)).unwrap();
         notify("Savatdan o'chirildi", "success");
       } catch {
         setCartQty(cartQty);
@@ -652,7 +673,7 @@ export default function ProductDetail({
     }
     setCartQty(newQty);
     try {
-      await updateCart({ id: cartItem.id, product: productId, quantity: newQty }).unwrap();
+      await updateCart({ id: Number(cartItem.id), product: productId, quantity: newQty }).unwrap();
     } catch {
       setCartQty(cartQty);
       notify("Miqdorni kamaytirishda xatolik", "error");
@@ -673,9 +694,9 @@ export default function ProductDetail({
         product_detail: product,
       }).unwrap();
       notify(wasInList ? "Sevimlilardan olib tashlandi" : "Sevimlilarga qo'shildi!", "wish");
-    } catch (err: any) {
+    } catch (err: unknown) {
       setInWishlist(wasInList);
-      notify(err?.data?.detail || "Xatolik yuz berdi", "error");
+      notify(getRequestErrorMessage(err, "Xatolik yuz berdi"), "error");
     } finally {
       setWishLoading(false);
     }
@@ -719,9 +740,9 @@ export default function ProductDetail({
           <p className="text-stone-900 font-semibold text-lg">Mahsulot topilmadi</p>
           <p className="text-stone-400 text-sm mt-1.5">Ushbu mahsulot mavjud emas yoki o'chirilgan.</p>
         </div>
-        <a href="/katalog" className="bg-stone-900 text-white px-7 py-3.5 rounded-2xl font-medium hover:bg-black transition-colors text-sm shadow-lg">
+        <Link href="/katalog" className="bg-stone-900 text-white px-7 py-3.5 rounded-2xl font-medium hover:bg-black transition-colors text-sm shadow-lg">
           Katalogga qaytish
-        </a>
+        </Link>
       </div>
     );
   }
@@ -771,9 +792,9 @@ export default function ProductDetail({
         <div className="max-w-7xl mx-auto px-4 py-7 md:py-10">
           {/* Breadcrumb */}
           <nav className="flex items-center gap-1.5 text-[11px] font-medium text-stone-400 mb-6 overflow-x-auto no-scrollbar whitespace-nowrap select-none">
-            <a href="/" className="hover:text-stone-700 transition-colors">Bosh sahifa</a>
+            <Link href="/" className="hover:text-stone-700 transition-colors">Bosh sahifa</Link>
             <ChevronRight size={10} className="text-stone-300 shrink-0" strokeWidth={2.5} />
-            <a href="/katalog" className="hover:text-stone-700 transition-colors">Katalog</a>
+            <Link href="/katalog" className="hover:text-stone-700 transition-colors">Katalog</Link>
             <ChevronRight size={10} className="text-stone-300 shrink-0" strokeWidth={2.5} />
             <span className="text-stone-600 truncate max-w-[200px] md:max-w-none font-medium">{product.name}</span>
           </nav>
@@ -802,7 +823,7 @@ export default function ProductDetail({
                     {product.is_hit && <span className="bg-amber-500 text-white text-[10px] font-semibold px-2.5 py-1 rounded-lg shadow-sm">Hit</span>}
                   </div>
                 )}
-                <img src={product.image} alt={product.name} loading="eager" className="w-full h-full object-contain transition-transform duration-700 group-hover:scale-[1.04]" />
+                <Image src={product.image} alt={product.name} fill sizes="(max-width: 1024px) 100vw, 33vw" unoptimized priority className="object-contain transition-transform duration-700 group-hover:scale-[1.04]" />
               </div>
 
               {/* Trust badges */}

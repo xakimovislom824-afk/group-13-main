@@ -1,5 +1,6 @@
 "use client";
 import Link from "next/link";
+import Image from "next/image";
 import React from "react";
 import { useGetDiscountBySlugQuery, useGetDiscountsQuery } from "../../../services/discountApi";
 interface PageProps {
@@ -56,9 +57,12 @@ const AktsiyaDetail = ({ params, searchParams }: PageProps) => {
             </p>
             <div className="overflow-hidden rounded-[12px] mb-6 md:mb-8 bg-[#F7F9FC] border flex items-center justify-center p-2 w-full h-[240px] sm:h-[360px] md:h-[460px] lg:h-[500px]">
               {displayImage ? (
-                <img
+                <Image
                   src={displayImage}
                   alt={discount.title}
+                  width={960}
+                  height={700}
+                  unoptimized
                   className="w-full h-full object-contain"
                   onError={(event) => {
                     event.currentTarget.style.display = "none";
@@ -91,7 +95,7 @@ const AktsiyaDetail = ({ params, searchParams }: PageProps) => {
                     <Link   key={item.id}   href={`/aksiyalar/${item.slug}?image=${encodeURIComponent(item.image)}`}   className="block group">
                       <div className="bg-[#F7F9FC] border rounded-[12px] overflow-hidden group-hover:shadow-sm transition duration-300">
                         <div className="w-full h-[160px] bg-white p-2 flex items-center justify-center">
-                          <img  src={item.image}  alt={item.title}  className="w-full h-full object-contain group-hover:scale-103 transition duration-300"/>
+                          <Image src={item.image} alt={item.title} width={640} height={320} unoptimized className="w-full h-full object-contain group-hover:scale-103 transition duration-300"/>
                         </div>
                         <div className="p-4 bg-white border-t">
                           <h4 className="text-[14px] md:text-[15px] font-bold text-[#2F3640] line-clamp-2 group-hover:text-[#1F6BFF] transition">  {item.title}</h4>
@@ -123,4 +127,4 @@ const AktsiyaDetail = ({ params, searchParams }: PageProps) => {
     </div>
   );
 };
-export default AktsiyaDetail; 
+export default AktsiyaDetail;

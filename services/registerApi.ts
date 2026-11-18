@@ -1,5 +1,8 @@
 import { baseApi } from "./baseApi";
 
+const isRecord = (value: unknown): value is Record<string, unknown> =>
+  typeof value === "object" && value !== null && !Array.isArray(value);
+
 export interface IRegister {
   username: string;
   email: string;
@@ -25,21 +28,23 @@ export const registerApi = baseApi.injectEndpoints({
             }),
           });
 
-          const data = await response.json();
+          const responseData: unknown = await response.json();
+          const data = isRecord(responseData) ? responseData : {};
 
           if (!response.ok) {
-            return { error: { status: response.status, data: data?.message || data?.error || "Registration failed" } };
+            return { error: { status: response.status, data: data.message || data.error || "Registration failed" } };
           }
 
           return {
             data: {
-              id: data.id || Date.now(),
-              username: data.username || body.username,
-              email: data.email || body.email,
+              id: Number(data.id) || Date.now(),
+              username: typeof data.username === "string" ? data.username : body.username,
+              email: typeof data.email === "string" ? data.email : body.email,
             },
           };
-        } catch (error: any) {
-          return { error: { status: 500, data: error?.message || "Registration failed" } };
+        } catch (error: unknown) {
+          const message = error instanceof Error ? error.message : "Registration failed";
+          return { error: { status: 500, data: message } };
         }
       },
     }),

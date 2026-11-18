@@ -1,10 +1,9 @@
 "use client";
-import React, { useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { useGetDiscountsQuery } from "../../services/discountApi";
 const Aksiyalar = () => {
   const { data: discounts = [], isLoading, error } = useGetDiscountsQuery();
-  const [currentPage, setCurrentPage] = useState(1);
   if (isLoading) {
     return (
       <div className="w-full min-h-screen flex items-center justify-center text-gray-500 font-medium">
@@ -33,10 +32,13 @@ const Aksiyalar = () => {
             <div key={item.id} className="flex flex-col h-full group">
               <div className="relative w-full h-[180px] md:h-[200px] rounded-[12px] overflow-hidden bg-[#F7F9FC] mb-4 flex items-center justify-center p-2">
                 {item.image ? (
-                  <img
+                  <Image
                     src={item.image}
                     alt={item.title}
-                    className="w-full h-full object-contain group-hover:scale-105 transition duration-300"
+                    fill
+                    sizes="(max-width: 768px) 100vw, 25vw"
+                    unoptimized
+                    className="object-contain group-hover:scale-105 transition duration-300"
                     onError={(event) => {
                       event.currentTarget.style.display = "none";
                     }}

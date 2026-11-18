@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import Link from "next/link";
 import ProductCard from "./ProductCard";
 import ProductSkeleton from "./ProductSkeleton";
 import { categories as storeCategories, formatPrice } from "../lib/site-config";
@@ -30,7 +31,7 @@ export default function CategoryCatalog({ slug }: { slug: string }) {
   const [page, setPage] = useState(1);
   const pageSize = 12;
   const title = storeCategories.find((item) => item.href.endsWith(`/${slug}`))?.label ?? "Katalog";
-  const terms = categoryTerms[slug] ?? [slug];
+  const terms = useMemo(() => categoryTerms[slug] ?? [slug], [slug]);
   const categoryIds = useMemo(() => apiCategories
     .filter((item) => terms.some((term) => formatSlug(item.name).includes(term)))
     .map((item) => item.id), [apiCategories, terms]);
@@ -78,7 +79,7 @@ export default function CategoryCatalog({ slug }: { slug: string }) {
 
   return (
     <main className="mx-auto w-full max-w-7xl px-4 py-8 md:px-6">
-      <nav aria-label="Sahifa yo'li" className="mb-4 text-sm text-[var(--text-muted)]"><a href="/" className="hover:text-[var(--secondary)]">Bosh sahifa</a><span aria-hidden="true"> / </span><a href="/katalog" className="hover:text-[var(--secondary)]">Katalog</a><span aria-hidden="true"> / </span><span className="text-[var(--text)]">{title}</span></nav>
+      <nav aria-label="Sahifa yo'li" className="mb-4 text-sm text-[var(--text-muted)]"><Link href="/" className="hover:text-[var(--secondary)]">Bosh sahifa</Link><span aria-hidden="true"> / </span><Link href="/katalog" className="hover:text-[var(--secondary)]">Katalog</Link><span aria-hidden="true"> / </span><span className="text-[var(--text)]">{title}</span></nav>
       <div className="mb-6 flex flex-wrap items-end justify-between gap-4">
         <div><p className="mb-2 text-sm font-bold uppercase tracking-[0.15em] text-[var(--secondary)]">Islomx7 katalogi</p><h1 className="text-3xl font-bold text-[var(--primary)] md:text-4xl">{title}</h1><p className="mt-2 text-[var(--text-muted)]">Tanlangan bo'limdagi mahsulotlarni ko'ring va saralang.</p></div>
         <label className="flex items-center gap-2 text-sm text-[var(--text-muted)]">Saralash
