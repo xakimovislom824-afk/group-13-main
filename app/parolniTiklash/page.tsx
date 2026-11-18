@@ -73,7 +73,7 @@ export default function ParolniTiklash() {
               </div>
 
               <p className="text-sm text-gray-500 mb-6 leading-relaxed">
-                Ro'yxatdan o'tgan email manzilingizni kiriting. Parolni tiklash uchun
+                Ro&apos;yxatdan o&apos;tgan email manzilingizni kiriting. Parolni tiklash uchun
                 tasdiqlash kodi yuboriladi.
               </p>
 
@@ -132,7 +132,7 @@ export default function ParolniTiklash() {
                 parolni tiklash kodi yuborildi.
               </p>
               <p className="text-sm text-gray-400 mb-8">
-                Spam papkasini ham tekshirib ko'ring.
+                Spam papkasini ham tekshirib ko&apos;ring.
               </p>
               <Link
                 href="/kirish"
