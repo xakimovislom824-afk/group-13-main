@@ -42,7 +42,7 @@ export default function savolJavob() {
             {/* SAVOL 3 */}
             <div className="border-b border-gray-100 py-4">
               <button className="w-full flex justify-between items-center text-left hover:text-blue-600 transition-colors">
-                <span className="font-medium text-slate-700">Do&apos;koningizda faqat oldindan to&apos;lov orqali buyurtma qilinadigan tovarlar bormi?</span>
+                <span className="font-medium text-slate-700">Do'koningizda faqat oldindan to'lov orqali buyurtma qilinadigan tovarlar bormi?</span>
                 <CiCirclePlus className="text-blue-500 text-2xl" />
               </button>
             </div>
@@ -66,18 +66,18 @@ export default function savolJavob() {
             {/* SAVOL 6 (OCHIQ HOLATI) */}
             <div className="border-b border-gray-100 py-4">
               <button className="w-full flex justify-between items-center text-left text-slate-700">
-                <span className="font-medium">Xarid vaqtida bo&apos;lib to&apos;lash yoki kredit rasmiylashtirish imkoniyati bormi? Shartlari qanday?</span>
+                <span className="font-medium">Xarid vaqtida bo'lib to'lash yoki kredit rasmiylashtirish imkoniyati bormi? Shartlari qanday?</span>
                 <CiCirclePlus className="text-blue-500 text-2xl" />
               </button>
               <div className="mt-4 text-gray-500 text-sm leading-relaxed">
-                Kredit va bo&apos;lib to&apos;lash tizimi tashkilotimizda kredit mutaxassislariga murojaat qilgan holda amalga oshiriladi. Ular sizga bank tomonidan taklif etilgan va arizangiz yuboriladigan kredit mahsulotlari bo&apos;yicha shartnomani rasmiylashtirib berishadi.
+                Kredit va bo'lib to'lash tizimi tashkilotimizda kredit mutaxassislariga murojaat qilgan holda amalga oshiriladi. Ular sizga bank tomonidan taklif etilgan va arizangiz yuboriladigan kredit mahsulotlari bo'yicha shartnomani rasmiylashtirib berishadi.
               </div>
             </div>
 
             {/* SAVOL 7 */}
             <div className="border-b border-gray-100 py-4">
               <button className="w-full flex justify-between items-center text-left hover:text-blue-600 transition-colors">
-                <span className="font-medium text-slate-700">Sotib olishdan oldin asbob yoki texnikani tekshirib ko&apos;rsa bo&apos;ladimi?</span>
+                <span className="font-medium text-slate-700">Sotib olishdan oldin asbob yoki texnikani tekshirib ko'rsa bo'ladimi?</span>
                 <CiCirclePlus className="text-blue-500 text-2xl" />
               </button>
             </div>
@@ -85,7 +85,7 @@ export default function savolJavob() {
             {/* SAVOL 8 */}
             <div className="border-b border-gray-100 py-4">
               <button className="w-full flex justify-between items-center text-left hover:text-blue-600 transition-colors">
-                <span className="font-medium text-slate-700">Sizlarda yana qanday qo&apos;shimcha xizmatlar mavjud?</span>
+                <span className="font-medium text-slate-700">Sizlarda yana qanday qo'shimcha xizmatlar mavjud?</span>
                 <CiCirclePlus className="text-blue-500 text-2xl" />
               </button>
             </div>
@@ -93,7 +93,7 @@ export default function savolJavob() {
             {/* SAVOL 9 */}
             <div className="border-b border-gray-100 py-4">
               <button className="w-full flex justify-between items-center text-left hover:text-blue-600 transition-colors">
-                <span className="font-medium text-slate-700">Aksiyalar qanchalik tez-tez o&apos;tkaziladi?</span>
+                <span className="font-medium text-slate-700">Aksiyalar qanchalik tez-tez o'tkaziladi?</span>
                 <CiCirclePlus className="text-blue-500 text-2xl" />
               </button>
             </div>
@@ -105,7 +105,7 @@ export default function savolJavob() {
 
           {/* Obuna bo'lish formasi */}
           <div className="bg-gray-50 rounded-xl p-6 border border-gray-100">
-            <h4 className="font-bold text-center text-slate-800 mb-2">Yangiliklarga obuna bo&apos;ling</h4>
+            <h4 className="font-bold text-center text-slate-800 mb-2">Yangiliklarga obuna bo'ling</h4>
             <p className="text-[12px] text-gray-500 text-center mb-4 leading-snug">
               Muntazam chegirmalar, maxsus takliflar va kompaniya yangiliklari.
             </p>
@@ -115,12 +115,12 @@ export default function savolJavob() {
               className="w-full p-3 border border-gray-200 rounded-md mb-4 outline-none focus:border-blue-500 transition-all text-sm"
             />
             <button className="w-full bg-blue-600 text-white font-bold py-3 rounded-md hover:bg-blue-700 transition-colors text-sm mb-4 uppercase tracking-wider">
-              Obuna bo&apos;lish
+              Obuna bo'lish
             </button>
             <div className="flex items-start gap-2">
               <input type="checkbox" className="mt-1" id="confirm" />
               <label htmlFor="confirm" className="text-[10px] text-gray-400 leading-tight cursor-pointer">
-                Maxfiylik siyosatiga muvofiq shaxsiy ma&apos;lumotlarni qayta ishlashga roziman
+                Maxfiylik siyosatiga muvofiq shaxsiy ma'lumotlarni qayta ishlashga roziman
               </label>
             </div>
           </div>

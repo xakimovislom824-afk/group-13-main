@@ -158,9 +158,9 @@ function AddressTab() {
       {!addrLoading && addresses.length === 0 && !showForm && (
         <div className="text-center py-16 bg-white rounded-xl border border-gray-100 shadow-sm">
           <FaMapMarkerAlt className="mx-auto mb-3 text-4xl text-gray-200" />
-          <p className="text-gray-400 text-sm mb-4">Hali manzil qo&apos;shilmagan</p>
+          <p className="text-gray-400 text-sm mb-4">Hali manzil qo'shilmagan</p>
           <button onClick={openNew} className="text-blue-500 text-sm font-semibold hover:underline">
-            + Yangi manzil qo&apos;shish
+            + Yangi manzil qo'shish
           </button>
         </div>
       )}
@@ -207,7 +207,7 @@ function AddressTab() {
               disabled={deleting}
               className="flex-1 p-4 flex items-center justify-center gap-2 text-gray-400 hover:bg-red-50 hover:text-red-500 transition-all disabled:opacity-50"
             >
-              <FaTrash size={14} /> O&apos;chirish
+              <FaTrash size={14} /> O'chirish
             </button>
           </div>
         </div>
@@ -596,7 +596,7 @@ function ShaxsiyKabinetContent() {
                         {userOrders.length === 0 ? (
                           <tr>
                             <td colSpan={5} className="px-6 py-10 text-center text-gray-400 text-sm">
-                              Hozircha buyurtmalar yo&apos;q
+                              Hozircha buyurtmalar yo'q
                             </td>
                           </tr>
                         ) : (
@@ -609,7 +609,7 @@ function ShaxsiyKabinetContent() {
                                   <span className="w-1.5 h-1.5 rounded-full bg-current" />{o.status}
                                 </span>
                               </td>
-                              <td className="px-4 md:px-6 py-4 text-base font-semibold text-[#1D406E] whitespace-nowrap">{o.amount} so&apos;m</td>
+                              <td className="px-4 md:px-6 py-4 text-base font-semibold text-[#1D406E] whitespace-nowrap">{o.amount} so'm</td>
                               <td className="px-4 md:px-6 py-4 text-right">
                                 <Link
                                   href={`/buyurtma/${encodeURIComponent(o.id.replace("#", ""))}`}
@@ -678,7 +678,7 @@ function ShaxsiyKabinetContent() {
                     <p className="text-5xl w-15 mx-auto mb-4 flex justify-center text-gray-300">
                       <FaShoppingCart />
                     </p>
-                    <p className="text-gray-400 text-sm">Hozircha buyurtmalar yo&apos;q</p>
+                    <p className="text-gray-400 text-sm">Hozircha buyurtmalar yo'q</p>
                     <Link
                       href="/katalog"
                       className="inline-block mt-4 text-blue-500 text-sm font-semibold hover:underline"
@@ -717,7 +717,7 @@ function ShaxsiyKabinetContent() {
                                 </span>
                               </td>
                               <td className="px-4 md:px-6 py-4 text-base font-semibold text-[#1D406E] whitespace-nowrap">
-                                {o.amount} so&apos;m
+                                {o.amount} so'm
                               </td>
                               <td className="px-4 md:px-6 py-4 text-right">
                                 <Link href={`/buyurtma/${encodeURIComponent(o.id.replace("#", ""))}`}>
@@ -780,7 +780,7 @@ function ShaxsiyKabinetContent() {
                       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 md:gap-6 text-sm">
                         <div>
                           <p className="text-gray-400 mb-1">Manzil</p>
-                          <p className="text-gray-700 font-medium leading-relaxed">056734, Toshkent, O&apos;zbekiston, Amir Temur ko&apos;chasi, 37/5</p>
+                          <p className="text-gray-700 font-medium leading-relaxed">056734, Toshkent, O'zbekiston, Amir Temur ko'chasi, 37/5</p>
                         </div>
                         <div>
                           <p className="text-gray-400 mb-1">Telefon</p>
@@ -803,7 +803,7 @@ function ShaxsiyKabinetContent() {
                       <FaEdit size={14} /> Tahrirlash
                     </button>
                     <button className="flex-1 p-4 flex items-center justify-center gap-2 text-gray-400 hover:bg-red-50 hover:text-red-500 transition-all">
-                      <FaTrash size={14} /> O&apos;chirish
+                      <FaTrash size={14} /> O'chirish
                     </button>
                   </div>
                 </div>
@@ -820,7 +820,7 @@ function ShaxsiyKabinetContent() {
                 {wishlistLoading ? (
                   <div className="py-10 text-center text-gray-400 text-sm">Yuklanmoqda...</div>
                 ) : wishlists.length === 0 ? (
-                  <p className="text-gray-400 text-sm py-10 text-center">Hali sevimlilar yo&apos;q</p>
+                  <p className="text-gray-400 text-sm py-10 text-center">Hali sevimlilar yo'q</p>
                 ) : (
                   <div className="space-y-3 max-h-[500px] overflow-y-auto pr-1">
                     {wishlists.map((item) => (
@@ -833,7 +833,7 @@ function ShaxsiyKabinetContent() {
                           </div>
                           <div>
                             <h3 className="font-semibold text-gray-800 text-sm">{item.product_detail?.name}</h3>
-                            <p className="text-red-500 font-medium text-sm">{item.product_detail?.price?.toLocaleString()} so&apos;m</p>
+                            <p className="text-red-500 font-medium text-sm">{item.product_detail?.price?.toLocaleString()} so'm</p>
                           </div>
                         </div>
                         <button onClick={() => removeWishlist(item.id)} className="p-2">
@@ -849,7 +849,7 @@ function ShaxsiyKabinetContent() {
             {/* ── PASSWORD ── */}
             {activeTab === "password" && (
               <div className="bg-white p-5 md:p-8 rounded-xl shadow-sm border border-gray-100 w-full max-w-2xl">
-                <h2 className="text-xl font-bold mb-8 text-[#1D2939]">Parolni o&apos;zgartirish</h2>
+                <h2 className="text-xl font-bold mb-8 text-[#1D2939]">Parolni o'zgartirish</h2>
                 <div className="space-y-5">
                   {[
                     { key: "old", label: "Amaldagi parol", placeholder: "Amaldagi parol" },

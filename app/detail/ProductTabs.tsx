@@ -56,15 +56,15 @@ export default function ProductTabs({ specs }: ProductTabsProps) {
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 max-w-7xl">
             <div className="lg:col-span-8 space-y-6">
               <h3 className="text-base font-bold text-slate-800">«MAKITA DF 347DWE14 V 1.5 A/sh akkumulyatorli drel-shurupovert» haqida</h3>
-              <p>Akkumulyatorli drel-shurupovert <strong className="font-bold text-slate-900">Makita DF347DWE</strong> mebel yig&apos;ish, binolar ichida va ko&apos;chada ta&apos;mirlash ishlarida qo&apos;llaniladi...</p>
+              <p>Akkumulyatorli drel-shurupovert <strong className="font-bold text-slate-900">Makita DF347DWE</strong> mebel yig'ish, binolar ichida va ko'chada ta'mirlash ishlarida qo'llaniladi...</p>
             </div>
           </div>
         )}
 
         {tab === "delivery" && (
           <div className="max-w-5xl space-y-8">
-            <h3 className="text-base font-bold text-slate-800">Yetkazib berish va To&apos;lov</h3>
-            <p>Biz siz xarid qilgan mahsulotni har doim sizga qulay bo&apos;lgan vaqtda yetkazib berishga tayyormiz...</p>
+            <h3 className="text-base font-bold text-slate-800">Yetkazib berish va To'lov</h3>
+            <p>Biz siz xarid qilgan mahsulotni har doim sizga qulay bo'lgan vaqtda yetkazib berishga tayyormiz...</p>
           </div>
         )}
       </div>

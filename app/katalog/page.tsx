@@ -15,7 +15,7 @@ function CatalogContent() {
       {searchQuery && (
         <div className="mb-4 flex items-center gap-3 flex-wrap">
           <span className="text-sm text-gray-600">
-            &quot;<b className="text-gray-800">{searchQuery}</b>&quot; bo&apos;yicha qidiruv natijalari
+            "<b className="text-gray-800">{searchQuery}</b>" bo'yicha qidiruv natijalari
           </span>
           <Link
             href="/katalog"

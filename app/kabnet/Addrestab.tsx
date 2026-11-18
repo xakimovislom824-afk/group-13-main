@@ -162,12 +162,12 @@ export default function AddressTab() {
       {!isLoading && addresses.length === 0 && !showForm && (
         <div className="text-center py-16 bg-white rounded-xl border border-gray-100 shadow-sm">
           <FaMapMarkerAlt className="mx-auto mb-3 text-4xl text-gray-200" />
-          <p className="text-gray-400 text-sm mb-4">Hali manzil qo&apos;shilmagan</p>
+          <p className="text-gray-400 text-sm mb-4">Hali manzil qo'shilmagan</p>
           <button
             onClick={handleOpenNew}
             className="text-blue-500 text-sm font-semibold hover:underline"
           >
-            + Yangi manzil qo&apos;shish
+            + Yangi manzil qo'shish
           </button>
         </div>
       )}
@@ -226,7 +226,7 @@ export default function AddressTab() {
               disabled={deleting}
               className="flex-1 p-4 flex items-center justify-center gap-2 text-gray-400 hover:bg-red-50 hover:text-red-500 transition-all disabled:opacity-50"
             >
-              <FaTrash size={14} /> O&apos;chirish
+              <FaTrash size={14} /> O'chirish
             </button>
           </div>
         </div>

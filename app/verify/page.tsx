@@ -41,7 +41,7 @@ export default function VerifyPage() {
       fallback={
         <div className="w-full min-h-screen flex items-center justify-center bg-gray-50">
           <div className="text-lg font-medium text-gray-600 animate-pulse">
-            Xavfsiz ulanish o&apos;rnatilmoqda...
+            Xavfsiz ulanish o'rnatilmoqda...
           </div>
         </div>
       }

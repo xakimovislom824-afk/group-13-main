@@ -87,12 +87,12 @@ export default function RegisterPage() {
           Stroyoptorg
         </Link>
         <span className="mx-2">/</span>
-        <span className="text-gray-500">Ro&apos;yxatdan o&apos;tish</span>
+        <span className="text-gray-500">Ro'yxatdan o'tish</span>
       </nav>
 
       <div className="max-w-[1200px] mx-auto">
         <h1 className="text-3xl md:text-4xl font-bold mb-8 md:mb-12">
-          Ro&apos;yxatdan o&apos;tish
+          Ro'yxatdan o'tish
         </h1>
 
         <div className="bg-white rounded-xl shadow-sm border border-gray-100 flex flex-col lg:flex-row overflow-hidden">
@@ -250,7 +250,7 @@ export default function RegisterPage() {
                       className="mt-1 w-4 h-4 accent-blue-600 cursor-pointer"
                     />
                     <span className="text-[12px] text-gray-500 group-hover:text-gray-700 transition-colors">
-                      Xizmat ko&apos;rsatish shartlariga roziman
+                      Xizmat ko'rsatish shartlariga roziman
                     </span>
                   </label>
                   {errors.termsAccepted && (
@@ -300,7 +300,7 @@ export default function RegisterPage() {
             </div>
 
             <p className="text-sm text-gray-500 leading-relaxed mb-8">
-              Agar sizda allaqachon account bo&apos;lsa tizimga kirishingiz mumkin.
+              Agar sizda allaqachon account bo'lsa tizimga kirishingiz mumkin.
             </p>
 
             <Link href="/kirish">

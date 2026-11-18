@@ -273,7 +273,7 @@ function SearchBoxContent({ isMobile = false }: SearchBoxProps) {
           {results.length === 0 ? (
             <div className="px-5 py-8 text-center text-gray-400 text-sm">
               <FaSearch className="mx-auto mb-2 text-gray-300" size={22} />
-              <p>«{searchQuery}» bo&apos;yicha mahsulot topilmadi</p>
+              <p>«{searchQuery}» bo'yicha mahsulot topilmadi</p>
             </div>
           ) : (
             <>
@@ -310,7 +310,7 @@ function SearchBoxContent({ isMobile = false }: SearchBoxProps) {
 
                     {product.price != null && (
                       <span className="text-sm font-bold text-blue-700 whitespace-nowrap shrink-0">
-                        {Number(product.price).toLocaleString("uz-UZ")} so&apos;m
+                        {Number(product.price).toLocaleString("uz-UZ")} so'm
                       </span>
                     )}
                   </div>
@@ -566,7 +566,7 @@ export default function Navbar() {
                 {isDarkMode ? <FiSun size={21} /> : <FiMoon size={21} />}
               </button>
               <button onClick={openModal} className="w-full py-4 px-4 bg-[#f0f4f8] text-blue-600 font-bold rounded-md uppercase text-[13px] tracking-widest mb-3">
-                Qo&apos;ng&apos;iroq qilishni so&apos;rang
+                Qo'ng'iroq qilishni so'rang
               </button>
               <div className="text-[13px] text-gray-500 italic">Har kuni, 8:00 dan 18:00 gacha</div>
             </div>
