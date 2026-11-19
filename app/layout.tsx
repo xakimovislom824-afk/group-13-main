@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import { Inter, Manrope } from "next/font/google";
 import { siteConfig } from "../lib/site-config";
 import "./globals.css";
 
@@ -9,9 +8,6 @@ import { ModalProvider } from "../app/context/ModalContext";
 import CallbackModalWrapper from "../app/src/components/CallbackModalWrapper";
 import Providers from "../store/providers";
 import { ToastContainer } from "react-toastify";
-
-const inter = Inter({ variable: "--font-inter", subsets: ["latin"] });
-const manrope = Manrope({ variable: "--font-manrope", subsets: ["latin"] });
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteConfig.url),
@@ -53,7 +49,7 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     locale: "uz_UZ",
-    url: "https://group-13-main-zeta.vercel.app",
+    url: "/",
     siteName: "Islomx7",
     title: "Islomx7 — Onlayn katalog",
     description:
@@ -76,7 +72,7 @@ export default function RootLayout({
   return (
     <html
       lang="uz"
-      className={`${inter.variable} ${manrope.variable} min-h-full antialiased`}
+      className="min-h-full antialiased dark"
     >
       <body className="min-h-screen flex flex-col items-center">
         <ModalProvider>

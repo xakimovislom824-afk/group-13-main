@@ -55,7 +55,7 @@ export default function Aloqa() {
       <div className="bg-white border-t-[3px] border-[#1E74D2]">
         <div className="max-w-[1240px] mx-auto px-4 py-3 flex items-center gap-2 text-[11px] text-gray-400">
           <Link href="/" className="hover:text-blue-500 border-b border-dotted border-gray-400">
-            Stroyoptorg
+            Islomx7
           </Link>
           <span>/</span>
           <span>Kontaktlar</span>
@@ -84,18 +84,11 @@ export default function Aloqa() {
               </div>
             </div>
             <div className="flex gap-3">
-              <Phone className="text-[#1E74D2] shrink-0 mt-0.5" size={18} />
-              <div>
-                <p className="text-xs font-bold uppercase tracking-wider text-[#1E74D2]">Telefon</p>
-                <p className="text-[13px] font-semibold text-gray-800 mt-0.5">8(8782) 28-45-81</p>
-              </div>
-            </div>
-            <div className="flex gap-3">
               <Mail className="text-[#1E74D2] shrink-0 mt-0.5" size={18} />
               <div>
                 <p className="text-xs font-bold uppercase tracking-wider text-[#1E74D2]">Email</p>
-                <a href="mailto:info@stroyoptorg.ru" className="text-blue-600 text-[13px] hover:underline block mt-0.5">
-                  info@stroyoptorg.ru
+                <a href="mailto:info@islomx7.uz" className="text-blue-600 text-[13px] hover:underline block mt-0.5">
+info@islomx7.uz
                 </a>
               </div>
             </div>

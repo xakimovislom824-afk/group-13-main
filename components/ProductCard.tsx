@@ -144,9 +144,9 @@ function ProductCard({ product }: { product: IProduct }) {
 
 
     return (
-        <Card className="group relative flex w-full flex-shrink-0 flex-col overflow-hidden rounded-xl shadow-none! ring-0 transition-all">
-            <Link href={`/detail/${product.id}`} className="flex flex-1 flex-col focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600">
-                <div className="product-image-panel relative h-44 w-full bg-gray-50 rounded-xl mb-3 overflow-hidden p-3">
+        <Card className="group relative flex w-full flex-shrink-0 flex-col overflow-hidden rounded-xl border-[#222] bg-[#111] shadow-none! ring-0 transition-all duration-300 hover:border-[#555] hover:shadow-[0_0_22px_rgba(229,231,235,0.08)]">
+            <Link href={`/detail/${product.id}`} className="flex flex-1 flex-col focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#c5c9d0]">
+                <div className="product-image-panel relative mb-3 h-44 w-full overflow-hidden rounded-xl bg-[#0a0a0a] p-3">
                     {product.image ? (
                         <Image
                             src={product.image}
@@ -193,7 +193,7 @@ function ProductCard({ product }: { product: IProduct }) {
                                 {formatPrice(product.old_price)}
                             </span>
                         )}
-                        <span className="font-extrabold text-blue-600 text-lg">
+                        <span className="text-lg font-extrabold text-[#c5c9d0]">
                             {formatPrice(product.price)}
                         </span>
                     </div>
@@ -234,7 +234,7 @@ function ProductCard({ product }: { product: IProduct }) {
                         type="button"
                         onClick={handleAddToCart}
                         disabled={cartBusy}
-                        className="flex h-9 flex-1 cursor-pointer items-center justify-center gap-1.5 rounded-md bg-blue-600 text-xs font-semibold text-white transition-all duration-200 hover:bg-blue-700 active:scale-95 disabled:opacity-70"
+                        className="flex h-9 flex-1 cursor-pointer items-center justify-center gap-1.5 rounded-xl bg-gradient-to-r from-[#e5e7eb] to-[#9ca3af] text-xs font-semibold text-black transition-all duration-200 hover:brightness-110 active:scale-95 disabled:opacity-70"
                     >
                         {addLoading ? (
                             <span className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-white border-t-transparent" />
