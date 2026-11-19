@@ -7,14 +7,22 @@ import { useGetProductsQuery } from "../services/productApi"
 
 function Carousell() {
     const [current, setCurrent] = useState(0);
-    const { data: products = [], isLoading } = useGetProductsQuery();
+    const { data: products = [], isLoading, isError, refetch } = useGetProductsQuery();
     const slides = products.slice(0, 4);
 
     const prev = () => setCurrent((c) => (c === 0 ? Math.max(slides.length - 1, 0) : c - 1));
     const next = () => setCurrent((c) => (c === slides.length - 1 ? 0 : c + 1));
 
-    if (isLoading || slides.length === 0) {
-        return <section className="relative mb-6 md:mb-12 h-[360px] sm:h-[380px] md:h-[460px] lg:h-[540px] bg-slate-100" />;
+    if (isError) {
+        return <section role="alert" className="mx-auto flex min-h-64 max-w-7xl flex-col items-center justify-center gap-3 px-4 text-center text-muted-foreground"><p>Mahsulotlarni yuklashda xatolik yuz berdi.</p><button type="button" onClick={() => void refetch()} className="font-semibold text-primary hover:underline">Qayta urinib ko&apos;rish</button></section>;
+    }
+
+    if (isLoading) {
+        return <section aria-label="Mahsulotlar yuklanmoqda" aria-busy="true" className="relative mb-6 h-[360px] animate-pulse bg-muted sm:h-[380px] md:mb-12 md:h-[460px] lg:h-[540px]" />;
+    }
+
+    if (slides.length === 0) {
+        return <section className="mb-6 px-4 py-12 text-center text-muted-foreground md:mb-12">Mahsulotlar topilmadi.</section>;
     }
 
     return (

@@ -1,32 +1,41 @@
-"use client"
+"use client";
 
-import Image from "next/image"
-import { useGetProductsQuery } from "../services/productApi"
+import Link from "next/link";
+import ProductCard from "./ProductCard";
+import ProductSkeleton from "./ProductSkeleton";
+import { useGetProductsQuery } from "../services/productApi";
 
-function HomAksiya() {
-    const { data: products = [], isLoading } = useGetProductsQuery()
-    const featuredProducts = products.slice(0, 4)
+export default function HomAksiya() {
+  const { data: products = [], isLoading, isError, refetch } = useGetProductsQuery();
+  const discountedProducts = products
+    .filter((product) => product.is_sale)
+    .sort((first, second) => Number(second.discountPercentage) - Number(first.discountPercentage))
+    .slice(0, 4);
 
-    if (isLoading || featuredProducts.length === 0) {
-        return <div className="w-full max-w-7xl mx-auto px-4 py-8 h-56 bg-slate-100" />
-    }
-
-    return (
-        <div className="w-full max-w-7xl mx-auto px-4 py-8">
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                {featuredProducts.map((product) => (
-                    <div key={product.id} className="relative overflow-hidden rounded-2xl h-48 bg-slate-100 cursor-pointer shadow-sm">
-                        <Image src={product.image} alt={product.name} fill className="object-contain p-6" />
-                        <div className="absolute inset-x-0 bottom-0 bg-white/90 p-4">
-                            <h3 className="text-sm font-bold text-gray-900 line-clamp-2">{product.name}</h3>
-                            <span className="text-xs text-blue-600 font-semibold">{product.price} $</span>
-                        </div>
-                    </div>
-                ))}
-            </div>
+  return (
+    <section aria-labelledby="home-offers-heading" className="py-8">
+      <div className="mb-5 flex flex-wrap items-end justify-between gap-3">
+        <div>
+          <p className="text-sm font-bold uppercase tracking-widest text-secondary">DummyJSON katalogi</p>
+          <h2 id="home-offers-heading" className="mt-1 text-2xl font-extrabold text-foreground sm:text-3xl">Aksiyadagi mahsulotlar</h2>
         </div>
+        <Link href="/aksiyalar" className="text-sm font-semibold text-secondary hover:underline">Barcha aksiyalar</Link>
+      </div>
 
-    )
+      {isLoading ? (
+        <ProductSkeleton count={4} />
+      ) : isError ? (
+        <div role="alert" className="rounded-xl border border-border bg-card p-6 text-center">
+          <p className="text-muted-foreground">Aksiyadagi mahsulotlarni yuklab bo&apos;lmadi.</p>
+          <button type="button" onClick={() => void refetch()} disabled={isLoading} className="mt-3 font-semibold text-primary hover:underline disabled:opacity-50">Qayta urinib ko&apos;rish</button>
+        </div>
+      ) : discountedProducts.length === 0 ? (
+        <p className="rounded-xl border border-dashed border-border bg-card px-6 py-10 text-center text-muted-foreground">Hozircha chegirmali mahsulotlar mavjud emas.</p>
+      ) : (
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          {discountedProducts.map((product) => <ProductCard key={product.id} product={product} />)}
+        </div>
+      )}
+    </section>
+  );
 }
-
-export default HomAksiya

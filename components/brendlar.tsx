@@ -3,7 +3,7 @@ import Image from 'next/image'
 import { useGetProductsQuery } from '../services/productApi'
 
 function Brendlar() {
-    const { data: products = [], isLoading } = useGetProductsQuery()
+    const { data: products = [], isLoading, isError, refetch } = useGetProductsQuery()
     const brands = Array.from(
         new Map(
             products
@@ -13,7 +13,11 @@ function Brendlar() {
     )
 
     if (isLoading) {
-        return <div className="bg-muted py-10 px-6 rounded-xl h-40 animate-pulse" />
+        return <div aria-label="Brendlar yuklanmoqda" aria-busy="true" className="bg-muted py-10 px-6 rounded-xl h-40 animate-pulse" />
+    }
+
+    if (isError) {
+        return <div role="alert" className="rounded-xl border border-border bg-card p-6 text-center text-muted-foreground"><p>Brendlarni yuklab bo&apos;lmadi.</p><button type="button" onClick={() => void refetch()} className="mt-2 font-semibold text-primary hover:underline">Qayta urinish</button></div>
     }
 
     if (brands.length === 0) return null

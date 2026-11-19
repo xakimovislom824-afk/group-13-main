@@ -25,7 +25,7 @@ const AktsiyaDetail = ({ params, searchParams }: PageProps) => {
         <h1 className="text-2xl font-bold text-red-500">Aksiya topilmadi</h1>
         <p className="text-gray-400 text-sm mt-1">Yuborilgan kalit: {discountSlug}</p>
         <Link href="/aksiyalar" className="text-blue-500 underline mt-4 inline-block">
-          Aksiyalar ro'yxatiga qaytish
+          Aksiyalar ro&apos;yxatiga qaytish
         </Link>
       </div>
     );
@@ -48,7 +48,7 @@ const AktsiyaDetail = ({ params, searchParams }: PageProps) => {
         <h1 className="text-[26px] sm:text-[30px] md:text-[36px] leading-[34px] sm:leading-[38px] md:leading-[44px] font-bold text-[#2F3640] mb-5">   {discount.title} </h1>
         <div className="flex items-center gap-4 mb-6">
           <span className="uppercase text-[11px] font-bold text-[#2F3640] bg-[#F2F4F7] px-2.5 py-1 rounded-[4px] tracking-wide">   Aksiya </span>
-          <span className="text-[13px] text-[#9AA0A6]">{publishedDate} kundan boshlab</span>
+          {publishedDate && <span className="text-[13px] text-[#9AA0A6]">{publishedDate} kundan boshlab</span>}
         </div>
         <div className="grid grid-cols-1 lg:grid-cols-[1fr_320px] gap-8 items-start">
                     <div className="w-full">
@@ -76,7 +76,7 @@ const AktsiyaDetail = ({ params, searchParams }: PageProps) => {
             <p className="text-[15px] md:text-[16px] leading-[26px] md:leading-[28px] text-[#555B65] whitespace-pre-line mb-8">  {discount.content}</p>
             {discount.discount_percent && (
               <div className="bg-[#F5F8FF] border border-[#E2E8F5] rounded-[12px] p-5 inline-block mb-4">
-                <p className="text-[14px] text-[#555B65] mb-1.5 font-medium">Aksiya bo'yicha chegirma:</p>
+                <p className="text-[14px] text-[#555B65] mb-1.5 font-medium">Aksiya bo&apos;yicha chegirma:</p>
                 <span className="text-[18px] md:text-[20px] font-bold text-[#1F6BFF] uppercase tracking-wider">   {discount.discount_percent}% CHEGIRMA </span>
               </div>
             )}
@@ -110,15 +110,15 @@ const AktsiyaDetail = ({ params, searchParams }: PageProps) => {
               )}
             </div>
             <div className="bg-[#F7F9FC] rounded-[14px] p-6 border">
-              <h3 className="text-[18px] font-bold text-[#2F3640] mb-2">Yangiliklarga obuna bo'ling</h3>
-              <p className="text-[13px] leading-[19px] text-[#7A7F87] mb-4">  Eng so'nggi chegirmalar va aksiyalarni birinchilardan bo'lib oling.</p>
+              <h3 className="text-[18px] font-bold text-[#2F3640] mb-2">Yangiliklarga obuna bo&apos;ling</h3>
+              <p className="text-[13px] leading-[19px] text-[#7A7F87] mb-4">  Eng so&apos;nggi chegirmalar va aksiyalarni birinchilardan bo&apos;lib oling.</p>
               <div className="space-y-3">
                 <input  type="email"  placeholder="Email"  className="w-full h-[46px] rounded-[8px] border border-[#D9DEE5] px-4 outline-none text-sm bg-white focus:border-[#1F6BFF] transition"/>
-                <button className="w-full h-[46px] rounded-[8px] bg-[#1F6BFF] text-white font-semibold hover:bg-blue-700 transition text-sm uppercase tracking-wider">  Obuna bo'lish</button>
+                <button className="w-full h-[46px] rounded-[8px] bg-[#1F6BFF] text-white font-semibold hover:bg-blue-700 transition text-sm uppercase tracking-wider">  Obuna bo&apos;lish</button>
               </div>
               <div className="flex items-start gap-2.5 mt-4">
                 <input type="checkbox" id="agree-detail" className="mt-1 cursor-pointer accent-[#1F6BFF]" />
-                <label htmlFor="agree-detail" className="text-[11px] leading-[15px] text-[#9AA0A6] cursor-pointer select-none">  Shaxsiy ma'lumotlarni qayta ishlash siyosatiga roziman</label>
+                <label htmlFor="agree-detail" className="text-[11px] leading-[15px] text-[#9AA0A6] cursor-pointer select-none">  Shaxsiy ma&apos;lumotlarni qayta ishlash siyosatiga roziman</label>
               </div>
             </div>
           </div>

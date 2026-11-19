@@ -59,13 +59,19 @@ const normalizePage = (response: unknown): ProductPage => {
   };
 };
 
-const pageQuery = ({ limit = 20, skip = 0 }: ProductQuery = {}) =>
-  `/products?limit=${Math.max(1, Math.min(100, limit))}&skip=${Math.max(0, skip)}`;
+const pageQuery = ({ limit = 20, skip = 0 }: ProductQuery = {}) => {
+  const requestedLimit = Number.isFinite(limit) ? Math.trunc(limit) : 20;
+  const normalizedLimit = requestedLimit === 0
+    ? 0
+    : Math.max(1, Math.min(100, requestedLimit));
+  const normalizedSkip = Number.isFinite(skip) ? Math.max(0, Math.trunc(skip)) : 0;
+  return `/products?limit=${normalizedLimit}&skip=${normalizedSkip}`;
+};
 
 export const productApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
     getProducts: builder.query<IProduct[], void>({
-      query: () => pageQuery({ limit: 20, skip: 0 }),
+      query: () => pageQuery({ limit: 0, skip: 0 }),
       transformResponse: (response: unknown) => normalizePage(response).products,
     }),
     getProductsPage: builder.query<ProductPage, ProductQuery>({
@@ -73,19 +79,18 @@ export const productApi = baseApi.injectEndpoints({
       transformResponse: normalizePage,
     }),
     getProductsByCategory: builder.query<ProductPage, ProductQuery & { slug: string }>({
-      query: ({ slug, limit = 20, skip = 0 }) =>
-        `/products/category/${encodeURIComponent(slug)}?limit=${Math.max(1, Math.min(100, limit))}&skip=${Math.max(0, skip)}`,
+      query: ({ slug, ...query }) => {
+        const params = pageQuery(query).split("?")[1];
+        return `/products/category/${encodeURIComponent(slug)}?${params}`;
+      },
       transformResponse: normalizePage,
     }),
     searchProducts: builder.query<ProductPage, ProductQuery & { q: string }>({
-      query: ({ q, limit = 20, skip = 0 }) =>
-        `/products/search?q=${encodeURIComponent(q)}&limit=${Math.max(1, Math.min(100, limit))}&skip=${Math.max(0, skip)}`,
+      query: ({ q, ...query }) => {
+        const params = pageQuery(query).split("?")[1];
+        return `/products/search?q=${encodeURIComponent(q)}&${params}`;
+      },
       transformResponse: normalizePage,
-    }),
-    getProductById: builder.query<IProduct, number>({
-      query: (id) => `/products/${id}`,
-      transformResponse: normalizeProduct,
-      providesTags: (_result, _error, id) => [{ type: "Product", id }],
     }),
   }),
 });
@@ -95,5 +100,4 @@ export const {
   useGetProductsPageQuery,
   useGetProductsByCategoryQuery,
   useSearchProductsQuery,
-  useGetProductByIdQuery,
 } = productApi;

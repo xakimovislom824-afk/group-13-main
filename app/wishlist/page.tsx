@@ -22,7 +22,7 @@ function Wishlist() {
     return (
       <div className="flex flex-col items-center justify-center py-24 text-center">
         <Heart className="w-14 h-14 text-gray-200 mb-4" />
-        <p className="text-gray-400 text-sm font-medium">Saralanganlar hozircha bo'sh</p>
+        <p className="text-gray-400 text-sm font-medium">Saralanganlar hozircha bo&apos;sh</p>
       </div>
     );
   }
