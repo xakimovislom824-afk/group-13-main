@@ -53,7 +53,7 @@ export default function ParolniTiklash() {
 
         {/* Breadcrumb */}
         <nav className="mb-6 text-xs text-gray-400 flex items-center gap-2">
-          <Link href="/" className="hover:text-blue-600 transition-colors">Stroyoptorg</Link>
+          <Link href="/" className="hover:text-blue-600 transition-colors">Islomx7</Link>
           <span>/</span>
           <Link href="/kirish" className="hover:text-blue-600 transition-colors">Kirish</Link>
           <span>/</span>

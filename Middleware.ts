@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
 // Login talab qilinmaydigan sahifalar
-const PUBLIC_ROUTES = ["/kirish", "/login", "/parolniTiklash", "/verify"];
+const PUBLIC_ROUTES = ["/kirish", "/parolniTiklash", "/verify"];
 
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
