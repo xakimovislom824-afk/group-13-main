@@ -29,17 +29,17 @@ const normalizeDiscount = (value: unknown): IDiscount => {
     products: [Number(product.id ?? 0)],
     products_detail: JSON.stringify(product),
     is_published: true,
-    starts_at: new Date().toISOString(),
+    starts_at: "",
     ends_at: "",
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString(),
+    created_at: "",
+    updated_at: "",
   };
 };
 
 export const discountApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
     getDiscounts: builder.query<IDiscount[], void>({
-      query: () => "/products",
+      query: () => "/products?limit=0",
       transformResponse: (response: unknown) => {
         const responseRecord = isRecord(response) ? response : {};
         const products: unknown[] = Array.isArray(response)
@@ -52,7 +52,7 @@ export const discountApi = baseApi.injectEndpoints({
     }),
     getDiscountBySlug: builder.query<IDiscount, string>({
       async queryFn(slug, _queryApi, _extraOptions, baseQuery) {
-        const result = await baseQuery("/products");
+        const result = await baseQuery("/products?limit=0");
         if (result.error) return { error: result.error };
 
         const responseRecord = isRecord(result.data) ? result.data : {};

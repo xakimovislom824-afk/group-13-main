@@ -6,6 +6,7 @@ export const baseApi = createApi({
 
   baseQuery: fetchBaseQuery({
     baseUrl: "https://dummyjson.com",
+    timeout: 15000,
     prepareHeaders: (headers) => {
       // localStorage faqat brauzerda ishlaydi
       if (typeof window !== "undefined") {

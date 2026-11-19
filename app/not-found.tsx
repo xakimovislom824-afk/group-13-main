@@ -28,7 +28,7 @@ export default function NotFound() {
         </div>
 
         <p className="text-gray-500 text-sm md:text-[15px] max-w-lg mx-auto leading-relaxed px-4">
-          So'ralgan sahifa topilmadi. Balki u o'chirilgan bo'lishi yoki manzili o'zgartirilgan bo'lishi mumkin. Qidiruvdan foydalanib ko'ring.
+          So&apos;ralgan sahifa topilmadi. Balki u o&apos;chirilgan bo&apos;lishi yoki manzili o&apos;zgartirilgan bo&apos;lishi mumkin. Qidiruvdan foydalanib ko&apos;ring.
         </p>
 
         <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4 px-6">

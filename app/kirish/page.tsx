@@ -202,18 +202,18 @@ export default function LoginPage() {
                 <UserPlus size={32} strokeWidth={1.5} />
               </div>
               <h2 className="text-xl md:text-2xl font-bold text-gray-800">
-                Hali akkauntingiz yo'qmi?
+                Hali akkauntingiz yo&apos;qmi?
               </h2>
             </div>
 
             <div className="space-y-4 text-sm leading-relaxed text-gray-500 max-w-md">
               <p>
-                <span className="font-bold text-gray-700">Ro'yxatdan o'tish</span>{" "}
-                buyurtmalaringiz holatini kuzatish va xaridlar tarixini ko'rish imkonini beradi.
+                <span className="font-bold text-gray-700">Ro&apos;yxatdan o&apos;tish</span>{" "}
+                buyurtmalaringiz holatini kuzatish va xaridlar tarixini ko&apos;rish imkonini beradi.
               </p>
               <p>
-                Biz faqat xaridni amalga oshirish uchun zarur bo'lgan minimal
-                ma'lumotlarni so'raymiz.
+                Biz faqat xaridni amalga oshirish uchun zarur bo&apos;lgan minimal
+                ma&apos;lumotlarni so&apos;raymiz.
               </p>
             </div>
 
@@ -223,7 +223,7 @@ export default function LoginPage() {
                   type="button"
                   className="w-full sm:w-auto flex items-center justify-center gap-3 bg-[#0B1320] hover:bg-black text-white px-10 py-4 rounded-lg uppercase text-[11px] font-bold tracking-[2px] transition-all group shadow-lg"
                 >
-                  RO'YXATDAN O'TISH
+                  RO&apos;YXATDAN O&apos;TISH
                   <ChevronRight
                     size={16}
                     className="group-hover:translate-x-1 transition-transform"

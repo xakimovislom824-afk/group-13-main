@@ -203,7 +203,7 @@ export default function BuyurtmaPage() {
               ))}
             </div>
 
-            <h2 className="text-base font-bold text-gray-800 mb-3">To'lov</h2>
+            <h2 className="text-base font-bold text-gray-800 mb-3">To&apos;lov</h2>
             {/* FIX: gap-4 -> gap-3 sm:gap-4 va flex-wrap qo'shildi, 360px da ikkita
                 tugma yonma-yon sig'masa ham siqilib chiqib ketmaydi */}
             <div className="flex flex-wrap gap-3 sm:gap-4 mb-6 sm:mb-8">
@@ -229,7 +229,7 @@ export default function BuyurtmaPage() {
               ))}
             </div>
 
-            <h2 className="text-base font-bold text-gray-800 mb-3">Shaxsiy ma'lumotlar</h2>
+            <h2 className="text-base font-bold text-gray-800 mb-3">Shaxsiy ma&apos;lumotlar</h2>
             {/* FIX: grid-cols-2 -> grid-cols-1 sm:grid-cols-2.
                 360px da Ism/Familiya inputlari juda torayib ketardi, endi mobilda
                 ustma-ust, kengroq ekranda yonma-yon joylashadi. */}
@@ -319,7 +319,7 @@ export default function BuyurtmaPage() {
               </div>
 
               {!order || order.items.length === 0 ? (
-                <p className="text-gray-400 text-sm text-center py-8">Buyurtma bo'sh</p>
+                <p className="text-gray-400 text-sm text-center py-8">Buyurtma bo&apos;sh</p>
               ) : (
                 <>
                   <div className="max-h-[340px] overflow-y-auto pr-1 space-y-4 mb-5">
@@ -388,7 +388,7 @@ export default function BuyurtmaPage() {
         {faqs.length > 0 && (
           <div className="mt-10">
             {/* FIX: text-2xl -> text-xl sm:text-2xl */}
-            <h2 className="text-xl sm:text-2xl font-bold text-[#1a1a1a] mb-5 sm:mb-6">Ko'p so'raladigan savollar</h2>
+            <h2 className="text-xl sm:text-2xl font-bold text-[#1a1a1a] mb-5 sm:mb-6">Ko&apos;p so&apos;raladigan savollar</h2>
             <div className="space-y-3">
               {faqs.map((faq) => (
                 <div

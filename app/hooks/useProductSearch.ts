@@ -16,16 +16,18 @@ export function useProductSearch(query: string) {
     return () => window.clearTimeout(timer);
   }, [query]);
 
-  const { data } = useSearchProductsQuery(
+  const { data, isError, isFetching, refetch } = useSearchProductsQuery(
     { q: debouncedQuery, limit: 8, skip: 0 },
     { skip: debouncedQuery.length < 2 },
   );
 
-  return (data?.products ?? []).map((product) => ({
+  const products = (debouncedQuery === query.trim() ? data?.products ?? [] : []).map((product) => ({
     id: product.id,
     name: product.name,
     price: Number(product.price),
     image: product.image,
     category: product.category,
   }));
+
+  return { products, isError, isFetching, refetch };
 }

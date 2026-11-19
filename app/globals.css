@@ -111,7 +111,63 @@ html.dark .text-slate-600,
 html.dark .text-slate-500,
 html.dark .text-stone-700,
 html.dark .text-stone-600,
-html.dark .text-stone-500 { color: var(--text-muted) !important; }
+html.dark .text-stone-500,
+html.dark .text-stone-400,
+html.dark .text-stone-300,
+html.dark .text-neutral-700,
+html.dark .text-neutral-600,
+html.dark .text-neutral-500,
+html.dark .text-neutral-400 { color: var(--text-muted) !important; }
+html.dark .text-stone-900,
+html.dark .text-stone-800,
+html.dark .text-neutral-900,
+html.dark .text-neutral-800,
+html.dark .text-amber-950,
+html.dark .text-amber-900,
+html.dark .text-orange-950,
+html.dark .text-orange-900,
+html.dark .text-red-950,
+html.dark .text-red-900,
+html.dark .text-green-950,
+html.dark .text-green-900,
+html.dark .text-emerald-950,
+html.dark .text-blue-950,
+html.dark .text-blue-900 { color: var(--text) !important; }
+
+html.dark [class~="bg-[#faf9f7]"],
+html.dark [class~="bg-[#F8F9FA]"],
+html.dark [class~="bg-[#F7F9FC]"],
+html.dark [class~="bg-[#F2F4F7]"],
+html.dark [class~="bg-[#F5F8FF]"],
+html.dark [class~="bg-[#F4F7FE]"],
+html.dark [class~="bg-[#F5F7F9]"],
+html.dark [class~="bg-[#F9FAFB]"],
+html.dark [class~="bg-[#FBFBFB]"],
+html.dark [class~="bg-[#FCFDFF]"],
+html.dark [class~="bg-[#FBFCFE]"] { background-color: var(--surface) !important; }
+html.dark [class~="bg-[#FBFBFB]"],
+html.dark [class~="bg-[#FBFCFE]"] { background-color: var(--muted) !important; }
+html.dark [class~="text-[#2D2D2D]"],
+html.dark [class~="text-[#1A202C]"],
+html.dark [class~="text-[#2F3640]"],
+html.dark [class~="text-[#333]"],
+html.dark [class~="text-[#555B65]"],
+html.dark [class~="text-[#1D2939]"],
+html.dark [class~="text-[#1D406E]"],
+html.dark [class~="text-[#344054]"],
+html.dark [class~="text-[#1a1a1a]"] { color: var(--text) !important; }
+html.dark [class~="text-[#A0A4AB]"],
+html.dark [class~="text-[#9AA0A6]"],
+html.dark [class~="text-[#7A7F87]"] { color: var(--text-muted) !important; }
+html.dark [class~="bg-[#faf9f7]"],
+html.dark [class~="bg-[#F8F9FA]"] { background-color: var(--background) !important; }
+html.dark [class~="bg-[#FBFBFB]"],
+html.dark [class~="bg-[#FCFDFF]"] { background-color: var(--surface) !important; }
+html.dark [class~="bg-[#f9fafb]"],
+html.dark [class~="bg-[#f0f4f8]"] { background-color: var(--background) !important; }
+html.dark [class~="border-[#D9DEE5]"],
+html.dark [class~="border-[#E2E8F5]"] { border-color: var(--border) !important; }
+
 html.dark .border-gray-50,
 html.dark .border-gray-100,
 html.dark .border-gray-200,
@@ -131,7 +187,21 @@ html.dark .bg-green-50,
 html.dark .bg-emerald-50,
 html.dark .bg-amber-50,
 html.dark .bg-violet-50,
-html.dark .bg-pink-50 { background-color: var(--muted) !important; }
+html.dark .bg-pink-50,
+html.dark .bg-stone-50,
+html.dark .bg-stone-100,
+html.dark [class*="bg-blue-50/"],
+html.dark [class*="bg-red-50/"],
+html.dark [class*="bg-green-50/"],
+html.dark [class*="bg-emerald-50/"],
+html.dark [class*="bg-amber-50/"],
+html.dark [class*="bg-violet-50/"],
+html.dark [class*="bg-pink-50/"],
+html.dark [class*="bg-stone-50/"] { background-color: var(--muted) !important; }
+html.dark [class*="bg-white/90"] { background-color: color-mix(in srgb, var(--surface) 90%, transparent) !important; }
+html.dark [class*="border-emerald-100/"],
+html.dark [class*="border-blue-100/"],
+html.dark [class*="border-violet-100/"] { border-color: var(--border) !important; }
 html.dark [class~="bg-[#f9fafb]"],
 html.dark [class~="bg-[#f5f7fb]"],
 html.dark [class~="bg-[#f7f9fc]"] { background-color: var(--background) !important; }

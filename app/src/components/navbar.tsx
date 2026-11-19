@@ -144,13 +144,13 @@ function SearchBoxContent({ isMobile = false }: SearchBoxProps) {
   const inputRef = useRef<HTMLInputElement>(null);
   const prevUrlSearchRef = useRef<string>("");
 
-  const results = useProductSearch(searchQuery);
+  const { products: results, isError: searchError, isFetching: searchFetching, refetch: refetchSearch } = useProductSearch(searchQuery);
 
   useEffect(() => {
-    if (selected || searchQuery.trim().length < 2 || results.length === 0) return;
+    if (selected || searchQuery.trim().length < 2 || (!searchError && !searchFetching && results.length === 0)) return;
     const timeoutId = window.setTimeout(() => setIsOpen(true), 0);
     return () => window.clearTimeout(timeoutId);
-  }, [results, selected, searchQuery]);
+  }, [results, searchError, searchFetching, selected, searchQuery]);
 
   useEffect(() => {
     const handler = (e: MouseEvent) => {
@@ -218,7 +218,7 @@ function SearchBoxContent({ isMobile = false }: SearchBoxProps) {
   };
 
   const handleFocus = () => {
-    if (!selected && searchQuery.trim().length >= 2 && results.length > 0) {
+    if (!selected && searchQuery.trim().length >= 2 && (results.length > 0 || searchError || searchFetching)) {
       setIsOpen(true);
     }
   };
@@ -264,10 +264,17 @@ function SearchBoxContent({ isMobile = false }: SearchBoxProps) {
           className={`absolute top-full left-0 w-full bg-white border border-gray-200 shadow-2xl rounded-b-md z-[1100] overflow-hidden flex flex-col ${isMobile ? "max-h-[60vh]" : "max-h-[420px]"
             }`}
         >
-          {results.length === 0 ? (
+          {searchError ? (
+            <div role="alert" className="px-5 py-6 text-center text-sm text-muted-foreground">
+              <p>Qidiruv natijalarini yuklab bo&apos;lmadi.</p>
+              <button type="button" onClick={() => void refetchSearch()} className="mt-2 font-semibold text-primary hover:underline">Qayta urinish</button>
+            </div>
+          ) : searchFetching && results.length === 0 ? (
+            <p role="status" className="px-5 py-8 text-center text-sm text-muted-foreground">Qidirilmoqda...</p>
+          ) : results.length === 0 ? (
             <div className="px-5 py-8 text-center text-gray-400 text-sm">
               <FaSearch className="mx-auto mb-2 text-gray-300" size={22} />
-              <p>«{searchQuery}» bo'yicha mahsulot topilmadi</p>
+              <p>«{searchQuery}» bo&apos;yicha mahsulot topilmadi</p>
             </div>
           ) : (
             <>
@@ -404,14 +411,12 @@ export default function Navbar() {
   }, []);
 
   const toggleDarkMode = useCallback(() => {
-    setIsDarkMode((current) => {
-      const next = !current;
-      document.documentElement.classList.toggle("dark", next);
-      document.documentElement.style.colorScheme = next ? "dark" : "light";
-      localStorage.setItem("theme", JSON.stringify({ mode: next ? "dark" : "light" }));
-      return next;
-    });
-  }, []);
+    const next = !isDarkMode;
+    document.documentElement.classList.toggle("dark", next);
+    document.documentElement.style.colorScheme = next ? "dark" : "light";
+    localStorage.setItem("theme", JSON.stringify({ mode: next ? "dark" : "light" }));
+    setIsDarkMode(next);
+  }, [isDarkMode]);
 
   const closeSidebar = useCallback(() => setIsSidebarOpen(false), []);
   const openSidebar = useCallback(() => setIsSidebarOpen(true), []);
@@ -558,7 +563,7 @@ export default function Navbar() {
                 {isDarkMode ? <FiSun size={21} /> : <FiMoon size={21} />}
               </button>
               <button onClick={openModal} className="w-full py-4 px-4 bg-[#f0f4f8] text-blue-600 font-bold rounded-md uppercase text-[13px] tracking-widest mb-3">
-                Qo'ng'iroq qilishni so'rang
+                Qo&apos;ng&apos;iroq qilishni so&apos;rang
               </button>
               <div className="text-[13px] text-gray-500 italic">Har kuni, 8:00 dan 18:00 gacha</div>
             </div>
