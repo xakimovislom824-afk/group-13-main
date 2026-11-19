@@ -2,14 +2,13 @@
 
 import Link from "next/link";
 import { useModal } from "../../context/ModalContext";
-import { categories, siteConfig } from "../../../lib/site-config";
+import { siteConfig } from "../../../lib/site-config";
 
 const informationLinks = [
   ["Biz haqimizda", "/biz-haqimizda"], ["Yetkazib berish", "/yetkazib-berish"],
   ["To'lov", "/tolov"], ["Savol-javob", "/savol-javob"], ["Qaytarish va kafolat", "/qaytarish-va-kafolat"],
   ["Yangiliklar", "/blog"], ["Aloqa", "/aloqa"],
 ];
-const payments = ["Payme", "Click", "Uzum Bank", "Humo", "UzCard", "Visa", "Mastercard", "Naqd pul"];
 
 export default function Footer() {
   const { openModal } = useModal();
@@ -19,7 +18,7 @@ export default function Footer() {
         <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-4">
           <div>
             <Link href="/" className="text-2xl font-extrabold tracking-tight text-white">Islom<span className="text-[var(--accent)]">x7</span></Link>
-            <p className="mt-4 max-w-xs text-sm leading-6 text-slate-300">Qurilish, ta&apos;mir va uy uchun kerakli mahsulotlar — ishonchli tanlov va qulay xarid.</p>
+            <p className="mt-4 max-w-xs text-sm leading-6 text-slate-300">Mahsulotlarni qidirish, ko&apos;rish va brauzerdagi savatga saqlash uchun Islomx7 onlayn katalogi.</p>
             <div className="mt-5 flex gap-3 text-sm">
               <a className="rounded-lg border border-white/20 px-3 py-2 hover:bg-white/10" href={siteConfig.telegram} target="_blank" rel="noreferrer">Telegram</a>
               <a className="rounded-lg border border-white/20 px-3 py-2 hover:bg-white/10" href={siteConfig.instagram} target="_blank" rel="noreferrer">Instagram</a>
@@ -31,7 +30,7 @@ export default function Footer() {
           </div>
           <div>
             <h2 className="font-bold text-white">Katalog</h2>
-            <ul className="mt-4 flex flex-col gap-3 text-sm">{categories.map((item) => <li key={item.href}><Link className="hover:text-[var(--accent)]" href={item.href}>{item.label}</Link></li>)}</ul>
+            <ul className="mt-4 flex flex-col gap-3 text-sm"><li><Link className="hover:text-[var(--accent)]" href="/katalog">Barcha mahsulotlar</Link></li></ul>
           </div>
           <div>
             <h2 className="font-bold text-white">Aloqa</h2>
@@ -43,9 +42,6 @@ export default function Footer() {
               <button onClick={openModal} className="w-fit rounded-lg bg-[var(--accent)] px-4 py-2 font-semibold text-[var(--primary)] hover:bg-[var(--accent-hover)]">Qo&apos;ng&apos;iroq so&apos;rash</button>
             </address>
           </div>
-        </div>
-        <div className="mt-10 flex flex-wrap gap-2 border-t border-white/15 pt-6" aria-label="To'lov usullari">
-          {payments.map((payment) => <span key={payment} className="rounded-md border border-white/20 bg-white/5 px-3 py-1.5 text-xs font-semibold text-white">{payment}</span>)}
         </div>
         <div className="mt-6 flex flex-col gap-2 border-t border-white/15 pt-5 text-xs text-slate-400 sm:flex-row sm:items-center sm:justify-between">
           <p>{siteConfig.copyright}</p><Link href="/maxfiylik-siyosati" className="hover:text-white">Maxfiylik siyosati</Link>

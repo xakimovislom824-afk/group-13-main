@@ -5,14 +5,17 @@ export interface IProduct {
   price: string;
   old_price: string;
   image: string;
+  images?: string[];
   brand?: string;
+  discountPercentage?: number;
+  rating?: number;
   is_hit: boolean;
   is_new: boolean;
   is_sale: boolean;
   stock: number;
   created_at: string;
   updated_at: string;
-  category: number;
+  category: string | number;
 }
 
 export interface IProductResponse {

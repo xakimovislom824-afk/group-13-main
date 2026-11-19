@@ -1,5 +1,6 @@
 // services/cartApi.ts
 import { baseApi } from "./baseApi";
+import type { IProduct } from "../Types/index.types";
 
 type CartItem = Record<string, unknown>;
 
@@ -37,7 +38,7 @@ export const cartApi = baseApi.injectEndpoints({
             queryFn: async () => ({ data: readCart() }),
             providesTags: ["Cart"],
         }),
-        addToCart: builder.mutation<CartItem[], { product: number; quantity: number }>({
+        addToCart: builder.mutation<CartItem[], { product: number; quantity: number; product_data?: Partial<IProduct> }>({
             queryFn: async (body) => {
                 const carts = readCart();
                 const existing = carts.find(
@@ -53,7 +54,7 @@ export const cartApi = baseApi.injectEndpoints({
                         ? { ...item, quantity: Number(item.quantity || 0) + Number(body.quantity || 1) }
                         : item
                     )
-                  : [...carts, { id: Date.now(), product: body.product, quantity: body.quantity, created_at: new Date().toISOString() }];
+                  : [...carts, { id: Date.now(), product: body.product, quantity: body.quantity, product_data: body.product_data, created_at: new Date().toISOString() }];
 
                 writeCart(next);
                 return { data: next };

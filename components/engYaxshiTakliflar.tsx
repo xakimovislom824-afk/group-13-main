@@ -1,18 +1,19 @@
 "use client"
 import { useState } from "react";
-import { useGetProductsQuery } from "../services/productApi";
+import { useGetProductsByCategoryQuery, useGetProductsQuery } from "../services/productApi";
 import { useGetCategoriesQuery } from "../services/categoryApi";
 import ProductCard from "./ProductCard";
 import ProductSkeleton from "./ProductSkeleton";
 
 function EngYaxshiTakliflar() {
-    const [selectedCategory, setSelectedCategory] = useState<number | null>(null);
+    const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
 
     const { data: productList = [], isLoading: productsLoading, isError: productsError, refetch: refetchProducts } = useGetProductsQuery();
     const { data: categories = [], isLoading: categoriesLoading, isError: categoriesError, refetch: refetchCategories } = useGetCategoriesQuery();
+    const { data: categoryPage, isLoading: categoryLoading, isError: categoryError, refetch: refetchCategory } = useGetProductsByCategoryQuery({ slug: selectedCategory ?? "", limit: 20, skip: 0 }, { skip: !selectedCategory });
 
-    const isLoading = productsLoading || categoriesLoading;
-    const isError = productsError || categoriesError;
+    const isLoading = productsLoading || categoriesLoading || categoryLoading;
+    const isError = productsError || categoriesError || categoryError;
 
     if (isLoading) {
         return <div className="bg-[var(--surface)] p-4 rounded-xl"><ProductSkeleton /></div>;
@@ -22,14 +23,13 @@ function EngYaxshiTakliflar() {
         return (
             <div className="rounded-xl border border-[var(--border)] bg-[var(--surface)] p-8 text-center">
                 <p className="text-[var(--text-muted)]">Mahsulotlarni yuklashda xatolik yuz berdi.</p>
-                <button onClick={() => { void refetchProducts(); void refetchCategories(); }} className="mt-4 rounded-[10px] bg-[var(--primary)] px-5 py-2.5 font-semibold text-white transition-colors hover:bg-[var(--primary-hover)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--secondary)]">Qayta urinib ko&apos;rish</button>
+                <button onClick={() => { void refetchProducts(); void refetchCategories(); if (selectedCategory) void refetchCategory(); }} className="mt-4 rounded-[10px] bg-[var(--primary)] px-5 py-2.5 font-semibold text-white transition-colors hover:bg-[var(--primary-hover)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--secondary)]">Qayta urinib ko&apos;rish</button>
             </div>
         );
     }
 
-    const filteredProducts = selectedCategory
-        ? productList.filter((p) => p.category === selectedCategory)
-        : productList;
+    const filteredProducts = (selectedCategory ? categoryPage?.products ?? [] : productList)
+        .filter((product) => product.is_sale);
 
     return (
         <div className="bg-white p-4 rounded-xl font-sans">
@@ -52,9 +52,9 @@ function EngYaxshiTakliflar() {
                     </button>
                     {categories.map((cat) => (
                         <button
-                            key={cat.id}
-                            onClick={() => setSelectedCategory(cat.id)}
-                            className={`px-6 py-2 rounded-md text-sm font-semibold whitespace-nowrap transition-all ${selectedCategory === cat.id
+                            key={cat.slug}
+                            onClick={() => setSelectedCategory(cat.slug)}
+                            className={`px-6 py-2 rounded-md text-sm font-semibold whitespace-nowrap transition-all ${selectedCategory === cat.slug
                                 ? "bg-blue-600 text-white"
                                 : "bg-slate-100 text-slate-700 hover:bg-slate-200"
                                 }`}

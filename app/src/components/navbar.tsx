@@ -17,7 +17,8 @@ import { useGetWishlistQuery } from "../../../services/wishlistApi";
 import { useGetCartsQuery } from "../../../services/cartApi";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useProductSearch } from "../../hooks/useProductSearch";
-import { categories, siteConfig } from "../../../lib/site-config";
+import { formatPrice, siteConfig } from "../../../lib/site-config";
+import { getCategoryDisplayName, useGetCategoriesQuery } from "../../../services/categoryApi";
 
 export const dynamic = "force-dynamic";
 
@@ -203,14 +204,9 @@ function SearchBoxContent({ isMobile = false }: SearchBoxProps) {
     }
   };
 
-  const handleSelect = (name: string) => {
-    setInputValue(name);
-    setIsOpen(false);
-    setSelected(true);
-  };
-
   const handleSubmit = () => {
     setIsOpen(false);
+    setSelected(true);
     const trimmed = inputValue.trim();
 
     if (!trimmed) {
@@ -238,7 +234,7 @@ function SearchBoxContent({ isMobile = false }: SearchBoxProps) {
           value={inputValue}
           onChange={e => handleChange(e.target.value)}
           onFocus={handleFocus}
-          onKeyDown={e => e.key === "Enter" && handleSubmit()}
+          onKeyDown={e => e.key === "Enter" && !e.nativeEvent.isComposing && e.keyCode !== 229 && handleSubmit()}
           placeholder="Mahsulot qidirish..."
           className="w-full min-w-0 px-3 outline-none text-sm h-full"
         />
@@ -282,10 +278,11 @@ function SearchBoxContent({ isMobile = false }: SearchBoxProps) {
 
               <div className="overflow-y-auto flex-1">
                 {results.map(product => (
-                  <div
+                  <Link
                     key={product.id}
-                    onMouseDown={e => { e.preventDefault(); handleSelect(product.name); }}
-                    className="flex items-center gap-3 px-4 py-3 hover:bg-blue-50 cursor-pointer border-b border-gray-50 last:border-none transition-colors group"
+                    href={`/detail/${product.id}`}
+                    onClick={() => { setIsOpen(false); setSelected(true); }}
+                    className="flex items-center gap-3 px-4 py-3 hover:bg-blue-50 border-b border-gray-50 last:border-none transition-colors group"
                   >
                     <div className="w-11 h-11 rounded-md overflow-hidden bg-gray-100 shrink-0 border border-gray-200">
                       {product.image ? (
@@ -308,10 +305,10 @@ function SearchBoxContent({ isMobile = false }: SearchBoxProps) {
 
                     {product.price != null && (
                       <span className="text-sm font-bold text-blue-700 whitespace-nowrap shrink-0">
-                        {Number(product.price).toLocaleString("uz-UZ")} so'm
+                        {formatPrice(product.price)}
                       </span>
                     )}
-                  </div>
+                  </Link>
                 ))}
               </div>
             </>
@@ -342,8 +339,9 @@ export default function Navbar() {
 
   const { openModal } = useModal();
   const { data: wishlist = [] } = useGetWishlistQuery();
-  const { data: cart } = useGetCartsQuery();
-  const cartCount = cart?.length ?? 0;
+  const { data: cart = [] } = useGetCartsQuery();
+  const { data: apiCategories = [] } = useGetCategoriesQuery();
+  const cartCount = cart.reduce((total, item) => total + Number(item.quantity ?? 0), 0);
 
   useEffect(() => {
     if (isSidebarOpen) {
@@ -372,29 +370,44 @@ export default function Navbar() {
   }, [refreshAuth]);
 
   useEffect(() => {
-    const timeoutId = window.setTimeout(() => {
-      const savedTheme = localStorage.getItem("theme");
-      let themeMode = "light";
-
-      try {
-        const parsedTheme = savedTheme ? JSON.parse(savedTheme) : null;
-        themeMode = parsedTheme?.mode === "dark" ? "dark" : "light";
-      } catch {
-        themeMode = savedTheme === "dark" ? "dark" : "light";
-      }
-
-      const dark = themeMode === "dark";
+    const root = document.documentElement;
+    const media = window.matchMedia("(prefers-color-scheme: dark)");
+    const applyTheme = (dark: boolean) => {
       setIsDarkMode(dark);
-      document.documentElement.classList.toggle("dark", dark);
-      localStorage.setItem("theme", JSON.stringify({ mode: themeMode }));
-    }, 0);
-    return () => window.clearTimeout(timeoutId);
+      root.classList.toggle("dark", dark);
+      root.style.colorScheme = dark ? "dark" : "light";
+    };
+    const getSavedMode = () => {
+      const saved = localStorage.getItem("theme");
+      try {
+        const parsed: unknown = saved ? JSON.parse(saved) : null;
+        if (parsed && typeof parsed === "object" && "mode" in parsed) {
+          const mode = (parsed as { mode?: unknown }).mode;
+          if (mode === "dark" || mode === "light") return mode;
+        }
+      } catch {
+        if (saved === "dark" || saved === "light") return saved;
+      }
+      return null;
+    };
+    const syncTheme = () => {
+      const saved = getSavedMode();
+      applyTheme(saved ? saved === "dark" : media.matches);
+    };
+    syncTheme();
+    media.addEventListener("change", syncTheme);
+    window.addEventListener("storage", syncTheme);
+    return () => {
+      media.removeEventListener("change", syncTheme);
+      window.removeEventListener("storage", syncTheme);
+    };
   }, []);
 
   const toggleDarkMode = useCallback(() => {
     setIsDarkMode((current) => {
       const next = !current;
       document.documentElement.classList.toggle("dark", next);
+      document.documentElement.style.colorScheme = next ? "dark" : "light";
       localStorage.setItem("theme", JSON.stringify({ mode: next ? "dark" : "light" }));
       return next;
     });
@@ -463,7 +476,7 @@ export default function Navbar() {
             Katalog <span aria-hidden="true">⌄</span>
           </summary>
           <div className="absolute left-0 top-full z-[1100] mt-2 grid w-[min(90vw,520px)] grid-cols-2 gap-1 rounded-xl border border-[var(--border)] bg-[var(--surface)] p-3 shadow-xl">
-            {categories.map((category) => <Link key={category.href} href={category.href} className="rounded-lg px-3 py-2 text-sm text-[var(--text)] hover:bg-[var(--secondary-soft)] hover:text-[var(--primary)]">{category.label}</Link>)}
+            {apiCategories.map((category) => <Link key={category.slug} href={`/katalog/${category.slug}`} className="rounded-lg px-3 py-2 text-sm text-[var(--text)] hover:bg-[var(--secondary-soft)] hover:text-[var(--primary)]">{getCategoryDisplayName(category)}</Link>)}
           </div>
         </details>
 
@@ -517,6 +530,10 @@ export default function Navbar() {
                   {l.label}
                 </Link>
               ))}
+              <div className="border-b border-border p-4">
+                <p className="mb-2 text-xs font-bold uppercase text-muted-foreground">Kategoriyalar</p>
+                {apiCategories.map((category) => <Link key={category.slug} href={`/katalog/${category.slug}`} onClick={closeSidebar} className="block rounded-md px-2 py-2 text-sm text-foreground hover:bg-muted">{getCategoryDisplayName(category)}</Link>)}
+              </div>
               {isLoggedIn ? (
                 <Link href="/kabnet" onClick={closeSidebar} className="p-4 border-b flex items-center gap-3 text-gray-700 hover:bg-gray-50">
                   <UserAvatar avatar={userData.avatar} username={userData.username} size="lg" />

@@ -1,6 +1,6 @@
 "use client";
 import { Card } from "../components/ui/card";
-import { ShoppingCart, Minus, Plus } from "lucide-react";
+import { ShoppingCart, Minus, Plus, Star } from "lucide-react";
 import {
     useGetWishlistQuery,
     useToggleWishlistMutation,
@@ -14,7 +14,8 @@ import {
 import Image from "next/image";
 import Link from "next/link";
 import { IProduct } from "../Types/index.types";
-import { useState, useEffect } from "react";
+import { formatPrice } from "../lib/site-config";
+import { useState } from "react";
 import { toast } from "react-toastify";
 
 type CartEntry = {
@@ -36,35 +37,8 @@ const getMutationErrorMessage = (error: unknown, fallback: string) => {
 };
 
 function ProductCard({ product }: { product: IProduct }) {
-    const [token, setToken] = useState<string | null>(null);
     const [localLiked, setLocalLiked] = useState<boolean | null>(null);
-
-    const syncAuthState = () => {
-        if (typeof window === "undefined") return;
-        const tokenFromStorage = localStorage.getItem("access");
-        if (tokenFromStorage) {
-            setToken(tokenFromStorage);
-            return;
-        }
-
-        const cookieToken = document.cookie
-            .split("; ")
-            .find((row) => row.startsWith("access="))
-            ?.split("=")[1];
-
-        setToken(cookieToken || null);
-    };
-
-    useEffect(() => {
-        const frame = window.requestAnimationFrame(syncAuthState);
-        window.addEventListener("authChange", syncAuthState);
-        return () => {
-            window.cancelAnimationFrame(frame);
-            window.removeEventListener("authChange", syncAuthState);
-        };
-    }, []);
-
-    const { data: wishlist = [] } = useGetWishlistQuery(undefined, { skip: !token });
+    const { data: wishlist = [] } = useGetWishlistQuery();
     const [toggleWishlist] = useToggleWishlistMutation();
 
     // ✅ Cart (demo mode: ishlashi uchun auth cheklovini olib tashlaymiz)
@@ -102,19 +76,9 @@ function ProductCard({ product }: { product: IProduct }) {
     );
     const liked = localLiked !== null ? localLiked : !!wishlistItem;
 
-    const requireAuth = () => {
-        if (!token) {
-            window.location.href = "/kirish";
-            return false;
-        }
-        return true;
-    };
-
-    // ❤️ Sevimlilarga qo'shish/o'chirish
     const handleToggleFavorite = async (e: React.MouseEvent) => {
         e.preventDefault();
         e.stopPropagation();
-        if (!requireAuth()) return;
         setLocalLiked(!liked);
         try {
             await toggleWishlist({
@@ -134,7 +98,7 @@ function ProductCard({ product }: { product: IProduct }) {
         e.stopPropagation();
         if (cartBusy) return;
         try {
-            await addToCart({ product: product.id, quantity: 1 }).unwrap();
+            await addToCart({ product: product.id, quantity: 1, product_data: product }).unwrap();
             toast.success("Savatchaga qo'shildi!", { autoClose: 1200 });
         } catch (error: unknown) {
             toast.error(getMutationErrorMessage(error, "Xatolik yuz berdi"), { autoClose: 2000 });
@@ -215,6 +179,10 @@ function ProductCard({ product }: { product: IProduct }) {
                     >
                         {product.name}
                     </h3>
+                    <div className="mb-2 flex items-center justify-between gap-2 text-[11px] text-muted-foreground">
+                        <span className="inline-flex items-center gap-1"><Star aria-hidden="true" className="size-3 fill-amber-400 text-amber-400" />{Number(product.rating ?? 0).toFixed(1)}</span>
+                        <span>{product.stock > 0 ? `Mavjud: ${product.stock}` : "Sotuvda yo'q"}</span>
+                    </div>
                     <p className="text-[11px] text-slate-400 line-clamp-2 mb-3">
                         {product.description || "Tavsif mavjud emas"}
                     </p>
@@ -222,11 +190,11 @@ function ProductCard({ product }: { product: IProduct }) {
                     <div className="flex items-baseline gap-2 mt-auto mb-4">
                         {product.old_price && (
                             <span className="line-through text-slate-400 text-xs">
-                                {Number(product.old_price).toLocaleString()}  <b>so&apos;m</b> 
+                                {formatPrice(product.old_price)}
                             </span>
                         )}
                         <span className="font-extrabold text-blue-600 text-lg">
-                            {Number(product.price).toLocaleString()} <b>so&apos;m</b> 
+                            {formatPrice(product.price)}
                         </span>
                     </div>
                 </div>

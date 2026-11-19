@@ -8,6 +8,7 @@ import * as z from "zod";
 import Image from "next/image";
 import { useGetFaqsQuery } from "../../services/faqApi";
 import { CheckCircle } from "lucide-react";
+import { formatPrice } from "../../lib/site-config";
 
 type OrderItem = {
   id: number;
@@ -54,8 +55,8 @@ function SuccessToast({ visible, onClose }: { visible: boolean; onClose: () => v
           <CheckCircle className="text-green-600 w-5 h-5" />
         </div>
         <div className="min-w-0">
-          <p className="text-[13px] sm:text-sm font-bold text-gray-800 truncate">Buyurtma muvaffaqiyatli berildi!</p>
-          <p className="text-[11px] sm:text-xs text-gray-400 mt-0.5 truncate">Buyurtmangiz qabul qilindi!</p>
+          <p className="text-[13px] sm:text-sm font-bold text-gray-800 truncate">Demo buyurtma qurilmada saqlandi</p>
+          <p className="text-[11px] sm:text-xs text-gray-400 mt-0.5 truncate">Serverga yuborilmadi, to&apos;lov olinmadi.</p>
         </div>
         <button
           onClick={onClose}
@@ -69,7 +70,7 @@ function SuccessToast({ visible, onClose }: { visible: boolean; onClose: () => v
 }
 
 function generateOrderId() {
-  return `#${Math.floor(100000 + Math.random() * 900000)}`;
+  return `LOCAL-${Date.now()}`;
 }
 
 export default function BuyurtmaPage() {
@@ -122,7 +123,7 @@ export default function BuyurtmaPage() {
         month: "2-digit",
         year: "numeric",
       }),
-      status: "Jarayonda",
+      status: "Demo · faqat shu qurilmada",
       amount: order.finalTotal.toLocaleString(),
       items: order.items,
       delivery,
@@ -163,6 +164,9 @@ export default function BuyurtmaPage() {
         <h1 className="text-2xl sm:text-3xl font-bold text-[#1a1a1a] mb-6 sm:mb-8">
           Buyurtmani rasmiylashtirish
         </h1>
+        <div role="note" className="mb-6 rounded-xl border border-amber-300 bg-amber-50 p-4 text-sm text-amber-950">
+          DummyJSON does not store orders or process payments. This checkout only saves a demo order in this browser; no payment is made and no order is sent to Islomx7.
+        </div>
 
         {/* FIX: gap-8 -> gap-6 sm:gap-8, mobil ustunlar orasidagi bo'shliq kamaytirildi */}
         <form onSubmit={handleSubmit(onOrderSubmit)} className="flex flex-col lg:flex-row gap-6 sm:gap-8">
@@ -332,11 +336,11 @@ export default function BuyurtmaPage() {
                         <div className="flex-1 min-w-0">
                           <p className="text-[13px] font-semibold text-gray-800 truncate">{item.name}</p>
                           <p className="text-[11px] text-gray-400 mt-0.5">
-                            {item.quantity} dona × {item.price.toLocaleString()} so'm
+                            {item.quantity} dona × {formatPrice(item.price)}
                           </p>
                         </div>
                         <p className="text-[13px] sm:text-[14px] font-bold text-blue-600 whitespace-nowrap">
-                          {(item.price * item.quantity).toLocaleString()} so'm
+                          {formatPrice(item.price * item.quantity)}
                         </p>
                       </div>
                     ))}
@@ -347,7 +351,7 @@ export default function BuyurtmaPage() {
                       <div className="flex justify-between text-sm">
                         <span className="text-gray-500">Promokod chegirma</span>
                         <span className="text-green-600 font-semibold">
-                          -{order.promoDiscount.toLocaleString()} so'm
+                          -{formatPrice(order.promoDiscount)}
                         </span>
                       </div>
                     )}
@@ -357,8 +361,7 @@ export default function BuyurtmaPage() {
                     <div className="flex justify-between items-end gap-2">
                       <span className="text-base font-bold text-gray-800">Jami:</span>
                       <span className="text-xl sm:text-2xl font-black text-blue-600 text-right">
-                        {order.finalTotal.toLocaleString()}{" "}
-                        <span className="text-sm font-bold">so'm</span>
+                        {formatPrice(order.finalTotal)}
                       </span>
                     </div>
                   </div>
