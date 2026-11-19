@@ -69,7 +69,7 @@ export default function BlogPage() {
                     {/* Sidebar */}
                     <div className="w-full grid grid-cols-1 md:grid-cols-2 lg:grid-cols-1 gap-6">
                         <div className="bg-white rounded-[12px] p-5 md:p-6 border border-gray-100 shadow-sm h-full">
-                            <h3 className="text-[16px] font-bold mb-4 text-[#2F3640] border-b pb-2">Bo&apos;limlar</h3>
+                            <h3 className="text-[16px] font-bold mb-4 text-[#2F3640] border-b pb-2">Bo'limlar</h3>
                             <ul className="space-y-3.5">
                                 <li className="flex justify-between items-center text-[11px] font-bold text-blue-600 uppercase border-b border-blue-100 pb-1 cursor-pointer">
                                     <span>BARCHA NASHRLAR</span>
@@ -79,10 +79,10 @@ export default function BlogPage() {
                         </div>
 
                         <div className="bg-white rounded-[12px] p-5 md:p-6 border border-gray-100 shadow-sm">
-                            <h3 className="text-[16px] font-bold mb-1.5 text-[#2F3640] text-center">Yangiliklarga obuna bo&apos;ling</h3>
+                            <h3 className="text-[16px] font-bold mb-1.5 text-[#2F3640] text-center">Yangiliklarga obuna bo'ling</h3>
                             <div className="space-y-2.5">
                                 <input type="email" placeholder="Email" className="w-full border border-gray-200 rounded-[8px] px-4 h-[44px] text-[13px] outline-none focus:border-blue-500 bg-[#F7F9FC]" />
-                                <button className="w-full bg-[#1F6BFF] hover:bg-blue-700 text-white font-bold text-[12px] h-[44px] rounded-[8px] uppercase tracking-wider transition">OBUNA BO&apos;LISH</button>
+                                <button className="w-full bg-[#1F6BFF] hover:bg-blue-700 text-white font-bold text-[12px] h-[44px] rounded-[8px] uppercase tracking-wider transition">OBUNA BO'LISH</button>
                             </div>
                         </div>
                     </div>

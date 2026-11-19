@@ -66,7 +66,7 @@ function YetkazibBerish() {
 
           <div className="mt-3 space-y-6">
             {isLoading && <p className="text-gray-500">Yuklanmoqda...</p>}
-            {isError && <p className="text-red-500">Ma&apos;lumotlarni yuklashda xatolik yuz berdi.</p>}
+            {isError && <p className="text-red-500">Ma'lumotlarni yuklashda xatolik yuz berdi.</p>}
             
             {deliveryMethods &&
               deliveryMethods.map((method, index) => (
@@ -77,7 +77,7 @@ function YetkazibBerish() {
                   <p className="mt-1 text-gray-600">{method.description}</p>
                   <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-xs text-gray-500">
                     <p>
-                      <span className="font-medium text-gray-700">Narxi:</span> {method.price} so&apos;m
+                      <span className="font-medium text-gray-700">Narxi:</span> {method.price} so'm
                     </p>
                     <p>
                       <span className="font-medium text-gray-700">Yetkazib berish vaqti:</span> {method.delivery_days?.toString()} kun
@@ -101,14 +101,14 @@ function YetkazibBerish() {
         <div className="w-full lg:w-[320px] shrink-0 flex flex-col gap-6">
           {/* Obuna Formasi */}
           <div className="bg-[#F8F9FA] p-6 rounded-md border border-gray-100 shadow-sm">
-            <h4 className="text-[15px] font-bold mb-2 uppercase">Yangiliklarga obuna bo&apos;ling</h4>
+            <h4 className="text-[15px] font-bold mb-2 uppercase">Yangiliklarga obuna bo'ling</h4>
             <p className="text-[12px] text-gray-500 mb-4 leading-snug">
-              Doimiy chegirmalar va kompaniya yangiliklaridan xabardor bo&apos;ling.
+              Doimiy chegirmalar va kompaniya yangiliklaridan xabardor bo'ling.
             </p>
 
             {isSubscribed ? (
               <div className="text-green-600 text-sm font-medium py-2">
-                Muvaffaqiyatli obuna bo&apos;ldingiz!
+                Muvaffaqiyatli obuna bo'ldingiz!
               </div>
             ) : (
               <form onSubmit={handleSubmit(onSubscribe)}>
@@ -130,7 +130,7 @@ function YetkazibBerish() {
                   type="submit"
                   className="w-full bg-[#2472d1] text-white font-bold py-3 rounded-sm text-[12px] uppercase tracking-wider hover:bg-blue-700 transition-colors active:scale-[0.98]"
                 >
-                  Obuna bo&apos;lish
+                  Obuna bo'lish
                 </button>
 
                 <div className="mt-4">
@@ -147,7 +147,7 @@ function YetkazibBerish() {
                         errors.privacyConsent ? "text-red-500 font-medium" : "text-gray-400"
                       }`}
                     >
-                      Maxfiylik siyosatiga muvofiq shaxsiy ma&apos;lumotlarni qayta ishlashga roziman.
+                      Maxfiylik siyosatiga muvofiq shaxsiy ma'lumotlarni qayta ishlashga roziman.
                     </label>
                   </div>
                   {errors.privacyConsent && (

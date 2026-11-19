@@ -47,7 +47,7 @@ export default function TulovSahifasi() {
       <nav className="text-[12px] text-gray-400 mb-6 flex items-center gap-2 overflow-x-auto whitespace-nowrap">
         <span className="hover:text-blue-600 cursor-pointer transition-colors">Stroyoptorg</span>
         <span>/</span>
-        <span className="text-gray-500">To&apos;lov usullari</span>
+        <span className="text-gray-500">To'lov usullari</span>
       </nav>
       <div className="flex flex-col lg:flex-row gap-10">
 
@@ -59,29 +59,29 @@ export default function TulovSahifasi() {
 
           <section className="mb-8">
 
-            <h2 className="text-[18px] font-bold mb-4">Yetkazib berishda to&apos;lov</h2>
+            <h2 className="text-[18px] font-bold mb-4">Yetkazib berishda to'lov</h2>
 
             <p className="mb-4 text-gray-700">
 
-              Saytda to&apos;lov tizimi yordamida bank kartasi orqali. Buyurtmani
+              Saytda to'lov tizimi yordamida bank kartasi orqali. Buyurtmani
 
-              rasmiylashtirishda &quot;To&apos;lov&quot; bo&apos;limida biz Sizni to&apos;lov sahifasiga
+              rasmiylashtirishda "To'lov" bo'limida biz Sizni to'lov sahifasiga
 
-              yo&apos;naltiramiz, u yerda bank kartangiz ma&apos;lumotlarini (raqami, amal
+              yo'naltiramiz, u yerda bank kartangiz ma'lumotlarini (raqami, amal
 
-              qilish muddati, karta egasining ismi) ko&apos;rsatishingiz kerak bo&apos;ladi.
+              qilish muddati, karta egasining ismi) ko'rsatishingiz kerak bo'ladi.
 
-              Barcha ma&apos;lumotlarni kiritganingizdan so&apos;ng &quot;To&apos;lov&quot; tugmasini bosing.
+              Barcha ma'lumotlarni kiritganingizdan so'ng "To'lov" tugmasini bosing.
 
             </p>
 
             <p className="mb-4 text-gray-700">
 
-              Bank kartasi yordamida to&apos;lovni amalga oshirish uchun tegishli sahifada
+              Bank kartasi yordamida to'lovni amalga oshirish uchun tegishli sahifada
 
-              &quot;Buyurtmani bank kartasi orqali to&apos;lash&quot; tugmasini bosish kerak. To&apos;lov
+              "Buyurtmani bank kartasi orqali to'lash" tugmasini bosish kerak. To'lov
 
-              quyidagi to&apos;lov tizimlarining bank kartalari orqali amalga oshiriladi:
+              quyidagi to'lov tizimlarining bank kartalari orqali amalga oshiriladi:
 
             </p>
 
@@ -115,13 +115,13 @@ export default function TulovSahifasi() {
 
             <p className="mb-2 text-gray-700">
 
-              <span className="font-bold">Naqd pulda</span> buyurtmani qabul qilishda haydovchiga to&apos;lanadi.
+              <span className="font-bold">Naqd pulda</span> buyurtmani qabul qilishda haydovchiga to'lanadi.
 
             </p>
 
             <p className="mb-2 text-gray-700">
 
-              Bizning menejerimiz sizga qo&apos;ng&apos;iroq qiladi va buyurtmani qabul qilish
+              Bizning menejerimiz sizga qo'ng'iroq qiladi va buyurtmani qabul qilish
 
               uchun qulay vaqtni kelishib oladi. Tayyorlangan buyurtma omborda sizni kutadi.
 
@@ -129,9 +129,9 @@ export default function TulovSahifasi() {
 
             <p className="text-gray-700 italic">
 
-              Yetkazib berish narxi tovarning o&apos;lchamlari va masofaga qarab
+              Yetkazib berish narxi tovarning o'lchamlari va masofaga qarab
 
-              belgilanadi va buyurtma summasiga qo&apos;shimcha ravishda qo&apos;shiladi.
+              belgilanadi va buyurtma summasiga qo'shimcha ravishda qo'shiladi.
 
             </p>
 
@@ -140,13 +140,13 @@ export default function TulovSahifasi() {
 
           <section className="mb-8">
 
-            <h2 className="text-[18px] font-bold mb-4">O&apos;zi olib ketishda (Samovivoz)</h2>
+            <h2 className="text-[18px] font-bold mb-4">O'zi olib ketishda (Samovivoz)</h2>
 
             <ul className="list-none space-y-2 ml-4">
 
               <li className="flex items-start gap-2 text-red-600 font-bold">
 
-                • <span className="text-gray-700 font-normal">Saytda to&apos;lov tizimi orqali yoki qabul qilish punktida kassa orqali bank kartasi bilan.</span>
+                • <span className="text-gray-700 font-normal">Saytda to'lov tizimi orqali yoki qabul qilish punktida kassa orqali bank kartasi bilan.</span>
 
               </li>
 
@@ -158,7 +158,7 @@ export default function TulovSahifasi() {
 
               <li className="flex items-start gap-2 text-red-600 font-bold">
 
-                • <span className="text-gray-700 font-normal">Buyurtmani qabul qilishda mahsulotni diqqat bilan ko&apos;zdan kechirishingizni, tashqi nuqsonlar va butunligini tekshirishingizni so&apos;raymiz.</span>
+                • <span className="text-gray-700 font-normal">Buyurtmani qabul qilishda mahsulotni diqqat bilan ko'zdan kechirishingizni, tashqi nuqsonlar va butunligini tekshirishingizni so'raymiz.</span>
 
               </li>
 
@@ -171,13 +171,13 @@ export default function TulovSahifasi() {
         <div className="w-full lg:w-[320px] shrink-0 flex flex-col gap-6">
           {/* Obuna Formasi (Zod bilan) */}
           <div className="bg-[#F8F9FA] p-6 rounded-md border border-gray-100 shadow-sm">
-            <h4 className="text-[15px] font-bold mb-2 uppercase">Yangiliklarga obuna bo&apos;ling</h4>
+            <h4 className="text-[15px] font-bold mb-2 uppercase">Yangiliklarga obuna bo'ling</h4>
             <p className="text-[12px] text-gray-500 mb-4 leading-snug">
-              Doimiy chegirmalar va kompaniya yangiliklaridan xabardor bo&apos;ling.
+              Doimiy chegirmalar va kompaniya yangiliklaridan xabardor bo'ling.
             </p>
 
             {isSubscribed ? (
-              <div className="text-green-600 text-sm font-medium py-2">Muvaffaqiyatli obuna bo&apos;ldingiz!</div>
+              <div className="text-green-600 text-sm font-medium py-2">Muvaffaqiyatli obuna bo'ldingiz!</div>
             ) : (
               <form onSubmit={handleSubmit(onSubscribe)}>
                 <div className="mb-3">
@@ -197,7 +197,7 @@ export default function TulovSahifasi() {
                   type="submit"
                   className="w-full bg-[#2472d1] text-white font-bold py-3 rounded-sm text-[12px] uppercase tracking-wider hover:bg-blue-700 transition-colors active:scale-[0.98]"
                 >
-                  Obuna bo&apos;lish
+                  Obuna bo'lish
                 </button>
 
                 <div className="mt-4">
@@ -213,7 +213,7 @@ export default function TulovSahifasi() {
                       className={`text-[10px] leading-tight cursor-pointer select-none ${errors.privacyConsent ? 'text-red-500 font-medium' : 'text-gray-400'
                         }`}
                     >
-                      Maxfiylik siyosatiga muvofiq shaxsiy ma&apos;lumotlarni qayta ishlashga roziman.
+                      Maxfiylik siyosatiga muvofiq shaxsiy ma'lumotlarni qayta ishlashga roziman.
                     </label>
                   </div>
                   {errors.privacyConsent && (

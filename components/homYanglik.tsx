@@ -35,7 +35,7 @@ function HomYanglik() {
         <section className="max-w-7xl mx-auto px-4 py-10 font-sans">
 
             <div className="flex justify-between items-center mb-8">
-                <h2 className="text-2xl font-bold text-[#1a1a1a]">So&apos;nggi yangiliklar</h2>
+                <h2 className="text-2xl font-bold text-[#1a1a1a]">So'nggi yangiliklar</h2>
                 <Link
                     href="/blog"
                     className="bg-[#f0f4f8] text-[#0066cc] px-5 py-2 rounded-lg text-sm font-semibold hover:bg-blue-100 transition hidden sm:block"
@@ -62,7 +62,7 @@ function HomYanglik() {
                                 />
                             ) : (
                                 <div className="w-full h-full flex items-center justify-center text-gray-300 text-sm">
-                                    Rasm yo&apos;q
+                                    Rasm yo'q
                                 </div>
                             )}
                         </div>
@@ -98,7 +98,7 @@ function HomYanglik() {
                                 />
                             ) : (
                                 <div className="w-full h-full flex items-center justify-center text-gray-300 text-sm">
-                                    Rasm yo&apos;q
+                                    Rasm yo'q
                                 </div>
                             )}
                         </div>
@@ -149,7 +149,7 @@ function HomYanglik() {
                         href="/blog"
                         className="text-[#0066cc] text-sm font-semibold border border-gray-200 px-6 py-2 rounded-lg hover:bg-blue-50 transition"
                     >
-                        Ko&apos;proq yangiliklar
+                        Ko'proq yangiliklar
                     </Link>
                 </div>
             </div>

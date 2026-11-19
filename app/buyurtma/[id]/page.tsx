@@ -181,13 +181,13 @@ export default function BuyurtmaDetailPage() {
                                             </p>
                                             <p className="text-xs text-gray-400">
                                                 {item.quantity} dona ×{" "}
-                                                {item.price.toLocaleString()} so&apos;m
+                                                {item.price.toLocaleString()} so'm
                                             </p>
                                         </div>
 
                                         {/* Narx */}
                                         <p className="text-[15px] font-bold text-blue-600 whitespace-nowrap shrink-0">
-                                            {(item.price * item.quantity).toLocaleString()} so&apos;m
+                                            {(item.price * item.quantity).toLocaleString()} so'm
                                         </p>
                                     </div>
                                 ))}
@@ -199,14 +199,14 @@ export default function BuyurtmaDetailPage() {
                                     <div className="flex justify-between text-sm text-gray-500">
                                         <span>Chegirma</span>
                                         <span className="font-medium text-green-600">
-                                            -{(subtotal - finalAmount).toLocaleString()} so&apos;m
+                                            -{(subtotal - finalAmount).toLocaleString()} so'm
                                         </span>
                                     </div>
                                 )}
                                 <div className="flex justify-between items-center pt-1 border-t border-gray-200">
-                                    <span className="text-base font-bold text-gray-800">Jami to&apos;lov</span>
+                                    <span className="text-base font-bold text-gray-800">Jami to'lov</span>
                                     <span className="text-xl font-black text-blue-600">
-                                        {order.amount} so&apos;m
+                                        {order.amount} so'm
                                     </span>
                                 </div>
                             </div>
@@ -234,7 +234,7 @@ export default function BuyurtmaDetailPage() {
                         {/* To'lov */}
                         <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
                             <h3 className="text-xs font-black text-gray-400 uppercase tracking-widest mb-4">
-                                To&apos;lov
+                                To'lov
                             </h3>
                             <div className="flex justify-between text-sm">
                                 <span className="text-gray-500">Usul</span>
@@ -247,7 +247,7 @@ export default function BuyurtmaDetailPage() {
                         {/* Mijoz */}
                         <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
                             <h3 className="text-xs font-black text-gray-400 uppercase tracking-widest mb-4">
-                                Mijoz ma&apos;lumotlari
+                                Mijoz ma'lumotlari
                             </h3>
                             <div className="space-y-2 text-sm">
                                 <div className="flex justify-between gap-2">

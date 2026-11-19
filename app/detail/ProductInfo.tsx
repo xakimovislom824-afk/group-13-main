@@ -36,7 +36,7 @@ export default function ProductInfo({ mainProduct, detailSpecs, onAddCart }: Pro
         </button>
 
         <div className="mt-6 border border-slate-100 rounded-xl p-5 space-y-4 bg-white shadow-sm">
-          <div className="flex items-center gap-3 text-sm text-slate-600"><CreditCard size={18} className="text-slate-400" /> Istalgan usulda to&apos;lov qilish imkoniyati</div>
+          <div className="flex items-center gap-3 text-sm text-slate-600"><CreditCard size={18} className="text-slate-400" /> Istalgan usulda to'lov qilish imkoniyati</div>
           <div className="flex items-center gap-3 text-sm text-slate-600"><Package size={18} className="text-slate-400" /> Katalogda keng assortiment mavjud</div>
           <div className="flex items-center gap-3 text-sm text-slate-600"><Truck size={18} className="text-slate-400" /> Tezkor yetkazib berish xizmati</div>
         </div>
@@ -62,7 +62,7 @@ export default function ProductInfo({ mainProduct, detailSpecs, onAddCart }: Pro
           </div>
         </div>
 
-        <button onClick={() => onAddCart(qty)} className="w-full h-12 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-medium text-[15px] shadow-sm">Savatga qo&apos;shish</button>
+        <button onClick={() => onAddCart(qty)} className="w-full h-12 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-medium text-[15px] shadow-sm">Savatga qo'shish</button>
         <button className="w-full h-12 bg-slate-50 hover:bg-slate-100 text-blue-600 border border-slate-200/60 rounded-xl mt-3 font-medium text-[15px]">1 marta bosib sotib olish</button>
 
         <div className="flex justify-between mt-5 pt-4 border-t border-slate-100">

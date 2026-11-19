@@ -315,8 +315,8 @@ const CallbackModal = () => {
                     </svg>
                 </div>
 
-                <h2 className="modal-title">Qayta qo&apos;ng&apos;iroq</h2>
-                <p className="modal-subtitle">Ma&apos;lumotlaringizni qoldiring, tez orada siz bilan bog&apos;lanamiz</p>
+                <h2 className="modal-title">Qayta qo'ng'iroq</h2>
+                <p className="modal-subtitle">Ma'lumotlaringizni qoldiring, tez orada siz bilan bog'lanamiz</p>
 
                 <div className="modal-divider" />
 
@@ -375,7 +375,7 @@ const CallbackModal = () => {
                     <div className="privacy-row">
                         <input type="checkbox" id="privacy" required className="privacy-checkbox" />
                         <label htmlFor="privacy" className="privacy-label">
-                            <a href="/xafsizlik">Maxfiylik siyosati</a>ga muvofiq shaxsiy ma&apos;lumotlarim qayta ishlanishiga roziman
+                            <a href="/xafsizlik">Maxfiylik siyosati</a>ga muvofiq shaxsiy ma'lumotlarim qayta ishlanishiga roziman
                         </label>
                     </div>
 

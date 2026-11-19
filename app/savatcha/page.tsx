@@ -134,7 +134,7 @@ export default function SavatchaPage() {
         {items.length === 0 ? (
           <div className="bg-white p-10 sm:p-20 text-center rounded-2xl shadow-sm border">
             <p className="text-gray-400 text-lg sm:text-xl mb-6">
-              Savatchangiz hozircha bo&apos;sh
+              Savatchangiz hozircha bo'sh
             </p>
             <Link
               href="/katalog"
@@ -176,7 +176,7 @@ export default function SavatchaPage() {
                               />
                             ) : (
                               <span className="text-[10px] text-gray-400">
-                                Rasm yo&apos;q
+                                Rasm yo'q
                               </span>
                             )}
                           </div>
@@ -282,7 +282,7 @@ export default function SavatchaPage() {
                                     />
                                   ) : (
                                     <span className="text-xs text-gray-400">
-                                      Rasm yo&apos;q
+                                      Rasm yo'q
                                     </span>
                                   )}
                                 </div>
@@ -300,7 +300,7 @@ export default function SavatchaPage() {
 
                             <td className="px-6 py-6 text-center">
                               <p className="text-[15px] font-bold text-gray-900">
-                              {formatPrice(price)}
+                                {formatPrice(price)}
                               </p>
                             </td>
 
@@ -364,7 +364,7 @@ export default function SavatchaPage() {
 
                 <div className="space-y-3 sm:space-y-4 mb-6 sm:mb-8">
                   <div className="flex justify-between text-[14px] sm:text-[15px]">
-                    <span className="text-gray-500">Promokod bo&apos;yicha chegirma</span>
+                    <span className="text-gray-500">Promokod bo'yicha chegirma</span>
                     <span
                       className={`font-semibold ${promoApplied ? "text-green-600" : "text-gray-800"
                         }`}
@@ -421,19 +421,19 @@ export default function SavatchaPage() {
                     onClick={handleApplyPromo}
                     className="w-full bg-blue-50 text-blue-600 font-bold py-3 rounded-xl text-sm hover:bg-blue-100 transition"
                   >
-                    Promokodni qo&apos;llash
+                    Promokodni qo'llash
                   </button>
 
                   <button
                     onClick={handleGoToCheckout}
                     className="block w-full bg-blue-600 text-white font-bold py-4 rounded-xl mt-3 sm:mt-4 hover:bg-blue-700 shadow-xl shadow-blue-200 transition-all uppercase text-xs tracking-[2px] text-center"
                   >
-                    Rasmiylashtirishga o&apos;tish
+                    Rasmiylashtirishga o'tish
                   </button>
                 </div>
 
                 <p className="text-gray-400 text-[11px] text-center mt-4 sm:mt-6 leading-relaxed">
-                  &quot;Rasmiylashtirish&quot; tugmasini bosish orqali siz ommaviy oferta
+                  "Rasmiylashtirish" tugmasini bosish orqali siz ommaviy oferta
                   shartlariga rozilik bildirasiz.
                 </p>
               </div>

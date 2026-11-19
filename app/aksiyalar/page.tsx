@@ -14,7 +14,7 @@ const Aksiyalar = () => {
   if (error) {
     return (
       <div className="w-full min-h-screen flex items-center justify-center text-red-500 font-medium">
-        Ma&apos;lumotlarni yuklashda xatolik yuz berdi.
+        Ma'lumotlarni yuklashda xatolik yuz berdi.
       </div>
     );
   }
@@ -62,12 +62,12 @@ const Aksiyalar = () => {
 
         <div className="mt-16 md:mt-24 bg-[#F7F9FC] rounded-[16px] p-6 md:p-10 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
           <div className="max-w-[450px]">
-            <h3 className="text-[18px] md:text-[20px] font-bold text-[#2F3640] mb-2">Yangiliklarga obuna bo&apos;ling</h3>
-            <p className="text-[13px] leading-[20px] text-[#7A7F87]">   Muntazam chegirmalar, maxsus takliflar va kompaniya yangiliklaridan birinchilardan bo&apos;lib xabardor bo&apos;ling. </p>
+            <h3 className="text-[18px] md:text-[20px] font-bold text-[#2F3640] mb-2">Yangiliklarga obuna bo'ling</h3>
+            <p className="text-[13px] leading-[20px] text-[#7A7F87]">   Muntazam chegirmalar, maxsus takliflar va kompaniya yangiliklaridan birinchilardan bo'lib xabardor bo'ling. </p>
           </div>
           <div className="flex flex-col sm:flex-row items-stretch gap-3 w-full lg:max-w-[600px]">
             <input  type="email"  placeholder="Elektron pochta (Email)"  className="flex-grow h-[48px] rounded-[8px] border border-[#D9DEE5] px-4 outline-none text-sm bg-white focus:border-[#1F6BFF] transition"/>
-            <button className="h-[48px] px-8 rounded-[8px] bg-[#1F6BFF] text-white font-semibold hover:bg-blue-700 transition text-sm whitespace-nowrap uppercase tracking-wide">   Obuna bo&apos;lish </button>
+            <button className="h-[48px] px-8 rounded-[8px] bg-[#1F6BFF] text-white font-semibold hover:bg-blue-700 transition text-sm whitespace-nowrap uppercase tracking-wide">   Obuna bo'lish </button>
           </div>
         </div>
       </div>
