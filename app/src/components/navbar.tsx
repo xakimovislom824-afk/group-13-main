@@ -329,17 +329,6 @@ export default function Navbar() {
   const pathname = usePathname();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
-  useEffect(() => {
-    // Next.js adds this marker even when no font size adjustment is configured.
-    const removeEmptyAdjustmentMeta = () => {
-      const adjustmentMeta = document.head.querySelector<HTMLMetaElement>('meta[name="next-size-adjust"]');
-      if (adjustmentMeta?.content === "") adjustmentMeta.remove();
-    };
-    const observer = new MutationObserver(removeEmptyAdjustmentMeta);
-    observer.observe(document.head, { childList: true });
-    removeEmptyAdjustmentMeta();
-    return () => observer.disconnect();
-  }, []);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [userData, setUserData] = useState<UserData>({ username: null, avatar: null });
 
