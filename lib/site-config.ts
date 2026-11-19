@@ -10,15 +10,5 @@ export const siteConfig = {
   copyright: "© 2026 Islomx7. Barcha huquqlar himoyalangan.",
 };
 
-export const categories = [
-  { label: "Qurilish materiallari", href: "/katalog/qurilish-materiallari" },
-  { label: "Asbob-uskunalar", href: "/katalog/asbob-uskunalar" },
-  { label: "Elektr jihozlari", href: "/katalog/elektr" },
-  { label: "Santexnika", href: "/katalog/santexnika" },
-  { label: "Uy va bog'", href: "/katalog/uy-va-bog" },
-  { label: "Mebel", href: "/katalog/mebel" },
-  { label: "Yoritish", href: "/katalog/yoritish" },
-] as const;
-
 export const formatPrice = (value: number | string) =>
-  `${Math.round(Number(value) || 0).toLocaleString("fr-FR").replace(/\u202f/g, " ")} so'm`;
+  new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", maximumFractionDigits: 2 }).format(Number(value) || 0);

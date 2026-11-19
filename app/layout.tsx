@@ -17,25 +17,20 @@ export const metadata: Metadata = {
   metadataBase: new URL(siteConfig.url),
 
   title: {
-    default: "Islomx7 — Qurilish va uy uchun onlayn do'kon",
+    default: "Islomx7 — onlayn mahsulotlar katalogi",
     template: "%s | Islomx7",
   },
 
   description:
-    "Qurilish materiallari, ta'mirlash asboblari va uy jihozlarini Islomx7 dan qulay narxlarda xarid qiling. Toshkent bo'ylab tezkor yetkazib berish.",
+    "Islomx7 onlayn katalogida mahsulotlarni haqiqiy API ma'lumotlari asosida qidiring, narx va reytinglarni ko'ring hamda savatingizni boshqaring.",
 
   keywords: [
     "Islomx7",
-    "onlayn do'kon",
-    "online do'kon",
-    "internet do'kon",
-    "O'zbekiston onlayn do'koni",
-    "qurilish materiallari",
-    "elektr asboblari",
-    "uy jihozlari",
+    "onlayn katalog",
     "mahsulotlar",
-    "Toshkent",
-    "O'zbekiston",
+    "mahsulot qidirish",
+    "kategoriya",
+    "reyting",
   ],
 
   authors: [
@@ -60,16 +55,16 @@ export const metadata: Metadata = {
     locale: "uz_UZ",
     url: "https://group-13-main-zeta.vercel.app",
     siteName: "Islomx7",
-    title: "Islomx7 — Onlayn do'kon",
+    title: "Islomx7 — Onlayn katalog",
     description:
-      "Qurilish materiallari, elektr asboblari va uy uchun kerakli mahsulotlarni onlayn xarid qiling.",
+      "Mahsulotlarni qidirish, narx va reytinglarni ko'rish hamda savatni boshqarish uchun onlayn katalog.",
   },
 
   twitter: {
     card: "summary_large_image",
-    title: "Islomx7 — Onlayn do'kon",
+    title: "Islomx7 — Onlayn katalog",
     description:
-      "O'zbekistondagi onlayn do'kon. Kerakli mahsulotlarni onlayn xarid qiling.",
+      "Mahsulotlarni ko'rish va qidirish uchun Islomx7 onlayn katalogi.",
   },
 };
 

@@ -1,55 +1,99 @@
-import { IProduct } from "../Types/index.types";
 import { baseApi } from "./baseApi";
-import { dummyCategories } from "./categoryApi";
+import type { IProduct } from "../Types/index.types";
+
+export interface ProductPage {
+  products: IProduct[];
+  total: number;
+  skip: number;
+  limit: number;
+}
+
+export interface ProductQuery {
+  limit?: number;
+  skip?: number;
+}
 
 const isRecord = (value: unknown): value is Record<string, unknown> =>
   typeof value === "object" && value !== null && !Array.isArray(value);
 
-const normalizeProduct = (value: unknown): IProduct => {
+export const normalizeProduct = (value: unknown): IProduct => {
   const item = isRecord(value) ? value : {};
-  const categoryName = String(item.category ?? "").toLowerCase();
-  const categoryId =
-    dummyCategories.findIndex((name) => name.toLowerCase() === categoryName) + 1 || 1;
+  const price = Number(item.price ?? 0);
+  const discountPercentage = Number(item.discountPercentage ?? 0);
+  const originalPrice = discountPercentage > 0
+    ? price / (1 - discountPercentage / 100)
+    : price;
+  const images = Array.isArray(item.images)
+    ? item.images.filter((image): image is string => typeof image === "string")
+    : [];
 
   return {
     id: Number(item.id ?? 0),
-    name: String(item.title ?? item.name ?? ""),
+    name: String(item.title ?? ""),
     description: String(item.description ?? ""),
-    price: String(item.price ?? "0"),
-    old_price: item.oldPrice ? String(item.oldPrice) : String(item.price ?? "0"),
-    image: String(Array.isArray(item.images) ? item.images[0] ?? "" : item.thumbnail ?? item.image ?? ""),
-    brand: String(item.brand ?? ""),
-    is_hit: false,
+    price: String(price),
+    old_price: String(originalPrice),
+    image: String(item.thumbnail ?? images[0] ?? ""),
+    images,
+    brand: typeof item.brand === "string" ? item.brand : "",
+    is_hit: Number(item.rating ?? 0) >= 4.5,
     is_new: false,
-    is_sale: Number(item.discountPercentage ?? 0) > 0,
+    is_sale: discountPercentage > 0,
+    discountPercentage,
+    rating: Number(item.rating ?? 0),
     stock: Number(item.stock ?? 0),
-    created_at: String(item.createdAt ?? new Date().toISOString()),
-    updated_at: String(item.updatedAt ?? new Date().toISOString()),
-    category: categoryId,
+    created_at: "",
+    updated_at: "",
+    category: typeof item.category === "string" ? item.category : "",
   };
 };
+
+const normalizePage = (response: unknown): ProductPage => {
+  const record = isRecord(response) ? response : {};
+  const products = Array.isArray(record.products) ? record.products : [];
+  return {
+    products: products.map(normalizeProduct),
+    total: Number(record.total ?? 0),
+    skip: Number(record.skip ?? 0),
+    limit: Number(record.limit ?? 20),
+  };
+};
+
+const pageQuery = ({ limit = 20, skip = 0 }: ProductQuery = {}) =>
+  `/products?limit=${Math.max(1, Math.min(100, limit))}&skip=${Math.max(0, skip)}`;
 
 export const productApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
     getProducts: builder.query<IProduct[], void>({
-      query: () => "/products",
-      transformResponse: (response: unknown) => {
-        const responseRecord = isRecord(response) ? response : {};
-        const products: unknown[] = Array.isArray(response)
-          ? response
-          : Array.isArray(responseRecord.products) ? responseRecord.products : [];
-        return products.map(normalizeProduct);
-      },
+      query: () => pageQuery({ limit: 20, skip: 0 }),
+      transformResponse: (response: unknown) => normalizePage(response).products,
     }),
-
+    getProductsPage: builder.query<ProductPage, ProductQuery>({
+      query: (query) => pageQuery(query),
+      transformResponse: normalizePage,
+    }),
+    getProductsByCategory: builder.query<ProductPage, ProductQuery & { slug: string }>({
+      query: ({ slug, limit = 20, skip = 0 }) =>
+        `/products/category/${encodeURIComponent(slug)}?limit=${Math.max(1, Math.min(100, limit))}&skip=${Math.max(0, skip)}`,
+      transformResponse: normalizePage,
+    }),
+    searchProducts: builder.query<ProductPage, ProductQuery & { q: string }>({
+      query: ({ q, limit = 20, skip = 0 }) =>
+        `/products/search?q=${encodeURIComponent(q)}&limit=${Math.max(1, Math.min(100, limit))}&skip=${Math.max(0, skip)}`,
+      transformResponse: normalizePage,
+    }),
     getProductById: builder.query<IProduct, number>({
       query: (id) => `/products/${id}`,
-      transformResponse: (response: unknown) => normalizeProduct(response),
+      transformResponse: normalizeProduct,
+      providesTags: (_result, _error, id) => [{ type: "Product", id }],
     }),
   }),
 });
 
 export const {
   useGetProductsQuery,
+  useGetProductsPageQuery,
+  useGetProductsByCategoryQuery,
+  useSearchProductsQuery,
   useGetProductByIdQuery,
 } = productApi;

@@ -15,11 +15,11 @@ const nextConfig: NextConfig = {
   },
   async redirects() {
     return [
-      { source: "/qurilishMateriallari", destination: "/katalog/qurilish-materiallari", permanent: true },
-      { source: "/asbobUskunalar", destination: "/katalog/asbob-uskunalar", permanent: true },
-      { source: "/elektr", destination: "/katalog/elektr", permanent: true },
-      { source: "/santexnika", destination: "/katalog/santexnika", permanent: true },
-      { source: "/uyBog", destination: "/katalog/uy-va-bog", permanent: true },
+      { source: "/qurilishMateriallari", destination: "/katalog", permanent: true },
+      { source: "/asbobUskunalar", destination: "/katalog", permanent: true },
+      { source: "/elektr", destination: "/katalog/smartphones", permanent: true },
+      { source: "/santexnika", destination: "/katalog", permanent: true },
+      { source: "/uyBog", destination: "/katalog/home-decoration", permanent: true },
       { source: "/yetkazibBerish", destination: "/yetkazib-berish", permanent: true },
       { source: "/savolJavob", destination: "/savol-javob", permanent: true },
       { source: "/xafsizlik", destination: "/maxfiylik-siyosati", permanent: true },

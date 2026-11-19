@@ -11,6 +11,7 @@ import {
 import { useGetProductsQuery } from "../../services/productApi";
 import { Trash2, Minus, Plus } from "lucide-react";
 import { IProduct } from "../../Types/index.types";
+import { formatPrice } from "../../lib/site-config";
 
 const isRecord = (value: unknown): value is Record<string, unknown> =>
   typeof value === "object" && value !== null && !Array.isArray(value);
@@ -20,7 +21,7 @@ interface ICartItemWithDetails {
   cart: number;
   product: number;
   quantity: number;
-  product_details?: IProduct;
+  product_details?: Partial<IProduct>;
 }
 
 export default function SavatchaPage() {
@@ -39,7 +40,12 @@ export default function SavatchaPage() {
 
   const items: ICartItemWithDetails[] = rawItems.map((item) => {
     const productId = Number(item.product ?? (isRecord(item.product_data) ? item.product_data.id : undefined) ?? (isRecord(item.product_detail) ? item.product_detail.id : undefined));
-    const matchedProduct = products.find((product) => Number(product.id) === productId);
+    const productSnapshot = isRecord(item.product_data)
+      ? item.product_data as Partial<IProduct>
+      : isRecord(item.product_detail)
+        ? item.product_detail as Partial<IProduct>
+        : undefined;
+    const matchedProduct = products.find((product) => Number(product.id) === productId) ?? productSnapshot;
     return {
       id: Number(item.id),
       cart: Number(item.cart ?? 0),
@@ -199,11 +205,11 @@ export default function SavatchaPage() {
                         <div className="flex items-center justify-between mt-3 pt-3 border-t border-gray-100">
                           <div>
                             <p className="text-[15px] font-black text-gray-900">
-                              {price.toLocaleString()} so&apos;m
+                              {formatPrice(price)}
                             </p>
-                            {price !== (price * qty) && (
+                            {Number(item.product_details?.old_price ?? price) > price && (
                               <p className="text-[11px] text-gray-400 line-through">
-                                {(price * 1.1).toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, " ")} so&apos;m
+                                {formatPrice(Number(item.product_details?.old_price ?? price))}
                               </p>
                             )}
                           </div>
@@ -294,7 +300,7 @@ export default function SavatchaPage() {
 
                             <td className="px-6 py-6 text-center">
                               <p className="text-[15px] font-bold text-gray-900">
-                                {price.toLocaleString()} so&apos;m
+                              {formatPrice(price)}
                               </p>
                             </td>
 
@@ -328,7 +334,7 @@ export default function SavatchaPage() {
 
                             <td className="px-6 py-6 text-center">
                               <p className="text-[15px] font-bold text-blue-600">
-                                {(price * qty).toLocaleString()} so&apos;m
+                                {formatPrice(price * qty)}
                               </p>
                             </td>
 
@@ -364,21 +370,20 @@ export default function SavatchaPage() {
                         }`}
                     >
                       {promoApplied
-                        ? `-${promoDiscount.toLocaleString()} so'm`
-                        : "0 so'm"}
+                        ? `-${formatPrice(promoDiscount)}`
+                        : formatPrice(0)}
                     </span>
                   </div>
                   <div className="flex justify-between text-[14px] sm:text-[15px] border-b border-dashed pb-3 sm:pb-4">
                     <span className="text-gray-500">Xarid summasidan chegirma</span>
-                    <span className="font-semibold text-gray-800">0 so&apos;m</span>
+                    <span className="font-semibold text-gray-800">{formatPrice(0)}</span>
                   </div>
                   <div className="flex justify-between items-end pt-1 sm:pt-2">
                     <span className="text-base sm:text-lg font-bold text-gray-800">
                       Summa:
                     </span>
                     <span className="text-2xl sm:text-3xl font-black text-blue-600 tracking-tighter">
-                      {finalTotal.toLocaleString()}{" "}
-                      <span className="text-base sm:text-lg font-bold">so&apos;m</span>
+                      {formatPrice(finalTotal)}
                     </span>
                   </div>
                 </div>

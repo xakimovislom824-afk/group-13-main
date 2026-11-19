@@ -1,12 +1,11 @@
 import type { Metadata } from "next";
 import CategoryCatalog from "../../../components/CategoryCatalog";
-import { categories } from "../../../lib/site-config";
 
 interface CategoryPageProps {
   params: Promise<{ category: string }>;
 }
 
-const categoryTitle = (slug: string) => categories.find((category) => category.href.endsWith(`/${slug}`))?.label ?? "Katalog";
+const categoryTitle = (slug: string) => slug.split("-").map((part) => part.charAt(0).toUpperCase() + part.slice(1)).join(" ");
 
 export async function generateMetadata({ params }: CategoryPageProps): Promise<Metadata> {
   const { category } = await params;

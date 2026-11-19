@@ -11,6 +11,7 @@ import {
   AlertCircle, Loader2,
 } from "lucide-react";
 import { useGetProductByIdQuery } from "../../../services/productDetailApi";
+import { formatPrice } from "../../../lib/site-config";
 
 import {
   useGetCartsQuery,
@@ -162,7 +163,6 @@ export function BuyNowModal({
       // Bu yerda backend-ga so'rov yuborishingiz mumkin (fetch yoki axios)
       // Masalan: await axios.post('/api/orders', { name, phone, qty, product })
       
-      await new Promise((resolve) => setTimeout(resolve, 1500)); // 1.5 sekund kutish (Zod effekt)
       setSubmitted(true);
     } catch (error) {
       console.error("Xatolik yuz berdi:", error);
@@ -204,15 +204,14 @@ export function BuyNowModal({
           /* Muvaffaqiyatli yakunlangandagi oyna */
           <div className="p-10 flex flex-col items-center gap-5 text-center">
             <div className="relative">
-              <div className="w-20 h-20 bg-emerald-50 rounded-full flex items-center justify-center border-2 border-emerald-100">
-                {/* <CheckCircle size={36} className="text-emerald-500" /> */}
-                <span className="text-emerald-500 text-3xl">✓</span>
+              <div className="w-20 h-20 bg-amber-50 rounded-full flex items-center justify-center border-2 border-amber-100">
+                <AlertCircle size={36} className="text-amber-600" />
               </div>
             </div>
             <div>
-              <h3 className="text-xl font-semibold text-stone-900 mb-2">Buyurtma qabul qilindi!</h3>
+              <h3 className="text-xl font-semibold text-stone-900 mb-2">Buyurtma yuborilmadi</h3>
               <p className="text-stone-500 text-sm leading-relaxed">
-                Operatorimiz tez orada <span className="text-stone-900 font-semibold">{phone}</span> raqamiga aloqaga chiqadi.
+                DummyJSON buyurtmalarni saqlamaydi. Ma&apos;lumot yuborilmadi va to&apos;lov olinmadi.
               </p>
             </div>
             <button onClick={onClose} className="w-full bg-blue-600 text-white py-4 rounded-2xl font-semibold text-sm hover:bg-blue-700 transition-colors shadow-lg">
@@ -229,7 +228,7 @@ export function BuyNowModal({
               </div>
               <div className="flex-1 min-w-0 flex flex-col justify-center">
                 <p className="text-xs text-stone-600 font-medium line-clamp-2 leading-snug mb-1">{product.name}</p>
-                <p className="text-stone-900 font-bold text-xl leading-none">{(finalPrice * qty).toLocaleString()} <span className="text-base">₽</span></p>
+                <p className="text-stone-900 font-bold text-xl leading-none">{formatPrice(finalPrice * qty)}</p>
               </div>
             </div>
 
@@ -298,7 +297,7 @@ export function BuyNowModal({
                   Yuborilmoqda...
                 </>
               ) : (
-                "Xaridni tasdiqlash"
+                "Tekshirish"
               )}
             </button>
           </div>
@@ -625,7 +624,7 @@ export default function ProductDetail({
     setCartLoading(true);
     setCartQty(1);
     try {
-      await addToCart({ product: productId, quantity: 1 }).unwrap();
+      await addToCart({ product: productId, quantity: 1, product_data: product }).unwrap();
       notify("Savatchaga qo'shildi!", "success");
     } catch (err: unknown) {
       setCartQty(0);
@@ -905,18 +904,17 @@ export default function ProductDetail({
                   <div>
                     {product.has_discount && product.old_price && (
                       <p className="text-sm text-stone-300 font-medium line-through mb-1">
-                        {(Number(product.old_price)).toLocaleString()} ₽
+                        {formatPrice(product.old_price)}
                       </p>
                     )}
                     <div className="flex items-end gap-2">
                       <span style={{ fontFamily: "'DM Serif Display', serif" }} className="text-4xl text-stone-900 leading-none font-normal">
-                        {finalPrice.toLocaleString()}
+                        {formatPrice(finalPrice)}
                       </span>
-                      <span className="text-xl text-stone-400 mb-0.5">₽</span>
                     </div>
                     {cartQty > 0 && (
                       <p className="text-xs text-blue-500 font-medium mt-1.5">
-                        Jami: {(finalPrice * cartQty).toLocaleString()} ₽ ({cartQty} dona)
+                        Jami: {formatPrice(finalPrice * cartQty)} ({cartQty} dona)
                       </p>
                     )}
                   </div>
@@ -1007,10 +1005,7 @@ export default function ProductDetail({
               {cartQty > 0 ? "Jami narx" : "Narx"}
             </span>
             <span style={{ fontFamily: "'DM Serif Display', serif" }} className="text-2xl text-stone-900 font-normal leading-tight">
-              {cartQty > 0
-                ? (finalPrice * cartQty).toLocaleString()
-                : finalPrice.toLocaleString()}{" "}
-              <span className="text-lg text-stone-400">₽</span>
+              {cartQty > 0 ? formatPrice(finalPrice * cartQty) : formatPrice(finalPrice)}
             </span>
           </div>
           <div className="flex items-center gap-2 flex-1">
