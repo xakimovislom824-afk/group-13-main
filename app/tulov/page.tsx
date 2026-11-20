@@ -45,7 +45,7 @@ export default function TulovSahifasi() {
     <div className="max-w-[1200px] mx-auto px-4 py-6 font-sans text-[#333]">
       {/* Breadcrumbs */}
       <nav className="text-[12px] text-gray-400 mb-6 flex items-center gap-2 overflow-x-auto whitespace-nowrap">
-        <span className="hover:text-blue-600 cursor-pointer transition-colors">Islomx7</span>
+        <span className="hover:text-blue-600 cursor-pointer transition-colors">Stroyoptorg</span>
         <span>/</span>
         <span className="text-gray-500">To&apos;lov usullari</span>
       </nav>

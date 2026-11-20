@@ -102,7 +102,7 @@ export default function LoginPage() {
     <div className="min-h-screen bg-[#F8F9FA] text-[#2D2D2D] p-4 md:p-8 lg:p-12">
       <nav className="max-w-[1200px] mx-auto mb-6 text-[11px] md:text-xs text-gray-400 flex items-center gap-2">
         <Link href="/" className="hover:text-blue-600 transition-colors">
-          Islomx7
+          Stroyoptorg
         </Link>
         <span>/</span>
         <span className="text-gray-500">Avtorizatsiya</span>
@@ -218,7 +218,7 @@ export default function LoginPage() {
             </div>
 
             <div className="mt-10">
-              <Link href="/yetkazib-berish" className="inline-block w-full sm:w-auto">
+              <Link href="/yetkazibBerish" className="inline-block w-full sm:w-auto">
                 <button
                   type="button"
                   className="w-full sm:w-auto flex items-center justify-center gap-3 bg-[#0B1320] hover:bg-black text-white px-10 py-4 rounded-lg uppercase text-[11px] font-bold tracking-[2px] transition-all group shadow-lg"

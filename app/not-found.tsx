@@ -7,7 +7,7 @@ export default function NotFound() {
 
       {/* Breadcrumbs */}
       <div className="absolute top-8 left-4 md:left-20 lg:left-32 flex items-center gap-2 text-[12px] text-gray-400">
-        <Link href="/" className="hover:text-gray-600">Islomx7</Link>
+        <Link href="/" className="hover:text-gray-600">Stroyoptorg</Link>
         <span>/</span>
         <span className="text-gray-300">Sahifa topilmadi</span>
       </div>
