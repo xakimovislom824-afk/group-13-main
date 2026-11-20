@@ -1,12 +1,26 @@
 import type { MetadataRoute } from "next";
+import { siteConfig } from "../lib/site-config";
+
+const publicRoutes = [
+  "/",
+  "/katalog",
+  "/aksiyalar",
+  "/blog",
+  "/aloqa",
+  "/yetkazibBerish",
+  "/tulov",
+  "/savolJavob",
+  "/biz-haqimizda",
+  "/qaytarish-va-kafolat",
+  "/xafsizlik",
+];
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  return [
-    {
-      url: "https://group-13-main-zeta.vercel.app/",
-      lastModified: new Date(),
-      changeFrequency: "weekly",
-      priority: 1,
-    },
-  ];
+  const lastModified = new Date();
+  return publicRoutes.map((route) => ({
+    url: new URL(route, siteConfig.url).toString(),
+    lastModified,
+    changeFrequency: route === "/" ? "weekly" : "monthly",
+    priority: route === "/" ? 1 : 0.7,
+  }));
 }

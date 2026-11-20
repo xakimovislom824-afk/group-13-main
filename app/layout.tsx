@@ -1,4 +1,5 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
+import Script from "next/script";
 import { Inter, Manrope } from "next/font/google";
 import { siteConfig } from "../lib/site-config";
 import "./globals.css";
@@ -66,6 +67,26 @@ export const metadata: Metadata = {
     description:
       "Mahsulotlarni ko'rish va qidirish uchun Islomx7 onlayn katalogi.",
   },
+
+  icons: {
+    icon: [
+      { url: "/brand-mark.svg", type: "image/svg+xml" },
+      { url: "/favicon-32x32.png", sizes: "32x32", type: "image/png" },
+      { url: "/favicon-16x16.png", sizes: "16x16", type: "image/png" },
+      { url: "/favicon.ico", sizes: "any" },
+    ],
+    apple: "/apple-touch-icon.png",
+  },
+};
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  colorScheme: "light dark",
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#f7f9fc" },
+    { media: "(prefers-color-scheme: dark)", color: "#101820" },
+  ],
 };
 
 export default function RootLayout({
@@ -76,9 +97,17 @@ export default function RootLayout({
   return (
     <html
       lang="uz"
+      suppressHydrationWarning
       className={`${inter.variable} ${manrope.variable} min-h-full antialiased`}
     >
       <body className="min-h-screen flex flex-col items-center">
+        <Script
+          id="restore-theme"
+          strategy="beforeInteractive"
+          dangerouslySetInnerHTML={{
+            __html: `(()=>{let mode=null;try{const value=localStorage.getItem("theme");if(value){let parsed;try{parsed=JSON.parse(value)}catch{}mode=parsed?.mode??parsed??value}}catch{}const dark=mode==="dark"||(mode!=="light"&&window.matchMedia("(prefers-color-scheme: dark)").matches);document.documentElement.classList.toggle("dark",dark);document.documentElement.style.colorScheme=dark?"dark":"light"})();`,
+          }}
+        />
         <ModalProvider>
           <Providers>
             <ToastContainer position="top-right" autoClose={2000} />

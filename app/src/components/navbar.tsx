@@ -4,7 +4,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { FiGift } from "react-icons/fi";
 import { FiMoon, FiSun } from "react-icons/fi";
-import { useState, useEffect, useCallback, useMemo, useRef, Suspense } from "react";
+import { useState, useEffect, useCallback, useMemo, useRef, useSyncExternalStore, Suspense } from "react";
 import {
   FaUser,
   FaHeart,
@@ -12,6 +12,7 @@ import {
   FaSearch,
 } from "react-icons/fa";
 import { IoClose, IoMenu } from "react-icons/io5";
+import BrandLogo from "./BrandLogo";
 import { useModal } from "../../context/ModalContext";
 import { useGetWishlistQuery } from "../../../services/wishlistApi";
 import { useGetCartsQuery } from "../../../services/cartApi";
@@ -34,6 +35,10 @@ const STORAGE_KEYS = {
   user: ["user", "userInfo", "userData", "currentUser", "profile"],
   token: ["access", "access_token", "accessToken", "token"],
 };
+
+const subscribeToHydration = () => () => {};
+const getClientSnapshot = () => true;
+const getServerSnapshot = () => false;
 
 // ─────────────────────────────────────────────
 // HELPERS
@@ -104,16 +109,16 @@ const UserAvatar = ({ avatar, username, size = "md" }: UserAvatarProps) => {
 // ─────────────────────────────────────────────
 interface NavIconProps { href: string; icon: React.ReactNode; label: string; badge?: number | string; className?: string }
 const NavIcon = ({ href, icon, label, badge, className = "" }: NavIconProps) => (
-  <Link href={href} className={`flex flex-col items-center hover:text-blue-600 transition-colors ${className}`}>
+  <Link href={href} aria-label={label} className={`flex flex-col items-center hover:text-[var(--secondary)] transition-colors ${className}`}>
     <div className="relative">
       {icon}
       {badge !== undefined && badge !== "" && (
-        <span className="absolute -top-1 -right-2 bg-red-600 text-white text-[9px] px-1.5 rounded-full border-2 border-white min-w-[18px] text-center">
+        <span className="absolute -right-2 -top-1 min-w-[18px] rounded-full border-2 border-[var(--surface)] bg-red-600 px-1.5 text-center text-[9px] text-white">
           {badge}
         </span>
       )}
     </div>
-    <span className="text-[10px] mt-1 font-medium hidden md:block">{label}</span>
+    <span className="mt-1 hidden text-[10px] font-medium lg:block">{label}</span>
   </Link>
 );
 
@@ -333,7 +338,7 @@ export default function Navbar() {
   const pathname = usePathname();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isDarkMode, setIsDarkMode] = useState(false);
-  const [hasMounted, setHasMounted] = useState(false);
+  const hasMounted = useSyncExternalStore(subscribeToHydration, getClientSnapshot, getServerSnapshot);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [userData, setUserData] = useState<UserData>({ username: null, avatar: null });
 
@@ -344,16 +349,41 @@ export default function Navbar() {
   const cartCount = cart.reduce((total, item) => total + Number(item.quantity ?? 0), 0);
 
   useEffect(() => {
-    setHasMounted(true);
-  }, []);
-
-  useEffect(() => {
     if (isSidebarOpen) {
       document.body.style.overflow = "hidden";
     } else {
       document.body.style.overflow = "unset";
     }
     return () => { document.body.style.overflow = "unset"; };
+  }, [isSidebarOpen]);
+
+  useEffect(() => {
+    if (!isSidebarOpen) return;
+    const drawer = document.getElementById("mobile-navigation");
+    const previousFocus = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+    const focusable = Array.from(drawer?.querySelectorAll<HTMLElement>('a[href], button:not([disabled])') ?? []);
+    focusable[0]?.focus();
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        setIsSidebarOpen(false);
+        return;
+      }
+      if (event.key !== "Tab" || focusable.length === 0) return;
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+      if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault();
+        first.focus();
+      }
+    };
+    document.addEventListener("keydown", handleKeyDown);
+    return () => {
+      document.removeEventListener("keydown", handleKeyDown);
+      previousFocus?.focus();
+    };
   }, [isSidebarOpen]);
 
   const refreshAuth = useCallback(() => {
@@ -396,14 +426,20 @@ export default function Navbar() {
     };
     const syncTheme = () => {
       const saved = getSavedMode();
-      applyTheme(saved ? saved === "dark" : media.matches);
+      applyTheme(saved === null ? media.matches : saved === "dark");
+    };
+    const syncSystemTheme = (event: MediaQueryListEvent) => {
+      if (getSavedMode() === null) applyTheme(event.matches);
+    };
+    const syncStoredTheme = (event: StorageEvent) => {
+      if (event.key === null || event.key === "theme") syncTheme();
     };
     syncTheme();
-    media.addEventListener("change", syncTheme);
-    window.addEventListener("storage", syncTheme);
+    media.addEventListener("change", syncSystemTheme);
+    window.addEventListener("storage", syncStoredTheme);
     return () => {
-      media.removeEventListener("change", syncTheme);
-      window.removeEventListener("storage", syncTheme);
+      media.removeEventListener("change", syncSystemTheme);
+      window.removeEventListener("storage", syncStoredTheme);
     };
   }, []);
 
@@ -420,8 +456,8 @@ export default function Navbar() {
 
   const sidebarLinks = useMemo(() => [
     { href: "/aksiyalar", label: "Barcha aksiyalar", icon: <FiGift size={20} /> },
-    { href: "/tolov", label: "To'lov" },
-    { href: "/yetkazib-berish", label: "Yetkazib berish" },
+    { href: "/tulov", label: "To'lov" },
+    { href: "/yetkazibBerish", label: "Yetkazib berish" },
     { href: "/fikrlar", label: "Fikrlar" },
     { href: "/blog", label: "Yangiliklar" },
     { href: "/aloqa", label: "Aloqa" },
@@ -432,50 +468,78 @@ export default function Navbar() {
 
       {/* ── MAIN NAVBAR ── */}
       <div className="flex items-center justify-between gap-3 px-4 py-3 md:gap-4 md:px-6">
-        <Link href="/" aria-label="Islomx7 bosh sahifasi" className="inline-flex shrink-0 items-center rounded-xl bg-black px-3 py-1.5">
-          <Image src="/logo.png" alt="Islomx7 logo" width={160} height={40} priority className="h-8 w-auto object-contain md:h-10" />
-        </Link>
+        <BrandLogo />
 
-        {/* Desktop SearchBox */}
-        <div className="hidden md:flex flex-1 max-w-2xl mx-4">
+        <div className="hidden lg:flex min-w-0 max-w-2xl flex-1 px-3">
           <SearchBox />
         </div>
 
-        <div className="flex items-center gap-3 md:gap-6 text-gray-500">
-          <button type="button" onClick={openSidebar} className="flex items-center gap-1.5 lg:hidden" aria-label="Menyuni ochish" aria-expanded={isSidebarOpen}>
-            <IoMenu size={20} className="sm:hidden" />
-            <IoMenu size={24} className="hidden sm:block" />
-            <span className="whitespace-nowrap text-xs font-bold sm:text-sm">Menyu</span>
+        <div className="flex shrink-0 items-center gap-2 text-[var(--text-muted)] sm:gap-3 lg:gap-5">
+          <button type="button" onClick={openSidebar} className="inline-flex size-10 items-center justify-center rounded-lg hover:bg-[var(--surface-muted)] lg:hidden" aria-label={isSidebarOpen ? "Menyuni yopish" : "Menyuni ochish"} aria-expanded={isSidebarOpen} aria-controls="mobile-navigation">
+            <IoMenu size={23} />
           </button>
-          <NavIcon href="/aksiyalar" icon={<FiGift size={20} />} label="Barcha aksiyalar" className="hidden lg:flex ml-6" />
-          <NavIcon href="/wishlist" icon={<FaHeart size={20} />} label="Saralangan" badge={wishlist.length || ""} />
-          <NavIcon href="/savatcha" icon={<FaShoppingCart size={20} />} label="Savat" badge={cartCount || ""} />
+          <NavIcon href="/wishlist" icon={<FaHeart size={19} />} label="Saralangan" badge={wishlist.length || ""} />
+          <NavIcon href="/savatcha" icon={<FaShoppingCart size={19} />} label="Savat" badge={cartCount || ""} />
+          <button
+            type="button"
+            onClick={toggleDarkMode}
+            aria-label={isDarkMode ? "Yorug' rejimni yoqish" : "Tungi rejimni yoqish"}
+            aria-pressed={isDarkMode}
+            className="inline-flex size-10 items-center justify-center rounded-lg hover:bg-[var(--surface-muted)] hover:text-[var(--text)]"
+          >
+            {isDarkMode ? <FiSun size={19} /> : <FiMoon size={19} />}
+          </button>
           {isLoggedIn ? (
-            <Link href="/kabnet" className="flex flex-col items-center hover:text-blue-600 transition-colors group">
+            <Link href="/kabnet" aria-label="Shaxsiy hisob" className="hidden lg:flex flex-col items-center hover:text-[var(--secondary)] transition-colors group">
               <UserAvatar avatar={userData.avatar} username={userData.username} size="md" />
-              <span className="text-[10px] mt-1 font-medium hidden md:block text-center truncate max-w-[80px] group-hover:text-blue-600">
+              <span className="mt-1 hidden max-w-[90px] truncate text-[10px] font-medium text-center group-hover:text-[var(--secondary)] lg:block">
                 {userData.username || "Shaxsiy hisob"}
               </span>
             </Link>
           ) : (
-            <Link href="/kirish" className="flex flex-col items-center hover:text-blue-600 transition-colors">
-              <FaUser size={20} />
-              <span className="text-[10px] mt-1 font-medium hidden md:block">Kirish</span>
+            <Link href="/kirish" aria-label="Kirish" className="hidden lg:flex flex-col items-center hover:text-[var(--secondary)] transition-colors">
+              <FaUser size={19} />
+              <span className="mt-1 hidden text-[10px] font-medium lg:block">Kirish</span>
             </Link>
           )}
         </div>
       </div>
 
+      <nav aria-label="Asosiy navigatsiya" className="hidden border-t border-[var(--border)] px-4 lg:block">
+        <div className="mx-auto flex max-w-7xl items-center justify-center gap-1">
+          {sidebarLinks.map((link) => {
+            const isActive = pathname === link.href || pathname?.startsWith(`${link.href}/`);
+            return (
+              <Link
+                key={link.href}
+                href={link.href}
+                aria-current={isActive ? "page" : undefined}
+                className={`relative inline-flex min-h-12 items-center whitespace-nowrap rounded-md px-3 text-[12px] font-semibold transition-all hover:bg-[var(--surface-muted)] hover:text-[var(--secondary)] hover:shadow-sm xl:px-4 ${isActive ? "text-[var(--secondary)] after:absolute after:inset-x-3 after:bottom-0 after:h-0.5 after:rounded-full after:bg-[var(--accent)] xl:after:inset-x-4" : "text-[var(--text-muted)]"}`}
+              >
+                {link.label}
+              </Link>
+            );
+          })}
+          <Link
+            href="/katalog"
+            aria-current={pathname === "/katalog" || pathname?.startsWith("/katalog/") ? "page" : undefined}
+            className={`relative inline-flex min-h-12 items-center whitespace-nowrap rounded-md px-3 text-[12px] font-semibold transition-all hover:bg-[var(--surface-muted)] hover:text-[var(--secondary)] hover:shadow-sm xl:px-4 ${pathname === "/katalog" || pathname?.startsWith("/katalog/") ? "text-[var(--secondary)] after:absolute after:inset-x-3 after:bottom-0 after:h-0.5 after:rounded-full after:bg-[var(--accent)] xl:after:inset-x-4" : "text-[var(--text-muted)]"}`}
+          >
+            Kategoriyalar
+          </Link>
+        </div>
+      </nav>
+
       {/* ── MOBILE SEARCH ── */}
-      <div className="flex md:hidden items-center px-3 sm:px-4 pb-4">
+      <div className="flex lg:hidden items-center px-3 pb-4 sm:px-4">
         <div className="flex-1 min-w-0">
           <SearchBox isMobile />
         </div>
       </div>
 
       {/* ── SIDEBAR ── */}
-      <div className={`fixed inset-0 bg-black/60 z-[2000] transition-opacity duration-300 ${isSidebarOpen ? "opacity-100 visible" : "opacity-0 invisible pointer-events-none"}`}>
-        <div className={`fixed top-0 left-0 h-full w-[85%] max-w-[360px] bg-white shadow-2xl transition-transform duration-300 transform ${isSidebarOpen ? "translate-x-0" : "-translate-x-full"} flex flex-col`}>
+      <div className={`fixed inset-0 z-[2000] bg-black/60 transition-opacity duration-300 ${isSidebarOpen ? "opacity-100 visible" : "opacity-0 invisible pointer-events-none"}`}>
+        <div id="mobile-navigation" role="dialog" aria-modal="true" aria-label="Sayt menyusi" className={`fixed left-0 top-0 flex h-full w-[min(85vw,360px)] flex-col bg-[var(--surface)] text-[var(--text)] shadow-2xl transition-transform duration-300 ${isSidebarOpen ? "translate-x-0" : "-translate-x-full"}`}>
           <div className="flex justify-end items-center p-4 border-b bg-white shrink-0">
             <button onClick={closeSidebar} className="p-1 bg-gray-100 rounded-md text-blue-600" aria-label="Menyuni yopish">
               <IoClose size={24} />
@@ -484,7 +548,7 @@ export default function Navbar() {
           <div className="flex-1 overflow-y-auto">
             <nav className="flex flex-col">
               {sidebarLinks.map(l => (
-                <Link key={l.href} href={l.href} onClick={closeSidebar}
+                <Link key={l.href} href={l.href} onClick={closeSidebar} aria-current={pathname === l.href ? "page" : undefined}
                   className={`p-4 border-b flex items-center ${l.icon ? "gap-3 text-gray-800 font-medium" : "text-gray-700 uppercase text-[13px] font-bold"} ${pathname === l.href ? "text-red-600 bg-red-50" : "hover:bg-gray-50"}`}>
                   {l.icon && <span className="text-gray-400">{l.icon}</span>}
                   {l.label}
@@ -493,7 +557,7 @@ export default function Navbar() {
               {hasMounted && apiCategories.length > 0 && (
                 <div className="border-b border-border p-4">
                   <p className="mb-2 text-xs font-bold uppercase text-muted-foreground">Kategoriyalar</p>
-                  {apiCategories.map((category) => <Link key={category.slug} href={`/katalog/${category.slug}`} onClick={closeSidebar} className="block rounded-md px-2 py-2 text-sm text-foreground hover:bg-muted">{getCategoryDisplayName(category)}</Link>)}
+                  {apiCategories.map((category) => <Link key={category.slug} href={`/katalog/${category.slug}`} onClick={closeSidebar} aria-current={pathname === `/katalog/${category.slug}` ? "page" : undefined} className="block rounded-md px-2 py-2 text-sm text-foreground hover:bg-muted">{getCategoryDisplayName(category)}</Link>)}
                 </div>
               )}
               {isLoggedIn ? (

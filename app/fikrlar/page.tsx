@@ -143,7 +143,7 @@ export default function FikrlarSahifasi() {
         </div>
       </div>
 
-      <main className="max-w-[1240px] mx-auto px-4 py-6 flex flex-col lg:flex-row gap-8">
+        <div className="max-w-[1240px] mx-auto px-4 py-6 flex flex-col lg:flex-row gap-8">
         <div className="flex-1">
           <h1 className="text-3xl font-bold text-[#1A202C] mb-6">
             Fikrlar
@@ -474,7 +474,7 @@ export default function FikrlarSahifasi() {
             )}
           </div>
         </aside>
-      </main>
+        </div>
     </div>
   );
 }

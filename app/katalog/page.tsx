@@ -30,12 +30,12 @@ function CatalogContent() {
         <div className="hidden sticky top-5 lg:block w-[300px] shrink-0">
           <Katalog2 />
         </div>
-        <main className="flex-1 min-w-0">
+        <div className="flex-1 min-w-0">
           <div className="lg:hidden mb-4">
             <Katalog2 />
           </div>
           <Products searchQuery={searchQuery} />
-        </main>
+        </div>
       </div>
     </div>
   );

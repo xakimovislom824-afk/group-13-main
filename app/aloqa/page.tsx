@@ -62,7 +62,7 @@ export default function Aloqa() {
         </div>
       </div>
 
-      <main className="max-w-[1240px] mx-auto px-4 py-6 md:py-10">
+      <div className="max-w-[1240px] mx-auto px-4 py-6 md:py-10">
 
         <h1 className="text-2xl md:text-4xl font-bold text-[#1A202C] mb-6 md:mb-8">Kontaktlar</h1>
 
@@ -215,7 +215,7 @@ export default function Aloqa() {
           </form>
         </div>
 
-      </main>
+      </div>
     </div>
   );
 }
