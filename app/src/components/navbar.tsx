@@ -333,6 +333,7 @@ export default function Navbar() {
   const pathname = usePathname();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isDarkMode, setIsDarkMode] = useState(false);
+  const [hasMounted, setHasMounted] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [userData, setUserData] = useState<UserData>({ username: null, avatar: null });
 
@@ -341,6 +342,10 @@ export default function Navbar() {
   const { data: cart = [] } = useGetCartsQuery();
   const { data: apiCategories = [] } = useGetCategoriesQuery();
   const cartCount = cart.reduce((total, item) => total + Number(item.quantity ?? 0), 0);
+
+  useEffect(() => {
+    setHasMounted(true);
+  }, []);
 
   useEffect(() => {
     if (isSidebarOpen) {
@@ -485,7 +490,7 @@ export default function Navbar() {
                   {l.label}
                 </Link>
               ))}
-              {apiCategories.length > 0 && (
+              {hasMounted && apiCategories.length > 0 && (
                 <div className="border-b border-border p-4">
                   <p className="mb-2 text-xs font-bold uppercase text-muted-foreground">Kategoriyalar</p>
                   {apiCategories.map((category) => <Link key={category.slug} href={`/katalog/${category.slug}`} onClick={closeSidebar} className="block rounded-md px-2 py-2 text-sm text-foreground hover:bg-muted">{getCategoryDisplayName(category)}</Link>)}
