@@ -12,7 +12,7 @@ export default function Xavfsizlik() {
       {/* Header / Breadcrumbs */}
       <header className="max-w-360 mx-auto px-4 py-8 md:px-20 lg:px-32">
         <nav className="flex items-center gap-2 text-[10px] md:text-xs text-gray-400 mb-4 uppercase tracking-wider">
-          <Link href="/" className="hover:text-gray-600 transition-colors">Stroyoptorg</Link>
+          <Link href="/" className="hover:text-gray-600 transition-colors">Islomx7</Link>
           <span>/</span>
           <span className="text-gray-300 italic">Maxfiylik siyosati</span>
         </nav>
@@ -27,7 +27,7 @@ export default function Xavfsizlik() {
             {/* Kirish */}
             <section>
               <p className="text-[15px] leading-relaxed italic">
-                Ushbu Maxfiylik siyosati &quot;Stroyoptorg&quot; platformasidan foydalanish jarayonida foydalanuvchilarning shaxsiy
+                Ushbu Maxfiylik siyosati &quot;Islomx7&quot; platformasidan foydalanish jarayonida foydalanuvchilarning shaxsiy
                 ma&apos;lumotlarini qanday yig&apos;ishimiz, saqlaymiz va himoya qilishimizni belgilaydi. Biz foydalanuvchilar
                 ishonchini qadrlaymiz va ma&apos;lumotlarni faqat qonuniy asosda, aniq maqsadlar uchun qayta ishlaymiz.
               </p>
@@ -39,10 +39,10 @@ export default function Xavfsizlik() {
                 1. Atamalar va tushunchalar
               </h2>
               <div className="space-y-3 pl-4 border-l-2 border-blue-500">
-                <p><strong>1.1. Sayt</strong> – internet-resurs, manzili: <span className="text-blue-600">https://stroyoptorg.uz</span>.</p>
+                <p><strong>1.1. Sayt</strong> – Islomx7 onlayn katalogi: <span className="text-blue-600">https://group-13-main-zeta.vercel.app</span>.</p>
                 <p><strong>1.2. Shaxsiy ma&apos;lumotlar</strong> – Foydalanuvchi mustaqil ravishda taqdim etadigan yoki sayt tomonidan avtomatik yig&apos;iladigan ma&apos;lumotlar.</p>
                 <p><strong>1.3. Foydalanuvchi</strong> – Saytdan foydalanayotgan har qanday jismoniy yoki yuridik shaxs.</p>
-                <p><strong>1.4. Operator</strong> – Shaxsiy ma&apos;lumotlarni qayta ishlovchi &quot;Stroyoptorg&quot; kompaniyasi.</p>
+                <p><strong>1.4. Operator</strong> – Shaxsiy ma&apos;lumotlarni qayta ishlovchi &quot;Islomx7&quot; kompaniyasi.</p>
                 <p><strong>1.5. Qayta ishlash</strong> – ma&apos;lumotlarni yig&apos;ish, ro&apos;yxatga olish, saqlash, o&apos;zgartirish, uzatish va yo&apos;q qilish amallari majmui.</p>
                 <p><strong>1.6. Maxfiylik</strong> – Operatorning uchinchi shaxslarga ruxsatsiz ma&apos;lumot uzatmaslik majburiyati.</p>
               </div>
@@ -136,7 +136,7 @@ export default function Xavfsizlik() {
                 <li>Marketing xabarnomalaridan voz kechish;</li>
                 <li>Shikoyat bilan vakolatli organga murojaat qilish.</li>
               </ul>
-              <p>Talablar <span className="font-semibold text-gray-800">support@stroyoptorg.uz</span> manziliga yuborilishi kerak. 10 ish kuni ichida javob beriladi.</p>
+              <p>Murojaatni <Link href="/aloqa" className="font-semibold text-blue-600 underline">aloqa sahifasi</Link> orqali yuborishingiz mumkin. Ko&apos;rib chiqish muddati hozircha e&apos;lon qilinmagan.</p>
             </section>
 
             {/* 8-Bo'lim */}
@@ -172,7 +172,7 @@ export default function Xavfsizlik() {
                 10.3. Kelishuv bo&apos;lmagan taqdirda nizo O&apos;zbekiston Respublikasi qonunchiligiga muvofiq sudda hal qilinadi.
               </p>
               <p className="text-sm leading-relaxed">
-                10.4. Murojaat uchun: <span className="font-bold">support@stroyoptorg.uz</span>
+                10.4. Murojaat uchun <Link href="/aloqa" className="font-bold text-blue-600 underline">aloqa sahifasidan</Link> foydalaning.
               </p>
             </section>
 
@@ -182,7 +182,7 @@ export default function Xavfsizlik() {
                 11. Yakuniy qoidalar
               </h2>
               <p>11.1. Ushbu siyosat saytda e&apos;lon qilingan kundan boshlab kuchga kiradi.</p>
-              <p>11.2. Siyosatning joriy versiyasi doimo <span className="text-blue-600">stroyoptorg.uz/privacy</span> sahifasida mavjud bo&apos;ladi.</p>
+              <p>11.2. Siyosatning joriy versiyasi <Link href="/xafsizlik" className="text-blue-600 underline">ushbu sahifada</Link> e&apos;lon qilinadi.</p>
               <p>11.3. Operator ushbu siyosatni o&apos;zgartirish huquqini saqlab qoladi, o&apos;zgartirishlar e&apos;lon qilingan kundan kuchga kiradi.</p>
             </section>
 
@@ -192,7 +192,7 @@ export default function Xavfsizlik() {
           <div className="mt-20 pt-10 border-t border-gray-100 flex flex-col md:flex-row justify-between items-center gap-6">
             <div>
               <p className="text-sm font-bold text-gray-800">Savollaringiz bormi?</p>
-              <p className="text-xs text-gray-400 mt-1">Biz bilan bog&apos;laning: support@stroyoptorg.uz</p>
+              <p className="text-xs text-gray-400 mt-1">Rasmiy email manzili hozircha e&apos;lon qilinmagan.</p>
             </div>
             <button
               onClick={openModal}

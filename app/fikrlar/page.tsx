@@ -136,7 +136,7 @@ export default function FikrlarSahifasi() {
       <div className="w-full border-t-[3px] border-[#1A73E8]">
         <div className="max-w-[1240px] mx-auto px-4 py-3 flex items-center gap-2 text-[11px] text-gray-400">
           <Link href="/" className="hover:text-blue-500 border-b border-dotted border-gray-400 leading-none">
-            Stroyoptorg
+            Islomx7
           </Link>
           <span className="text-gray-300">::</span>
           <span className="text-gray-400 leading-none">Fikrlar</span>

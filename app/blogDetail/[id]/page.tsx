@@ -46,7 +46,7 @@ export default function BlogDetail({ params, searchParams }: BlogDetailProps) {
         
         {/* Breadcrumbs */}
         <nav className="mb-5 text-[13px] text-[#A0A4AB]">
-          <Link href="/" className="hover:text-gray-600">Stroyoptorg</Link> 
+          <Link href="/" className="hover:text-gray-600">Islomx7</Link>
           <span className="mx-2">/</span> 
           <Link href="/blog" className="hover:text-gray-600">Yangiliklar</Link> 
           <span className="mx-2">/</span> 

@@ -20,10 +20,10 @@ export default function Footer() {
           <div>
             <BrandLogo inverse />
             <p className="mt-4 max-w-xs text-sm leading-6 text-slate-300">Mahsulotlarni qidirish, ko&apos;rish va brauzerdagi savatga saqlash uchun Islomx7 onlayn katalogi.</p>
-            <div className="mt-5 flex gap-3 text-sm">
-              <a className="rounded-lg border border-white/20 px-3 py-2 hover:bg-white/10" href={siteConfig.telegram} target="_blank" rel="noreferrer">Telegram</a>
-              <a className="rounded-lg border border-white/20 px-3 py-2 hover:bg-white/10" href={siteConfig.instagram} target="_blank" rel="noreferrer">Instagram</a>
-            </div>
+            {(siteConfig.telegram || siteConfig.instagram) && <div className="mt-5 flex gap-3 text-sm">
+              {siteConfig.telegram && <a className="rounded-lg border border-white/20 px-3 py-2 hover:bg-white/10" href={siteConfig.telegram} target="_blank" rel="noreferrer">Telegram</a>}
+              {siteConfig.instagram && <a className="rounded-lg border border-white/20 px-3 py-2 hover:bg-white/10" href={siteConfig.instagram} target="_blank" rel="noreferrer">Instagram</a>}
+            </div>}
           </div>
           <div>
             <h2 className="font-bold text-white">Ma&apos;lumot</h2>
@@ -36,10 +36,11 @@ export default function Footer() {
           <div>
             <h2 className="font-bold text-white">Aloqa</h2>
             <address className="mt-4 flex flex-col gap-3 text-sm not-italic">
-              <a href={`tel:${siteConfig.phone.replaceAll(" ", "")}`} className="hover:text-white">{siteConfig.phone}</a>
-              <a href={`mailto:${siteConfig.email}`} className="hover:text-white">{siteConfig.email}</a>
-              <span>{siteConfig.address}</span><span>{siteConfig.hours}</span>
-              <a className="text-[var(--accent)] underline underline-offset-4" href="https://maps.google.com/?q=Chilonzor+Toshkent" target="_blank" rel="noreferrer">Xaritada ko&apos;rish</a>
+              {siteConfig.phone && <a href={`tel:${siteConfig.phone.replaceAll(" ", "")}`} className="hover:text-white">{siteConfig.phone}</a>}
+              {siteConfig.email && <a href={`mailto:${siteConfig.email}`} className="hover:text-white">{siteConfig.email}</a>}
+              {siteConfig.address && <><span>{siteConfig.address}</span><a className="text-[var(--accent)] underline underline-offset-4" href={`https://maps.google.com/?q=${encodeURIComponent(siteConfig.address)}`} target="_blank" rel="noreferrer">Xaritada ko&apos;rish</a></>}
+              {siteConfig.hours && <span>{siteConfig.hours}</span>}
+              {!siteConfig.phone && !siteConfig.email && <p className="text-slate-300">Rasmiy telefon va elektron pochta ma&apos;lumotlari hozircha kiritilmagan.</p>}
               <button onClick={openModal} className="w-fit rounded-lg bg-[var(--accent)] px-4 py-2 font-semibold text-[var(--primary)] hover:bg-[var(--accent-hover)]">Qo&apos;ng&apos;iroq so&apos;rash</button>
             </address>
           </div>

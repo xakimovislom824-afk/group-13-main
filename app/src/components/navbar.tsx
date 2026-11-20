@@ -109,16 +109,14 @@ const UserAvatar = ({ avatar, username, size = "md" }: UserAvatarProps) => {
 // ─────────────────────────────────────────────
 interface NavIconProps { href: string; icon: React.ReactNode; label: string; badge?: number | string; className?: string }
 const NavIcon = ({ href, icon, label, badge, className = "" }: NavIconProps) => (
-  <Link href={href} aria-label={label} className={`flex flex-col items-center hover:text-[var(--secondary)] transition-colors ${className}`}>
-    <div className="relative">
-      {icon}
-      {badge !== undefined && badge !== "" && (
-        <span className="absolute -right-2 -top-1 min-w-[18px] rounded-full border-2 border-[var(--surface)] bg-red-600 px-1.5 text-center text-[9px] text-white">
-          {badge}
-        </span>
-      )}
-    </div>
-    <span className="mt-1 hidden text-[10px] font-medium lg:block">{label}</span>
+  <Link href={href} aria-label={label} className={`relative inline-flex size-10 shrink-0 items-center justify-center rounded-lg text-[var(--text-muted)] transition-colors hover:bg-[var(--surface-muted)] hover:text-[var(--secondary)] ${className}`}>
+    {icon}
+    {badge !== undefined && badge !== "" && (
+      <span className="absolute right-0.5 top-0.5 min-w-4 rounded-full border-2 border-[var(--surface)] bg-red-600 px-1 text-center text-[9px] leading-[14px] text-white">
+        {badge}
+      </span>
+    )}
+    <span className="sr-only">{label}</span>
   </Link>
 );
 
@@ -224,32 +222,34 @@ function SearchBoxContent({ isMobile = false }: SearchBoxProps) {
 
   return (
     <div ref={wrapperRef} className="relative w-full">
-      <div className={`flex items-center border-2 border-blue-600 rounded-sm overflow-hidden ${isMobile ? "h-11" : "h-10"}`}>
+      <div className="flex h-10 items-center overflow-hidden rounded-lg border border-[var(--border)] bg-[var(--surface)] transition-[border-color,box-shadow] focus-within:border-[var(--secondary)] focus-within:shadow-[0_0_0_3px_color-mix(in_srgb,var(--secondary)_14%,transparent)]">
+        <FaSearch aria-hidden="true" className="ml-3 shrink-0 text-[var(--text-muted)]" size={14} />
         <input
           ref={inputRef}
-          type="text"
+          type="search"
           value={inputValue}
           onChange={e => handleChange(e.target.value)}
           onFocus={handleFocus}
           onKeyDown={e => e.key === "Enter" && !e.nativeEvent.isComposing && e.keyCode !== 229 && handleSubmit()}
           placeholder="Mahsulot qidirish..."
-          className="w-full min-w-0 px-3 outline-none text-sm h-full"
+          aria-label="Mahsulot qidirish"
+          className="h-full w-full min-w-0 bg-transparent px-2.5 text-sm text-[var(--text)] outline-none placeholder:text-[var(--text-muted)]"
         />
-
         {showClear && (
           <button
+            type="button"
             onMouseDown={e => { e.preventDefault(); handleClear(); }}
-            className="px-2 text-gray-400 hover:text-gray-600 transition-colors shrink-0"
+            className="mr-1 inline-flex size-8 shrink-0 items-center justify-center rounded-md text-[var(--text-muted)] hover:bg-[var(--surface-muted)] hover:text-[var(--text)]"
             tabIndex={-1}
             aria-label="Tozalash"
           >
-            <IoClose size={18} />
+            <IoClose size={17} />
           </button>
         )}
-
         <button
+          type="button"
           onClick={handleSubmit}
-          className="bg-blue-600 hover:bg-blue-700 text-white px-4 h-full shrink-0 flex items-center justify-center transition-colors"
+          className="mr-1 inline-flex size-8 shrink-0 items-center justify-center rounded-md text-[var(--text-muted)] hover:bg-[var(--surface-muted)] hover:text-[var(--secondary)]"
           aria-label="Qidirish"
         >
           <FaSearch size={14} />
@@ -258,8 +258,7 @@ function SearchBoxContent({ isMobile = false }: SearchBoxProps) {
 
       {isOpen && searchQuery.trim().length >= 2 && (
         <div
-          className={`absolute top-full left-0 w-full bg-white border border-gray-200 shadow-2xl rounded-b-md z-[1100] overflow-hidden flex flex-col ${isMobile ? "max-h-[60vh]" : "max-h-[420px]"
-            }`}
+          className={`absolute left-0 top-[calc(100%+8px)] z-[1100] flex w-full flex-col overflow-hidden rounded-xl border border-[var(--border)] bg-[var(--surface)] text-[var(--text)] shadow-xl ${isMobile ? "max-h-[60vh]" : "max-h-[420px]"}`}
         >
           {searchError ? (
             <div role="alert" className="px-5 py-6 text-center text-sm text-muted-foreground">
@@ -275,9 +274,9 @@ function SearchBoxContent({ isMobile = false }: SearchBoxProps) {
             </div>
           ) : (
             <>
-              <div className="px-4 py-2 border-b border-gray-100 bg-gray-50 flex items-center justify-between shrink-0">
-                <span className="text-[11px] font-bold uppercase text-gray-400 tracking-wider">Mahsulotlar</span>
-                <span className="text-[11px] text-blue-600 font-semibold">{results.length} ta topildi</span>
+              <div className="flex shrink-0 items-center justify-between border-b border-[var(--border)] bg-[var(--surface-muted)] px-4 py-2">
+                <span className="text-[11px] font-bold uppercase tracking-wider text-[var(--text-muted)]">Mahsulotlar</span>
+                <span className="text-[11px] font-semibold text-[var(--secondary)]">{results.length} ta topildi</span>
               </div>
 
               <div className="overflow-y-auto flex-1">
@@ -337,6 +336,7 @@ function SearchBox({ isMobile = false }: SearchBoxProps) {
 export default function Navbar() {
   const pathname = usePathname();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isDarkMode, setIsDarkMode] = useState(false);
   const hasMounted = useSyncExternalStore(subscribeToHydration, getClientSnapshot, getServerSnapshot);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -349,12 +349,10 @@ export default function Navbar() {
   const cartCount = cart.reduce((total, item) => total + Number(item.quantity ?? 0), 0);
 
   useEffect(() => {
-    if (isSidebarOpen) {
-      document.body.style.overflow = "hidden";
-    } else {
-      document.body.style.overflow = "unset";
-    }
-    return () => { document.body.style.overflow = "unset"; };
+    const previousOverflow = document.body.style.overflow;
+    if (isSidebarOpen) document.body.style.overflow = "hidden";
+    else document.body.style.overflow = "";
+    return () => { document.body.style.overflow = previousOverflow; };
   }, [isSidebarOpen]);
 
   useEffect(() => {
@@ -464,135 +462,87 @@ export default function Navbar() {
   ], []);
 
   return (
-    <div className="sticky top-0 z-[1000] w-full border-b border-[var(--border)] bg-[var(--surface)]">
+    <header className="sticky top-0 z-[1000] w-full border-b border-[var(--border)] bg-[var(--surface)] shadow-[0_2px_12px_rgb(15_23_42_/_0.04)]">
+      <div className="mx-auto max-w-[1508px] px-3 sm:px-5 xl:px-6">
+        <div className="flex min-h-[68px] items-center gap-2 sm:gap-3 xl:gap-5">
+          <BrandLogo compact />
 
-      {/* ── MAIN NAVBAR ── */}
-      <div className="flex items-center justify-between gap-3 px-4 py-3 md:gap-4 md:px-6">
-        <BrandLogo />
-
-        <div className="hidden lg:flex min-w-0 max-w-2xl flex-1 px-3">
-          <SearchBox />
-        </div>
-
-        <div className="flex shrink-0 items-center gap-2 text-[var(--text-muted)] sm:gap-3 lg:gap-5">
-          <button type="button" onClick={openSidebar} className="inline-flex size-10 items-center justify-center rounded-lg hover:bg-[var(--surface-muted)] lg:hidden" aria-label={isSidebarOpen ? "Menyuni yopish" : "Menyuni ochish"} aria-expanded={isSidebarOpen} aria-controls="mobile-navigation">
-            <IoMenu size={23} />
-          </button>
-          <NavIcon href="/wishlist" icon={<FaHeart size={19} />} label="Saralangan" badge={wishlist.length || ""} />
-          <NavIcon href="/savatcha" icon={<FaShoppingCart size={19} />} label="Savat" badge={cartCount || ""} />
-          <button
-            type="button"
-            onClick={toggleDarkMode}
-            aria-label={isDarkMode ? "Yorug' rejimni yoqish" : "Tungi rejimni yoqish"}
-            aria-pressed={isDarkMode}
-            className="inline-flex size-10 items-center justify-center rounded-lg hover:bg-[var(--surface-muted)] hover:text-[var(--text)]"
-          >
-            {isDarkMode ? <FiSun size={19} /> : <FiMoon size={19} />}
-          </button>
-          {isLoggedIn ? (
-            <Link href="/kabnet" aria-label="Shaxsiy hisob" className="hidden lg:flex flex-col items-center hover:text-[var(--secondary)] transition-colors group">
-              <UserAvatar avatar={userData.avatar} username={userData.username} size="md" />
-              <span className="mt-1 hidden max-w-[90px] truncate text-[10px] font-medium text-center group-hover:text-[var(--secondary)] lg:block">
-                {userData.username || "Shaxsiy hisob"}
-              </span>
+          <nav aria-label="Asosiy navigatsiya" className="hidden min-w-0 flex-1 items-center justify-center gap-0.5 min-[1200px]:flex">
+            {sidebarLinks.map((link) => {
+              const isActive = pathname === link.href || pathname?.startsWith(`${link.href}/`);
+              return (
+                <Link key={link.href} href={link.href} aria-current={isActive ? "page" : undefined} className={`whitespace-nowrap rounded-md px-1.5 py-2 text-[11px] font-semibold transition-colors hover:bg-[var(--surface-muted)] hover:text-[var(--secondary)] min-[1366px]:px-2 min-[1440px]:px-2.5 min-[1440px]:text-xs ${isActive ? "text-[var(--secondary)]" : "text-[var(--text-muted)]"}`}>
+                  {link.label}
+                </Link>
+              );
+            })}
+            <Link href="/katalog" aria-current={pathname === "/katalog" || pathname?.startsWith("/katalog/") ? "page" : undefined} className={`whitespace-nowrap rounded-md px-1.5 py-2 text-[11px] font-semibold transition-colors hover:bg-[var(--surface-muted)] hover:text-[var(--secondary)] min-[1366px]:px-2 min-[1440px]:px-2.5 min-[1440px]:text-xs ${pathname === "/katalog" || pathname?.startsWith("/katalog/") ? "text-[var(--secondary)]" : "text-[var(--text-muted)]"}`}>
+              Kategoriyalar
             </Link>
-          ) : (
-            <Link href="/kirish" aria-label="Kirish" className="hidden lg:flex flex-col items-center hover:text-[var(--secondary)] transition-colors">
-              <FaUser size={19} />
-              <span className="mt-1 hidden text-[10px] font-medium lg:block">Kirish</span>
-            </Link>
-          )}
-        </div>
-      </div>
+          </nav>
 
-      <nav aria-label="Asosiy navigatsiya" className="hidden border-t border-[var(--border)] px-4 lg:block">
-        <div className="mx-auto flex max-w-7xl items-center justify-center gap-1">
-          {sidebarLinks.map((link) => {
-            const isActive = pathname === link.href || pathname?.startsWith(`${link.href}/`);
-            return (
-              <Link
-                key={link.href}
-                href={link.href}
-                aria-current={isActive ? "page" : undefined}
-                className={`relative inline-flex min-h-12 items-center whitespace-nowrap rounded-md px-3 text-[12px] font-semibold transition-all hover:bg-[var(--surface-muted)] hover:text-[var(--secondary)] hover:shadow-sm xl:px-4 ${isActive ? "text-[var(--secondary)] after:absolute after:inset-x-3 after:bottom-0 after:h-0.5 after:rounded-full after:bg-[var(--accent)] xl:after:inset-x-4" : "text-[var(--text-muted)]"}`}
-              >
-                {link.label}
+          <div className="hidden w-[clamp(150px,16vw,220px)] shrink min-[1200px]:block">
+            <SearchBox />
+          </div>
+
+          <div className="ml-auto flex shrink-0 items-center gap-0.5 text-[var(--text-muted)] sm:gap-1">
+            <button type="button" onClick={() => setIsSearchOpen((open) => !open)} className="inline-flex size-10 shrink-0 items-center justify-center rounded-lg hover:bg-[var(--surface-muted)] hover:text-[var(--secondary)] min-[1200px]:hidden" aria-label={isSearchOpen ? "Qidiruvni yopish" : "Mahsulot qidirish"} aria-expanded={isSearchOpen} aria-controls="compact-search">
+              {isSearchOpen ? <IoClose size={21} /> : <FaSearch size={17} />}
+            </button>
+            {isLoggedIn ? (
+              <Link href="/kabnet" aria-label="Shaxsiy hisob" title={userData.username || "Shaxsiy hisob"} className="inline-flex size-10 shrink-0 items-center justify-center rounded-lg text-[var(--text-muted)] transition-colors hover:bg-[var(--surface-muted)] hover:text-[var(--secondary)]">
+                {userData.avatar ? <UserAvatar avatar={userData.avatar} username={userData.username} size="sm" /> : <FaUser size={18} />}
               </Link>
-            );
-          })}
-          <Link
-            href="/katalog"
-            aria-current={pathname === "/katalog" || pathname?.startsWith("/katalog/") ? "page" : undefined}
-            className={`relative inline-flex min-h-12 items-center whitespace-nowrap rounded-md px-3 text-[12px] font-semibold transition-all hover:bg-[var(--surface-muted)] hover:text-[var(--secondary)] hover:shadow-sm xl:px-4 ${pathname === "/katalog" || pathname?.startsWith("/katalog/") ? "text-[var(--secondary)] after:absolute after:inset-x-3 after:bottom-0 after:h-0.5 after:rounded-full after:bg-[var(--accent)] xl:after:inset-x-4" : "text-[var(--text-muted)]"}`}
-          >
-            Kategoriyalar
-          </Link>
-        </div>
-      </nav>
-
-      {/* ── MOBILE SEARCH ── */}
-      <div className="flex lg:hidden items-center px-3 pb-4 sm:px-4">
-        <div className="flex-1 min-w-0">
-          <SearchBox isMobile />
-        </div>
-      </div>
-
-      {/* ── SIDEBAR ── */}
-      <div className={`fixed inset-0 z-[2000] bg-black/60 transition-opacity duration-300 ${isSidebarOpen ? "opacity-100 visible" : "opacity-0 invisible pointer-events-none"}`}>
-        <div id="mobile-navigation" role="dialog" aria-modal="true" aria-label="Sayt menyusi" className={`fixed left-0 top-0 flex h-full w-[min(85vw,360px)] flex-col bg-[var(--surface)] text-[var(--text)] shadow-2xl transition-transform duration-300 ${isSidebarOpen ? "translate-x-0" : "-translate-x-full"}`}>
-          <div className="flex justify-end items-center p-4 border-b bg-white shrink-0">
-            <button onClick={closeSidebar} className="p-1 bg-gray-100 rounded-md text-blue-600" aria-label="Menyuni yopish">
-              <IoClose size={24} />
+            ) : (
+              <Link href="/kirish" aria-label="Kirish" title="Kirish" className="inline-flex size-10 shrink-0 items-center justify-center rounded-lg text-[var(--text-muted)] transition-colors hover:bg-[var(--surface-muted)] hover:text-[var(--secondary)]">
+                <FaUser size={18} />
+              </Link>
+            )}
+            <NavIcon href="/savatcha" icon={<FaShoppingCart size={18} />} label="Savat" badge={cartCount || ""} />
+            <button type="button" onClick={isSidebarOpen ? closeSidebar : openSidebar} className="inline-flex size-10 shrink-0 items-center justify-center rounded-lg hover:bg-[var(--surface-muted)] min-[1200px]:hidden" aria-label={isSidebarOpen ? "Menyuni yopish" : "Menyuni ochish"} aria-expanded={isSidebarOpen} aria-controls="mobile-navigation">
+              {isSidebarOpen ? <IoClose size={22} /> : <IoMenu size={23} />}
+            </button>
+            <button type="button" onClick={toggleDarkMode} aria-label={isDarkMode ? "Yorug' rejimni yoqish" : "Tungi rejimni yoqish"} aria-pressed={isDarkMode} className="inline-flex size-10 shrink-0 items-center justify-center rounded-lg text-[var(--text-muted)] hover:bg-[var(--surface-muted)] hover:text-[var(--secondary)]" title={isDarkMode ? "Yorug' rejim" : "Tungi rejim"}>
+              {isDarkMode ? <FiSun size={19} /> : <FiMoon size={19} />}
             </button>
           </div>
-          <div className="flex-1 overflow-y-auto">
-            <nav className="flex flex-col">
-              {sidebarLinks.map(l => (
-                <Link key={l.href} href={l.href} onClick={closeSidebar} aria-current={pathname === l.href ? "page" : undefined}
-                  className={`p-4 border-b flex items-center ${l.icon ? "gap-3 text-gray-800 font-medium" : "text-gray-700 uppercase text-[13px] font-bold"} ${pathname === l.href ? "text-red-600 bg-red-50" : "hover:bg-gray-50"}`}>
-                  {l.icon && <span className="text-gray-400">{l.icon}</span>}
-                  {l.label}
-                </Link>
-              ))}
-              {hasMounted && apiCategories.length > 0 && (
-                <div className="border-b border-border p-4">
-                  <p className="mb-2 text-xs font-bold uppercase text-muted-foreground">Kategoriyalar</p>
-                  {apiCategories.map((category) => <Link key={category.slug} href={`/katalog/${category.slug}`} onClick={closeSidebar} aria-current={pathname === `/katalog/${category.slug}` ? "page" : undefined} className="block rounded-md px-2 py-2 text-sm text-foreground hover:bg-muted">{getCategoryDisplayName(category)}</Link>)}
-                </div>
-              )}
-              {isLoggedIn ? (
-                <Link href="/kabnet" onClick={closeSidebar} className="p-4 border-b flex items-center gap-3 text-gray-700 hover:bg-gray-50">
-                  <UserAvatar avatar={userData.avatar} username={userData.username} size="lg" />
-                  <div className="flex flex-col min-w-0">
-                    <span className="text-[13px] font-bold uppercase">Shaxsiy hisob</span>
-                    {userData.username && <span className="text-blue-600 text-[12px] font-medium truncate">{userData.username}</span>}
-                  </div>
-                </Link>
-              ) : (
-                <Link href="/kirish" onClick={closeSidebar} className="p-4 border-b flex items-center text-gray-700 uppercase text-[13px] font-bold hover:bg-gray-50">
-                  Kirish
-                </Link>
-              )}
-            </nav>
-            <div className="p-6 text-center border-t mt-4 mb-8">
-              <button
-                type="button"
-                onClick={toggleDarkMode}
-                aria-label={isDarkMode ? "Yorug' rejimni yoqish" : "Tungi rejimni yoqish"}
-                className="mx-auto mb-3 flex h-11 w-11 items-center justify-center rounded-full bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-200 dark:hover:bg-gray-700"
-              >
-                {isDarkMode ? <FiSun size={21} /> : <FiMoon size={21} />}
-              </button>
-              <button onClick={openModal} className="w-full py-4 px-4 bg-[#f0f4f8] text-blue-600 font-bold rounded-md uppercase text-[13px] tracking-widest mb-3">
-                Qo&apos;ng&apos;iroq qilishni so&apos;rang
-              </button>
-              <div className="text-[13px] text-gray-500 italic">Har kuni, 8:00 dan 18:00 gacha</div>
-            </div>
+        </div>
+
+        <div id="compact-search" className={`grid transition-[grid-template-rows,opacity,padding] duration-200 min-[1200px]:hidden ${isSearchOpen ? "grid-rows-[1fr] pb-3 opacity-100" : "grid-rows-[0fr] pb-0 opacity-0"}`} aria-hidden={!isSearchOpen}>
+          <div className="min-h-0 overflow-visible" inert={!isSearchOpen}>
+            <SearchBox isMobile />
           </div>
         </div>
-        <div className="w-full h-full" onClick={closeSidebar} />
       </div>
 
-    </div>
+      <div className={`fixed inset-0 z-[2000] bg-black/45 transition-opacity duration-200 ${isSidebarOpen ? "visible opacity-100" : "invisible pointer-events-none opacity-0"}`} onClick={closeSidebar} aria-hidden={!isSidebarOpen}>
+        <aside id="mobile-navigation" role="dialog" aria-modal="true" aria-label="Sayt menyusi" inert={!isSidebarOpen} onClick={(event) => event.stopPropagation()} className={`absolute inset-y-0 right-0 flex w-[min(88vw,380px)] flex-col border-l border-[var(--border)] bg-[var(--surface)] text-[var(--text)] shadow-2xl transition-transform duration-300 motion-reduce:transition-none ${isSidebarOpen ? "translate-x-0" : "translate-x-full"}`}>
+          <div className="flex min-h-[68px] items-center justify-between border-b border-[var(--border)] px-5">
+            <BrandLogo compact />
+            <button type="button" onClick={closeSidebar} className="inline-flex size-10 items-center justify-center rounded-lg text-[var(--text-muted)] hover:bg-[var(--surface-muted)]" aria-label="Menyuni yopish"><IoClose size={23} /></button>
+          </div>
+          <nav aria-label="Mobil navigatsiya" className="flex-1 overflow-y-auto p-3">
+            <div className="flex flex-col gap-1">
+              {sidebarLinks.map((link) => {
+                const isActive = pathname === link.href || pathname?.startsWith(`${link.href}/`);
+                return <Link key={link.href} href={link.href} onClick={closeSidebar} aria-current={isActive ? "page" : undefined} className={`flex min-h-12 items-center gap-3 rounded-lg px-3 text-sm font-semibold transition-colors ${isActive ? "bg-[var(--secondary-soft)] text-[var(--secondary)]" : "text-[var(--text)] hover:bg-[var(--surface-muted)]"}`}>
+                  {link.icon && <span className="text-[var(--secondary)]">{link.icon}</span>}{link.label}
+                </Link>;
+              })}
+              <Link href="/katalog" onClick={closeSidebar} aria-current={pathname === "/katalog" || pathname?.startsWith("/katalog/") ? "page" : undefined} className={`flex min-h-12 items-center rounded-lg px-3 text-sm font-semibold transition-colors ${pathname === "/katalog" || pathname?.startsWith("/katalog/") ? "bg-[var(--secondary-soft)] text-[var(--secondary)]" : "text-[var(--text)] hover:bg-[var(--surface-muted)]"}`}>Kategoriyalar</Link>
+              <Link href="/wishlist" onClick={closeSidebar} className="flex min-h-12 items-center gap-3 rounded-lg px-3 text-sm font-semibold text-[var(--text)] hover:bg-[var(--surface-muted)]"><FaHeart className="text-[var(--secondary)]" />Saralangan{wishlist.length > 0 && <span className="ml-auto rounded-full bg-red-600 px-2 py-0.5 text-xs text-white">{wishlist.length}</span>}</Link>
+            </div>
+            {hasMounted && apiCategories.length > 0 && <div className="mt-4 border-t border-[var(--border)] pt-4"><p className="px-3 pb-2 text-xs font-bold uppercase tracking-wider text-[var(--text-muted)]">Mahsulot kategoriyalari</p><div className="flex flex-col gap-1">{apiCategories.map((category) => <Link key={category.slug} href={`/katalog/${category.slug}`} onClick={closeSidebar} aria-current={pathname === `/katalog/${category.slug}` ? "page" : undefined} className={`rounded-lg px-3 py-2.5 text-sm transition-colors ${pathname === `/katalog/${category.slug}` ? "bg-[var(--secondary-soft)] font-semibold text-[var(--secondary)]" : "text-[var(--text-muted)] hover:bg-[var(--surface-muted)] hover:text-[var(--text)]"}`}>{getCategoryDisplayName(category)}</Link>)}</div></div>}
+          </nav>
+          <div className="border-t border-[var(--border)] p-4">
+            <Link href={isLoggedIn ? "/kabnet" : "/kirish"} onClick={closeSidebar} className="flex min-h-12 items-center gap-3 rounded-lg px-3 text-sm font-semibold text-[var(--text)] hover:bg-[var(--surface-muted)]">
+              {isLoggedIn ? <UserAvatar avatar={userData.avatar} username={userData.username} size="sm" /> : <FaUser className="ml-1 text-[var(--secondary)]" />}
+              <span>{isLoggedIn ? userData.username || "Shaxsiy hisob" : "Kirish / Shaxsiy hisob"}</span>
+            </Link>
+            <button type="button" onClick={openModal} className="mt-3 min-h-11 w-full rounded-lg bg-[var(--primary)] px-4 text-sm font-semibold text-white hover:opacity-90">Qo&apos;ng&apos;iroq qilishni so&apos;rang</button>
+          </div>
+        </aside>
+      </div>
+    </header>
   );
 }

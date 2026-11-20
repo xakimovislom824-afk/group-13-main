@@ -88,7 +88,7 @@ export default function RegisterPage() {
       {/* Breadcrumb */}
       <nav className="max-w-[1200px] mx-auto mb-6 text-[12px] text-gray-400">
         <Link href="/" className="hover:text-blue-600">
-          Stroyoptorg
+          Islomx7
         </Link>
         <span className="mx-2">/</span>
         <span className="text-gray-500">Ro&apos;yxatdan o&apos;tish</span>
