@@ -17,7 +17,7 @@ export default function BlogPage() {
                 
                 <nav className="mb-4">
                     <p className="text-[13px] text-[#A0A4AB]">
-                        <Link href="/" className="hover:text-gray-600">Stroyoptorg</Link> 
+                        <Link href="/" className="hover:text-gray-600">Islomx7</Link>
                         <span className="mx-2">/</span> 
                         <span className="text-gray-600 font-medium">Yangiliklar</span>
                     </p>

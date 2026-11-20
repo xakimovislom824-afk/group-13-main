@@ -1,6 +1,5 @@
 import Link from "next/link";
 import { ArrowRight, Compass, PackageCheck, Search } from "lucide-react";
-import { siteConfig } from "../../lib/site-config";
 
 const highlights = [
   { icon: Search, title: "Qidirish", text: "Katalogdan mahsulotlarni toping va ko‘rib chiqing." },
@@ -21,8 +20,7 @@ export default function AboutPage() {
         <aside className="rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-6 shadow-[var(--card-shadow)]">
           <h2 className="text-lg font-bold text-[var(--text)]">Savolingiz bormi?</h2>
           <p className="mt-2 text-sm leading-6 text-[var(--text-muted)]">Mahsulot, katalog yoki xizmatlar bo‘yicha bizga murojaat qiling.</p>
-          <a href={`mailto:${siteConfig.email}`} className="mt-4 inline-flex min-h-10 items-center font-semibold text-[var(--secondary)] underline underline-offset-4">{siteConfig.email}</a>
-          <p className="mt-2 text-sm text-[var(--text-muted)]">{siteConfig.phone}</p>
+          <p className="mt-4 text-sm text-[var(--text-muted)]">Rasmiy aloqa ma&apos;lumotlari hozircha kiritilmagan. Murojaat uchun <Link href="/aloqa" className="font-semibold text-[var(--secondary)] underline underline-offset-4">aloqa sahifasidan</Link> foydalaning.</p>
         </aside>
       </div>
       <div className="mt-12 grid gap-4 sm:grid-cols-3">

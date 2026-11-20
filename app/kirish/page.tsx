@@ -102,7 +102,7 @@ export default function LoginPage() {
     <div className="min-h-screen bg-[#F8F9FA] text-[#2D2D2D] p-4 md:p-8 lg:p-12">
       <nav className="max-w-[1200px] mx-auto mb-6 text-[11px] md:text-xs text-gray-400 flex items-center gap-2">
         <Link href="/" className="hover:text-blue-600 transition-colors">
-          Stroyoptorg
+          Islomx7
         </Link>
         <span>/</span>
         <span className="text-gray-500">Avtorizatsiya</span>

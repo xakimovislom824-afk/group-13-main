@@ -16,7 +16,7 @@ export default function HomAksiya() {
     <section aria-labelledby="home-offers-heading" className="py-8">
       <div className="mb-5 flex flex-wrap items-end justify-between gap-3">
         <div>
-          <p className="text-sm font-bold uppercase tracking-widest text-secondary">DummyJSON katalogi</p>
+          <p className="text-sm font-bold uppercase tracking-widest text-secondary">DummyJSON demo API namunaviy katalogi</p>
           <h2 id="home-offers-heading" className="mt-1 text-2xl font-extrabold text-foreground sm:text-3xl">Aksiyadagi mahsulotlar</h2>
         </div>
         <Link href="/aksiyalar" className="text-sm font-semibold text-secondary hover:underline">Barcha aksiyalar</Link>

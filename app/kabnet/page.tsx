@@ -822,15 +822,15 @@ function ShaxsiyKabinetContent() {
                       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 md:gap-6 text-sm">
                         <div>
                           <p className="text-gray-400 mb-1">Manzil</p>
-                          <p className="text-gray-700 font-medium leading-relaxed">056734, Toshkent, O&apos;zbekiston, Amir Temur ko&apos;chasi, 37/5</p>
+                          <p className="text-gray-700 font-medium leading-relaxed">Manzil kiritilmagan</p>
                         </div>
                         <div>
                           <p className="text-gray-400 mb-1">Telefon</p>
-                          <p className="text-gray-700 font-medium">{userInfo?.phone || '+998 (90) 123-45-67'}</p>
+                          <p className="text-gray-700 font-medium">{userInfo?.phone || "Kiritilmagan"}</p>
                         </div>
                         <div>
                           <p className="text-gray-400 mb-1">Email</p>
-                          <p className="text-gray-700 font-medium break-all">{userInfo?.email || 'example@gmail.com'}</p>
+                          <p className="text-gray-700 font-medium break-all">{userInfo?.email || "Kiritilmagan"}</p>
                         </div>
                       </div>
                     </div>
