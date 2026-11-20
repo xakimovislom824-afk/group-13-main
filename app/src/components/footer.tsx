@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { useModal } from "../../context/ModalContext";
 import { siteConfig } from "../../../lib/site-config";
 
@@ -17,7 +18,9 @@ export default function Footer() {
       <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
         <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-4">
           <div>
-            <Link href="/" className="text-2xl font-extrabold tracking-tight text-white">Islom<span className="text-[var(--accent)]">x7</span></Link>
+            <Link href="/" aria-label="Islomx7 bosh sahifasi" className="inline-flex items-center rounded-xl bg-black px-3 py-1.5">
+              <Image src="/logo.png" alt="Islomx7 logo" width={160} height={40} className="h-8 w-auto object-contain md:h-10" />
+            </Link>
             <p className="mt-4 max-w-xs text-sm leading-6 text-slate-300">Mahsulotlarni qidirish, ko&apos;rish va brauzerdagi savatga saqlash uchun Islomx7 onlayn katalogi.</p>
             <div className="mt-5 flex gap-3 text-sm">
               <a className="rounded-lg border border-white/20 px-3 py-2 hover:bg-white/10" href={siteConfig.telegram} target="_blank" rel="noreferrer">Telegram</a>
