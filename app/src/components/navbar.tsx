@@ -223,7 +223,6 @@ function SearchBoxContent({ isMobile = false }: SearchBoxProps) {
   return (
     <div ref={wrapperRef} className="relative w-full">
       <div className="flex h-10 items-center overflow-hidden rounded-lg border border-[var(--border)] bg-[var(--surface)] transition-[border-color,box-shadow] focus-within:border-[var(--secondary)] focus-within:shadow-[0_0_0_3px_color-mix(in_srgb,var(--secondary)_14%,transparent)]">
-        <FaSearch aria-hidden="true" className="ml-3 shrink-0 text-[var(--text-muted)]" size={14} />
         <input
           ref={inputRef}
           type="search"
@@ -252,7 +251,7 @@ function SearchBoxContent({ isMobile = false }: SearchBoxProps) {
           className="mr-1 inline-flex size-8 shrink-0 items-center justify-center rounded-md text-[var(--text-muted)] hover:bg-[var(--surface-muted)] hover:text-[var(--secondary)]"
           aria-label="Qidirish"
         >
-          <FaSearch size={14} />
+          <FaSearch aria-hidden="true" size={14} />
         </button>
       </div>
 
@@ -481,17 +480,21 @@ export default function Navbar() {
             </Link>
           </nav>
 
-          <div className="hidden w-[clamp(150px,16vw,220px)] shrink min-[1200px]:block">
+          <div className="hidden w-[clamp(220px,20vw,260px)] shrink min-[1200px]:block">
+            <SearchBox />
+          </div>
+
+          <div className="hidden w-[clamp(200px,24vw,260px)] shrink-0 min-[768px]:block min-[1200px]:hidden">
             <SearchBox />
           </div>
 
           <div className="ml-auto flex shrink-0 items-center gap-0.5 text-[var(--text-muted)] sm:gap-1">
-            <button type="button" onClick={() => setIsSearchOpen((open) => !open)} className="inline-flex size-10 shrink-0 items-center justify-center rounded-lg hover:bg-[var(--surface-muted)] hover:text-[var(--secondary)] min-[1200px]:hidden" aria-label={isSearchOpen ? "Qidiruvni yopish" : "Mahsulot qidirish"} aria-expanded={isSearchOpen} aria-controls="compact-search">
+            <button type="button" onClick={() => setIsSearchOpen((open) => !open)} className="inline-flex size-10 shrink-0 items-center justify-center rounded-lg hover:bg-[var(--surface-muted)] hover:text-[var(--secondary)] min-[768px]:hidden" aria-label={isSearchOpen ? "Qidiruvni yopish" : "Mahsulot qidirish"} aria-expanded={isSearchOpen} aria-controls="compact-search">
               {isSearchOpen ? <IoClose size={21} /> : <FaSearch size={17} />}
             </button>
             {isLoggedIn ? (
               <Link href="/kabnet" aria-label="Shaxsiy hisob" title={userData.username || "Shaxsiy hisob"} className="inline-flex size-10 shrink-0 items-center justify-center rounded-lg text-[var(--text-muted)] transition-colors hover:bg-[var(--surface-muted)] hover:text-[var(--secondary)]">
-                {userData.avatar ? <UserAvatar avatar={userData.avatar} username={userData.username} size="sm" /> : <FaUser size={18} />}
+                {userData.avatar ? <UserAvatar avatar={userData.avatar} username={userData.username} size="lg" /> : <FaUser size={18} />}
               </Link>
             ) : (
               <Link href="/kirish" aria-label="Kirish" title="Kirish" className="inline-flex size-10 shrink-0 items-center justify-center rounded-lg text-[var(--text-muted)] transition-colors hover:bg-[var(--surface-muted)] hover:text-[var(--secondary)]">
@@ -499,7 +502,7 @@ export default function Navbar() {
               </Link>
             )}
             <NavIcon href="/savatcha" icon={<FaShoppingCart size={18} />} label="Savat" badge={cartCount || ""} />
-            <button type="button" onClick={isSidebarOpen ? closeSidebar : openSidebar} className="inline-flex size-10 shrink-0 items-center justify-center rounded-lg hover:bg-[var(--surface-muted)] min-[1200px]:hidden" aria-label={isSidebarOpen ? "Menyuni yopish" : "Menyuni ochish"} aria-expanded={isSidebarOpen} aria-controls="mobile-navigation">
+            <button type="button" onClick={isSidebarOpen ? closeSidebar : openSidebar} className="inline-flex size-10 shrink-0 items-center justify-center rounded-lg hover:bg-[var(--surface-muted)] min-[768px]:hidden" aria-label={isSidebarOpen ? "Menyuni yopish" : "Menyuni ochish"} aria-expanded={isSidebarOpen} aria-controls="mobile-navigation">
               {isSidebarOpen ? <IoClose size={22} /> : <IoMenu size={23} />}
             </button>
             <button type="button" onClick={toggleDarkMode} aria-label={isDarkMode ? "Yorug' rejimni yoqish" : "Tungi rejimni yoqish"} aria-pressed={isDarkMode} className="inline-flex size-10 shrink-0 items-center justify-center rounded-lg text-[var(--text-muted)] hover:bg-[var(--surface-muted)] hover:text-[var(--secondary)]" title={isDarkMode ? "Yorug' rejim" : "Tungi rejim"}>
@@ -508,7 +511,15 @@ export default function Navbar() {
           </div>
         </div>
 
-        <div id="compact-search" className={`grid transition-[grid-template-rows,opacity,padding] duration-200 min-[1200px]:hidden ${isSearchOpen ? "grid-rows-[1fr] pb-3 opacity-100" : "grid-rows-[0fr] pb-0 opacity-0"}`} aria-hidden={!isSearchOpen}>
+        <nav aria-label="Asosiy navigatsiya" className="hidden min-[768px]:flex min-[1200px]:hidden min-h-11 flex-wrap items-center justify-center gap-x-2 gap-y-1 border-t border-[var(--border)] py-1">
+          {sidebarLinks.map((link) => {
+            const isActive = pathname === link.href || pathname?.startsWith(`${link.href}/`);
+            return <Link key={link.href} href={link.href} aria-current={isActive ? "page" : undefined} className={`whitespace-nowrap rounded-md px-2 py-1.5 text-xs font-semibold transition-colors hover:bg-[var(--surface-muted)] hover:text-[var(--secondary)] ${isActive ? "text-[var(--secondary)]" : "text-[var(--text-muted)]"}`}>{link.label}</Link>;
+          })}
+          <Link href="/katalog" aria-current={pathname === "/katalog" || pathname?.startsWith("/katalog/") ? "page" : undefined} className={`whitespace-nowrap rounded-md px-2 py-1.5 text-xs font-semibold transition-colors hover:bg-[var(--surface-muted)] hover:text-[var(--secondary)] ${pathname === "/katalog" || pathname?.startsWith("/katalog/") ? "text-[var(--secondary)]" : "text-[var(--text-muted)]"}`}>Kategoriyalar</Link>
+        </nav>
+
+        <div id="compact-search" className={`grid transition-[grid-template-rows,opacity,padding] duration-200 min-[768px]:hidden ${isSearchOpen ? "grid-rows-[1fr] pb-3 opacity-100" : "grid-rows-[0fr] pb-0 opacity-0"}`} aria-hidden={!isSearchOpen}>
           <div className="min-h-0 overflow-visible" inert={!isSearchOpen}>
             <SearchBox isMobile />
           </div>

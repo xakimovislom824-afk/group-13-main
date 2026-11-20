@@ -116,5 +116,12 @@ html.dark .favorite-button { border-color: var(--border) !important; color: var(
   body, [data-slot="card"] { transition: background-color 220ms ease, color 220ms ease, border-color 220ms ease; }
 }
 
+.store-marquee-track { animation: store-marquee-scroll 42s linear infinite; }
+.store-marquee-track:hover { animation-play-state: paused; }
+@keyframes store-marquee-scroll { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+@media (prefers-reduced-motion: reduce) {
+  .store-marquee-track { animation: none; }
+}
+
 .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
 .scrollbar-hide::-webkit-scrollbar { display: none; }
