@@ -10,19 +10,5 @@ export const siteConfig = {
   copyright: "© 2026 Islomx7. Barcha huquqlar himoyalangan.",
 };
 
-export const pageMetadata = (title: string, description: string, path: string) => ({
-  title,
-  description,
-  openGraph: {
-    type: "website" as const,
-    locale: "uz_UZ",
-    url: new URL(path, siteConfig.url).toString(),
-    siteName: siteConfig.name,
-    title: `${title} | ${siteConfig.name}`,
-    description,
-  },
-  twitter: { card: "summary_large_image" as const, title: `${title} | ${siteConfig.name}`, description },
-});
-
 export const formatPrice = (value: number | string) =>
   new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", maximumFractionDigits: 2 }).format(Number(value) || 0);

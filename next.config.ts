@@ -20,6 +20,11 @@ const nextConfig: NextConfig = {
       { source: "/elektr", destination: "/katalog/smartphones", permanent: true },
       { source: "/santexnika", destination: "/katalog", permanent: true },
       { source: "/uyBog", destination: "/katalog/home-decoration", permanent: true },
+      { source: "/yetkazibBerish", destination: "/yetkazib-berish", permanent: true },
+      { source: "/savolJavob", destination: "/savol-javob", permanent: true },
+      { source: "/xafsizlik", destination: "/maxfiylik-siyosati", permanent: true },
+      { source: "/tulov", destination: "/tolov", permanent: true },
+      { source: "/login", destination: "/kirish", permanent: true },
     ];
   },
   images: {

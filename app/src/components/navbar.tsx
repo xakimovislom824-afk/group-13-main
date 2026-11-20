@@ -2,7 +2,9 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { useState, useEffect, useCallback, useRef, Suspense } from "react";
+import { FiGift } from "react-icons/fi";
+import { FiMoon, FiSun } from "react-icons/fi";
+import { useState, useEffect, useCallback, useMemo, useRef, Suspense } from "react";
 import {
   FaUser,
   FaHeart,
@@ -10,11 +12,13 @@ import {
   FaSearch,
 } from "react-icons/fa";
 import { IoClose, IoMenu } from "react-icons/io5";
+import { useModal } from "../../context/ModalContext";
 import { useGetWishlistQuery } from "../../../services/wishlistApi";
 import { useGetCartsQuery } from "../../../services/cartApi";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useProductSearch } from "../../hooks/useProductSearch";
 import { formatPrice } from "../../../lib/site-config";
+import { getCategoryDisplayName, useGetCategoriesQuery } from "../../../services/categoryApi";
 
 export const dynamic = "force-dynamic";
 
@@ -71,7 +75,7 @@ function highlightMatch(text: string, query: string) {
   return (
     <>
       {text.slice(0, idx)}
-      <span className="text-[#c5c9d0] font-bold">{text.slice(idx, idx + query.length)}</span>
+      <span className="text-blue-600 font-bold">{text.slice(idx, idx + query.length)}</span>
       {text.slice(idx + query.length)}
     </>
   );
@@ -100,11 +104,11 @@ const UserAvatar = ({ avatar, username, size = "md" }: UserAvatarProps) => {
 // ─────────────────────────────────────────────
 interface NavIconProps { href: string; icon: React.ReactNode; label: string; badge?: number | string; className?: string }
 const NavIcon = ({ href, icon, label, badge, className = "" }: NavIconProps) => (
-  <Link href={href} aria-label={label} className={`flex flex-col items-center text-[#d4d4d4] transition-colors hover:text-white ${className}`}>
+  <Link href={href} className={`flex flex-col items-center hover:text-blue-600 transition-colors ${className}`}>
     <div className="relative">
       {icon}
       {badge !== undefined && badge !== "" && (
-        <span className="absolute -top-1 -right-2 min-w-[18px] rounded-full border-2 border-black bg-[#c5c9d0] px-1.5 text-center text-[9px] text-black">
+        <span className="absolute -top-1 -right-2 bg-red-600 text-white text-[9px] px-1.5 rounded-full border-2 border-white min-w-[18px] text-center">
           {badge}
         </span>
       )}
@@ -215,7 +219,7 @@ function SearchBoxContent({ isMobile = false }: SearchBoxProps) {
 
   return (
     <div ref={wrapperRef} className="relative w-full">
-      <div className={`flex items-center border border-[#3a3a3a] rounded-xl bg-[#111] overflow-hidden ${isMobile ? "h-11" : "h-10"}`}>
+      <div className={`flex items-center border-2 border-blue-600 rounded-sm overflow-hidden ${isMobile ? "h-11" : "h-10"}`}>
         <input
           ref={inputRef}
           type="text"
@@ -240,7 +244,7 @@ function SearchBoxContent({ isMobile = false }: SearchBoxProps) {
 
         <button
           onClick={handleSubmit}
-          className="bg-gradient-to-r from-[#e5e7eb] to-[#9ca3af] px-4 h-full shrink-0 flex items-center justify-center text-black transition-colors hover:brightness-110"
+          className="bg-blue-600 hover:bg-blue-700 text-white px-4 h-full shrink-0 flex items-center justify-center transition-colors"
           aria-label="Qidirish"
         >
           <FaSearch size={14} />
@@ -268,7 +272,7 @@ function SearchBoxContent({ isMobile = false }: SearchBoxProps) {
             <>
               <div className="px-4 py-2 border-b border-gray-100 bg-gray-50 flex items-center justify-between shrink-0">
                 <span className="text-[11px] font-bold uppercase text-gray-400 tracking-wider">Mahsulotlar</span>
-                <span className="text-[11px] text-[#c5c9d0] font-semibold">{results.length} ta topildi</span>
+                <span className="text-[11px] text-blue-600 font-semibold">{results.length} ta topildi</span>
               </div>
 
               <div className="overflow-y-auto flex-1">
@@ -299,7 +303,7 @@ function SearchBoxContent({ isMobile = false }: SearchBoxProps) {
                     </div>
 
                     {product.price != null && (
-                      <span className="text-sm font-bold text-[#c5c9d0] whitespace-nowrap shrink-0">
+                      <span className="text-sm font-bold text-blue-700 whitespace-nowrap shrink-0">
                         {formatPrice(product.price)}
                       </span>
                     )}
@@ -328,23 +332,14 @@ function SearchBox({ isMobile = false }: SearchBoxProps) {
 export default function Navbar() {
   const pathname = usePathname();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-
-  useEffect(() => {
-    // Next.js adds this marker even when no font size adjustment is configured.
-    const removeEmptyAdjustmentMeta = () => {
-      const adjustmentMeta = document.head.querySelector<HTMLMetaElement>('meta[name="next-size-adjust"]');
-      if (adjustmentMeta?.content === "") adjustmentMeta.remove();
-    };
-    const observer = new MutationObserver(removeEmptyAdjustmentMeta);
-    observer.observe(document.head, { childList: true });
-    removeEmptyAdjustmentMeta();
-    return () => observer.disconnect();
-  }, []);
+  const [isDarkMode, setIsDarkMode] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [userData, setUserData] = useState<UserData>({ username: null, avatar: null });
 
+  const { openModal } = useModal();
   const { data: wishlist = [] } = useGetWishlistQuery();
   const { data: cart = [] } = useGetCartsQuery();
+  const { data: apiCategories = [] } = useGetCategoriesQuery();
   const cartCount = cart.reduce((total, item) => total + Number(item.quantity ?? 0), 0);
 
   useEffect(() => {
@@ -373,63 +368,161 @@ export default function Navbar() {
     };
   }, [refreshAuth]);
 
+  useEffect(() => {
+    const root = document.documentElement;
+    const media = window.matchMedia("(prefers-color-scheme: dark)");
+    const applyTheme = (dark: boolean) => {
+      setIsDarkMode(dark);
+      root.classList.toggle("dark", dark);
+      root.style.colorScheme = dark ? "dark" : "light";
+    };
+    const getSavedMode = () => {
+      const saved = localStorage.getItem("theme");
+      try {
+        const parsed: unknown = saved ? JSON.parse(saved) : null;
+        if (parsed && typeof parsed === "object" && "mode" in parsed) {
+          const mode = (parsed as { mode?: unknown }).mode;
+          if (mode === "dark" || mode === "light") return mode;
+        }
+      } catch {
+        if (saved === "dark" || saved === "light") return saved;
+      }
+      return null;
+    };
+    const syncTheme = () => {
+      const saved = getSavedMode();
+      applyTheme(saved ? saved === "dark" : media.matches);
+    };
+    syncTheme();
+    media.addEventListener("change", syncTheme);
+    window.addEventListener("storage", syncTheme);
+    return () => {
+      media.removeEventListener("change", syncTheme);
+      window.removeEventListener("storage", syncTheme);
+    };
+  }, []);
+
+  const toggleDarkMode = useCallback(() => {
+    const next = !isDarkMode;
+    document.documentElement.classList.toggle("dark", next);
+    document.documentElement.style.colorScheme = next ? "dark" : "light";
+    localStorage.setItem("theme", JSON.stringify({ mode: next ? "dark" : "light" }));
+    setIsDarkMode(next);
+  }, [isDarkMode]);
+
   const closeSidebar = useCallback(() => setIsSidebarOpen(false), []);
   const openSidebar = useCallback(() => setIsSidebarOpen(true), []);
 
-  useEffect(() => {
-    if (!isSidebarOpen) return;
-    const handleEscape = (event: KeyboardEvent) => {
-      if (event.key === "Escape") closeSidebar();
-    };
-    window.addEventListener("keydown", handleEscape);
-    return () => window.removeEventListener("keydown", handleEscape);
-  }, [closeSidebar, isSidebarOpen]);
-  const navLinks = [
-    { href: "/", label: "Bosh sahifa" },
-    { href: "/katalog", label: "Mahsulotlar" },
-    { href: "/yetkazib-berish", label: "Yetkazib berish" },
-    { href: "/tolov", label: "To'lov" },
+  const sidebarLinks = useMemo(() => [
+    { href: "/aksiyalar", label: "Barcha aksiyalar", icon: <FiGift size={20} /> },
+    { href: "/tulov", label: "To'lov" },
+    { href: "/yetkazibBerish", label: "Yetkazib berish" },
+    { href: "/fikrlar", label: "Fikrlar" },
+    { href: "/blog", label: "Yangiliklar" },
     { href: "/aloqa", label: "Aloqa" },
-  ];
+  ], []);
 
   return (
-    <>
-    <header className="sticky top-0 z-[1000] w-full border-b border-[#2a2a2a] bg-black text-[#d4d4d4] backdrop-blur-md">
-      <div className="mx-auto flex max-w-[1508px] items-center justify-between gap-3 px-4 py-3 md:px-6">
-        <button type="button" onClick={openSidebar} className="flex size-10 shrink-0 items-center justify-center rounded-lg hover:bg-white/10 focus-visible:ring-2 focus-visible:ring-[#c5c9d0] md:hidden" aria-label="Menyuni ochish" aria-expanded={isSidebarOpen}>
-          <IoMenu size={23} />
-        </button>
-        <Link href="/" aria-label="Bosh sahifa" className="shrink-0">
-          <Image src="/logo.png" alt="Islomx7 logo" width={320} height={100} priority className="h-9 w-auto object-contain md:h-11" />
+    <div className="sticky top-0 z-[1000] w-full border-b border-[var(--border)] bg-[var(--surface)]">
+
+      {/* ── MAIN NAVBAR ── */}
+      <div className="flex items-center justify-between gap-3 px-4 py-3 md:gap-4 md:px-6">
+        <Link href="/" aria-label="Islomx7 bosh sahifasi" className="flex shrink-0 items-center">
+          <Image src="/logo.png" alt="Islomx7 logo" width={1040} height={360} priority className="h-10 w-auto object-contain" />
         </Link>
-        <nav className="hidden flex-1 items-center justify-center gap-5 md:flex" aria-label="Asosiy navigatsiya">
-          {navLinks.map(({ href, label }) => <Link key={href} href={href} className={`text-sm font-medium transition-colors hover:text-white ${pathname === href ? "text-white" : "text-[#a3a3a3]"}`}>{label}</Link>)}
-        </nav>
-        <div className="flex shrink-0 items-center gap-3 md:gap-5">
-          <NavIcon href="/wishlist" icon={<FaHeart size={19} />} label="Saralangan" badge={wishlist.length || ""} />
+
+        {/* Desktop SearchBox */}
+        <div className="hidden md:flex flex-1 max-w-2xl mx-4">
+          <SearchBox />
+        </div>
+
+        <div className="flex items-center gap-3 md:gap-6 text-gray-500">
+          <button type="button" onClick={openSidebar} className="flex items-center gap-1.5 lg:hidden" aria-label="Menyuni ochish" aria-expanded={isSidebarOpen}>
+            <IoMenu size={20} className="sm:hidden" />
+            <IoMenu size={24} className="hidden sm:block" />
+            <span className="whitespace-nowrap text-xs font-bold sm:text-sm">Menyu</span>
+          </button>
+          <NavIcon href="/aksiyalar" icon={<FiGift size={20} />} label="Barcha aksiyalar" className="hidden lg:flex ml-6" />
+          <NavIcon href="/wishlist" icon={<FaHeart size={20} />} label="Saralangan" badge={wishlist.length || ""} />
           <NavIcon href="/savatcha" icon={<FaShoppingCart size={20} />} label="Savat" badge={cartCount || ""} />
-          <Link href="/kirish" aria-label={isLoggedIn ? "Shaxsiy hisob" : "Kirish"} className="flex flex-col items-center gap-1 text-[#d4d4d4] hover:text-white">
-            {isLoggedIn ? <UserAvatar avatar={userData.avatar} username={userData.username} size="sm" /> : <FaUser size={18} />}
-            <span className="hidden text-[10px] md:block">{isLoggedIn ? "Hisob" : "Kirish"}</span>
-          </Link>
+          {isLoggedIn ? (
+            <Link href="/kabnet" className="flex flex-col items-center hover:text-blue-600 transition-colors group">
+              <UserAvatar avatar={userData.avatar} username={userData.username} size="md" />
+              <span className="text-[10px] mt-1 font-medium hidden md:block text-center truncate max-w-[80px] group-hover:text-blue-600">
+                {userData.username || "Shaxsiy hisob"}
+              </span>
+            </Link>
+          ) : (
+            <Link href="/kirish" className="flex flex-col items-center hover:text-blue-600 transition-colors">
+              <FaUser size={20} />
+              <span className="text-[10px] mt-1 font-medium hidden md:block">Kirish</span>
+            </Link>
+          )}
         </div>
       </div>
-      <div className={`fixed inset-0 z-[1100] bg-black/70 transition-opacity md:hidden ${isSidebarOpen ? "visible opacity-100" : "invisible pointer-events-none opacity-0"}`} aria-hidden={!isSidebarOpen}>
-        <button type="button" className="absolute inset-0 h-full w-full cursor-default" onClick={closeSidebar} aria-label="Menyuni yopish" />
-        <aside className={`absolute inset-y-0 left-0 flex w-[min(88vw,360px)] flex-col border-r border-[#292929] bg-[#090909] p-5 shadow-2xl transition-transform duration-300 ${isSidebarOpen ? "translate-x-0" : "-translate-x-full"}`} aria-label="Mobil navigatsiya" role="dialog" aria-modal="true">
-          <div className="mb-6 flex items-center justify-between">
-            <Image src="/logo.png" alt="Islomx7 logo" width={260} height={80} className="h-9 w-auto" />
-            <button type="button" onClick={closeSidebar} aria-label="Menyuni yopish" className="rounded-lg p-2 hover:bg-white/10"><IoClose size={22} /></button>
-          </div>
-          <nav className="flex flex-col" aria-label="Mobil navigatsiya">
-            {navLinks.map(({ href, label }) => <Link key={href} href={href} onClick={closeSidebar} className="border-b border-[#222] py-4 text-sm font-medium hover:text-white">{label}</Link>)}
-            <Link href="/wishlist" onClick={closeSidebar} className="border-b border-[#222] py-4 text-sm font-medium hover:text-white">Saralangan</Link>
-            <Link href="/kirish" onClick={closeSidebar} className="py-4 text-sm font-medium hover:text-white">{isLoggedIn ? "Shaxsiy hisob" : "Kirish"}</Link>
-          </nav>
-        </aside>
+
+      {/* ── MOBILE SEARCH ── */}
+      <div className="flex md:hidden items-center px-3 sm:px-4 pb-4">
+        <div className="flex-1 min-w-0">
+          <SearchBox isMobile />
+        </div>
       </div>
-    </header>
-    <div className="border-b border-[#222] bg-black px-4 pb-3 md:px-6"><div className="mx-auto max-w-[1508px]"><SearchBox /></div></div>
-    </>
+
+      {/* ── SIDEBAR ── */}
+      <div className={`fixed inset-0 bg-black/60 z-[2000] transition-opacity duration-300 ${isSidebarOpen ? "opacity-100 visible" : "opacity-0 invisible pointer-events-none"}`}>
+        <div className={`fixed top-0 left-0 h-full w-[85%] max-w-[360px] bg-white shadow-2xl transition-transform duration-300 transform ${isSidebarOpen ? "translate-x-0" : "-translate-x-full"} flex flex-col`}>
+          <div className="flex justify-between items-center p-4 border-b bg-white shrink-0">
+            <span className="font-bold text-[18px] text-gray-800">Menyu</span>
+            <button onClick={closeSidebar} className="p-1 bg-gray-100 rounded-md text-blue-600" aria-label="Menyuni yopish">
+              <IoClose size={24} />
+            </button>
+          </div>
+          <div className="flex-1 overflow-y-auto">
+            <nav className="flex flex-col">
+              {sidebarLinks.map(l => (
+                <Link key={l.href} href={l.href} onClick={closeSidebar}
+                  className={`p-4 border-b flex items-center ${l.icon ? "gap-3 text-gray-800 font-medium" : "text-gray-700 uppercase text-[13px] font-bold"} ${pathname === l.href ? "text-red-600 bg-red-50" : "hover:bg-gray-50"}`}>
+                  {l.icon && <span className="text-gray-400">{l.icon}</span>}
+                  {l.label}
+                </Link>
+              ))}
+              <div className="border-b border-border p-4">
+                <p className="mb-2 text-xs font-bold uppercase text-muted-foreground">Kategoriyalar</p>
+                {apiCategories.map((category) => <Link key={category.slug} href={`/katalog/${category.slug}`} onClick={closeSidebar} className="block rounded-md px-2 py-2 text-sm text-foreground hover:bg-muted">{getCategoryDisplayName(category)}</Link>)}
+              </div>
+              {isLoggedIn ? (
+                <Link href="/kabnet" onClick={closeSidebar} className="p-4 border-b flex items-center gap-3 text-gray-700 hover:bg-gray-50">
+                  <UserAvatar avatar={userData.avatar} username={userData.username} size="lg" />
+                  <div className="flex flex-col min-w-0">
+                    <span className="text-[13px] font-bold uppercase">Shaxsiy hisob</span>
+                    {userData.username && <span className="text-blue-600 text-[12px] font-medium truncate">{userData.username}</span>}
+                  </div>
+                </Link>
+              ) : (
+                <Link href="/kirish" onClick={closeSidebar} className="p-4 border-b flex items-center text-gray-700 uppercase text-[13px] font-bold hover:bg-gray-50">
+                  Kirish
+                </Link>
+              )}
+            </nav>
+            <div className="p-6 text-center border-t mt-4 mb-8">
+              <button
+                type="button"
+                onClick={toggleDarkMode}
+                aria-label={isDarkMode ? "Yorug' rejimni yoqish" : "Tungi rejimni yoqish"}
+                className="mx-auto mb-3 flex h-11 w-11 items-center justify-center rounded-full bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-200 dark:hover:bg-gray-700"
+              >
+                {isDarkMode ? <FiSun size={21} /> : <FiMoon size={21} />}
+              </button>
+              <button onClick={openModal} className="w-full py-4 px-4 bg-[#f0f4f8] text-blue-600 font-bold rounded-md uppercase text-[13px] tracking-widest mb-3">
+                Qo&apos;ng&apos;iroq qilishni so&apos;rang
+              </button>
+              <div className="text-[13px] text-gray-500 italic">Har kuni, 8:00 dan 18:00 gacha</div>
+            </div>
+          </div>
+        </div>
+        <div className="w-full h-full" onClick={closeSidebar} />
+      </div>
+
+    </div>
   );
 }

@@ -1,50 +1,52 @@
-import Image from "next/image";
+"use client";
+
 import Link from "next/link";
-import { FaInstagram, FaTelegramPlane } from "react-icons/fa";
+import { useModal } from "../../context/ModalContext";
 import { siteConfig } from "../../../lib/site-config";
 
-const footerLinks = [
-  ["Bosh sahifa", "/"],
-  ["Mahsulotlar", "/katalog"],
-  ["Savatcha", "/savatcha"],
-  ["Saralangan", "/wishlist"],
-  ["Kirish", "/kirish"],
-  ["Yetkazib berish", "/yetkazib-berish"],
-  ["To'lov", "/tolov"],
-  ["Aloqa", "/aloqa"],
-  ["Biz haqimizda", "/biz-haqimizda"],
-  ["Maxfiylik siyosati", "/maxfiylik-siyosati"],
+const informationLinks = [
+  ["Biz haqimizda", "/biz-haqimizda"], ["Yetkazib berish", "/yetkazib-berish"],
+  ["To'lov", "/tolov"], ["Savol-javob", "/savol-javob"], ["Qaytarish va kafolat", "/qaytarish-va-kafolat"],
+  ["Yangiliklar", "/blog"], ["Aloqa", "/aloqa"],
 ];
 
 export default function Footer() {
+  const { openModal } = useModal();
   return (
-    <footer className="mt-12 border-t border-[#222] bg-[#080808] text-[#d4d4d4]">
-      <div className="mx-auto grid max-w-[1508px] gap-10 px-4 py-12 sm:grid-cols-2 sm:px-6 lg:grid-cols-[1.3fr_1fr_1fr] lg:px-8">
-        <div>
-          <Link href="/" aria-label="Islomx7 bosh sahifasi" className="inline-flex rounded-sm bg-black">
-            <Image src="/logo.png" alt="Islomx7 logo" width={320} height={100} className="h-9 w-auto object-contain md:h-11" />
-          </Link>
-          <p className="mt-4 max-w-sm text-sm leading-6 text-[#8a8a8a]">Islomx7 — kerakli mahsulotlarni topish va ko&apos;rish uchun qulay onlayn katalog.</p>
-          <div className="mt-5 flex gap-3">
-            <a href={siteConfig.telegram} target="_blank" rel="noreferrer" aria-label="Telegram — Islomx7" className="flex size-10 items-center justify-center rounded-xl border border-[#292929] text-[#d4d4d4] transition hover:border-[#bfc3ca] hover:text-white"><FaTelegramPlane size={18} /></a>
-            <a href={siteConfig.instagram} target="_blank" rel="noreferrer" aria-label="Instagram — Islomx7" className="flex size-10 items-center justify-center rounded-xl border border-[#292929] text-[#d4d4d4] transition hover:border-[#bfc3ca] hover:text-white"><FaInstagram size={18} /></a>
+    <footer className="bg-[var(--footer-bg)] text-[var(--footer-text)]">
+      <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
+        <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-4">
+          <div>
+            <Link href="/" className="text-2xl font-extrabold tracking-tight text-white">Islom<span className="text-[var(--accent)]">x7</span></Link>
+            <p className="mt-4 max-w-xs text-sm leading-6 text-slate-300">Mahsulotlarni qidirish, ko&apos;rish va brauzerdagi savatga saqlash uchun Islomx7 onlayn katalogi.</p>
+            <div className="mt-5 flex gap-3 text-sm">
+              <a className="rounded-lg border border-white/20 px-3 py-2 hover:bg-white/10" href={siteConfig.telegram} target="_blank" rel="noreferrer">Telegram</a>
+              <a className="rounded-lg border border-white/20 px-3 py-2 hover:bg-white/10" href={siteConfig.instagram} target="_blank" rel="noreferrer">Instagram</a>
+            </div>
+          </div>
+          <div>
+            <h2 className="font-bold text-white">Ma&apos;lumot</h2>
+            <ul className="mt-4 flex flex-col gap-3 text-sm">{informationLinks.map(([label, href]) => <li key={href}><Link className="hover:text-[var(--accent)]" href={href}>{label}</Link></li>)}</ul>
+          </div>
+          <div>
+            <h2 className="font-bold text-white">Katalog</h2>
+            <ul className="mt-4 flex flex-col gap-3 text-sm"><li><Link className="hover:text-[var(--accent)]" href="/katalog">Barcha mahsulotlar</Link></li></ul>
+          </div>
+          <div>
+            <h2 className="font-bold text-white">Aloqa</h2>
+            <address className="mt-4 flex flex-col gap-3 text-sm not-italic">
+              <a href={`tel:${siteConfig.phone.replaceAll(" ", "")}`} className="hover:text-white">{siteConfig.phone}</a>
+              <a href={`mailto:${siteConfig.email}`} className="hover:text-white">{siteConfig.email}</a>
+              <span>{siteConfig.address}</span><span>{siteConfig.hours}</span>
+              <a className="text-[var(--accent)] underline underline-offset-4" href="https://maps.google.com/?q=Chilonzor+Toshkent" target="_blank" rel="noreferrer">Xaritada ko&apos;rish</a>
+              <button onClick={openModal} className="w-fit rounded-lg bg-[var(--accent)] px-4 py-2 font-semibold text-[var(--primary)] hover:bg-[var(--accent-hover)]">Qo&apos;ng&apos;iroq so&apos;rash</button>
+            </address>
           </div>
         </div>
-        <div>
-          <h2 className="font-semibold text-white">Sahifalar</h2>
-          <ul className="mt-4 grid grid-cols-2 gap-x-4 gap-y-3 text-sm">
-            {footerLinks.map(([label, href]) => <li key={href}><Link className="text-[#8a8a8a] transition hover:text-white" href={href}>{label}</Link></li>)}
-          </ul>
-        </div>
-        <div>
-          <h2 className="font-semibold text-white">Aloqa</h2>
-          <address className="mt-4 flex flex-col gap-3 text-sm not-italic text-[#8a8a8a]">
-            <a href={`mailto:${siteConfig.email}`} className="transition hover:text-white">{siteConfig.email}</a>
-            <span>{siteConfig.address}</span>
-          </address>
+        <div className="mt-6 flex flex-col gap-2 border-t border-white/15 pt-5 text-xs text-slate-400 sm:flex-row sm:items-center sm:justify-between">
+          <p>{siteConfig.copyright}</p><Link href="/maxfiylik-siyosati" className="hover:text-white">Maxfiylik siyosati</Link>
         </div>
       </div>
-      <div className="border-t border-[#222] px-4 py-5 text-center text-xs text-[#777]">{siteConfig.copyright}</div>
     </footer>
   );
 }

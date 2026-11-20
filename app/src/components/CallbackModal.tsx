@@ -375,7 +375,7 @@ const CallbackModal = () => {
                     <div className="privacy-row">
                         <input type="checkbox" id="privacy" required className="privacy-checkbox" />
                         <label htmlFor="privacy" className="privacy-label">
-                            <a href="/maxfiylik-siyosati">Maxfiylik siyosati</a>ga muvofiq shaxsiy ma&apos;lumotlarim qayta ishlanishiga roziman
+                            <a href="/xafsizlik">Maxfiylik siyosati</a>ga muvofiq shaxsiy ma&apos;lumotlarim qayta ishlanishiga roziman
                         </label>
                     </div>
 
