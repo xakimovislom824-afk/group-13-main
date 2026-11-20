@@ -1,126 +1,27 @@
-"use client";
-import { CiCirclePlus } from "react-icons/ci";
+import Link from "next/link";
+import { ArrowRight, HelpCircle } from "lucide-react";
+import FAQAccordion from "../src/components/FAQAccordion";
 
 export default function SavolJavob() {
   return (
-    <div className="max-w-300 mx-auto p-6 font-sans bg-white">
-      {/* Breadcrumbs (Yo'nalish ko'rsatkichi) */}
-      <nav className="text-gray-400 text-sm mb-4">
-        Stroyoptorg  /  <span className="text-gray-600">Savol-javob</span>
+    <section className="mx-auto w-full max-w-7xl px-4 py-10 sm:px-6 lg:px-8 lg:py-14">
+      <nav aria-label="Breadcrumb" className="mb-5 text-sm text-[var(--text-muted)]">
+        <Link href="/" className="hover:text-[var(--secondary)]">Bosh sahifa</Link><span aria-hidden="true" className="mx-2">/</span><span className="text-[var(--text)]">Savol-javob</span>
       </nav>
-
-      <h1 className="text-4xl font-bold text-slate-800 mb-8">Savol-javob</h1>
-
-      <div className="flex flex-col lg:flex-row gap-8">
-
-        {/* CHAP TOMON: SAVOLLAR RO'YXATI (AKKORDEON) */}
-        <div className="flex-1">
-          <div className="border-t border-gray-100">
-
-            {/* SAVOL 1 */}
-            <div className="border-b border-gray-100 py-4">
-              <button className="w-full flex justify-between items-center text-left hover:text-blue-600 transition-colors">
-                <span className="font-medium text-slate-700">Qurilish jarayonida ishlatilmagan materiallarni qaytarishim mumkinmi?</span>
-                <CiCirclePlus className="text-blue-500 text-2xl" />
-              </button>
-            </div>
-
-            {/* SAVOL 2 */}
-            <div className="border-b border-gray-100 py-4">
-              <button className="w-full flex justify-between items-center text-left hover:text-blue-600 transition-colors">
-                <span className="font-medium text-slate-700">Yetkazib berish narxi ichiga yukni tushirish xizmati kiradimi?</span>
-                <CiCirclePlus className="text-blue-500 text-2xl" />
-              </button>
-            </div>
-
-            {/* SAVOL 3 */}
-            <div className="border-b border-gray-100 py-4">
-              <button className="w-full flex justify-between items-center text-left hover:text-blue-600 transition-colors">
-                <span className="font-medium text-slate-700">Do&apos;koningizda faqat oldindan to&apos;lov orqali buyurtma qilinadigan tovarlar bormi?</span>
-                <CiCirclePlus className="text-blue-500 text-2xl" />
-              </button>
-            </div>
-
-            {/* SAVOL 4 */}
-            <div className="border-b border-gray-100 py-4">
-              <button className="w-full flexify justify-between items-center text-left hover:text-blue-600 transition-colors">
-                <span className="font-medium text-slate-700">Eng kam buyurtma miqdori qancha?</span>
-                <CiCirclePlus className="text-blue-500 text-2xl" />
-              </button>
-            </div>
-
-            {/* SAVOL 5 */}
-            <div className="border-b border-gray-100 py-4">
-              <button className="w-full flex justify-between items-center text-left hover:text-blue-600 transition-colors">
-                <span className="font-medium text-slate-700">Sizlarda bepul yetkazib berish xizmati bormi?</span>
-                <CiCirclePlus className="text-blue-500 text-2xl" />
-              </button>
-            </div>
-
-            {/* SAVOL 6 (OCHIQ HOLATI) */}
-            <div className="border-b border-gray-100 py-4">
-              <button className="w-full flex justify-between items-center text-left text-slate-700">
-                <span className="font-medium">Xarid vaqtida bo&apos;lib to&apos;lash yoki kredit rasmiylashtirish imkoniyati bormi? Shartlari qanday?</span>
-                <CiCirclePlus className="text-blue-500 text-2xl" />
-              </button>
-              <div className="mt-4 text-gray-500 text-sm leading-relaxed">
-                Kredit va bo&apos;lib to&apos;lash tizimi tashkilotimizda kredit mutaxassislariga murojaat qilgan holda amalga oshiriladi. Ular sizga bank tomonidan taklif etilgan va arizangiz yuboriladigan kredit mahsulotlari bo&apos;yicha shartnomani rasmiylashtirib berishadi.
-              </div>
-            </div>
-
-            {/* SAVOL 7 */}
-            <div className="border-b border-gray-100 py-4">
-              <button className="w-full flex justify-between items-center text-left hover:text-blue-600 transition-colors">
-                <span className="font-medium text-slate-700">Sotib olishdan oldin asbob yoki texnikani tekshirib ko&apos;rsa bo&apos;ladimi?</span>
-                <CiCirclePlus className="text-blue-500 text-2xl" />
-              </button>
-            </div>
-
-            {/* SAVOL 8 */}
-            <div className="border-b border-gray-100 py-4">
-              <button className="w-full flex justify-between items-center text-left hover:text-blue-600 transition-colors">
-                <span className="font-medium text-slate-700">Sizlarda yana qanday qo&apos;shimcha xizmatlar mavjud?</span>
-                <CiCirclePlus className="text-blue-500 text-2xl" />
-              </button>
-            </div>
-
-            {/* SAVOL 9 */}
-            <div className="border-b border-gray-100 py-4">
-              <button className="w-full flex justify-between items-center text-left hover:text-blue-600 transition-colors">
-                <span className="font-medium text-slate-700">Aksiyalar qanchalik tez-tez o&apos;tkaziladi?</span>
-                <CiCirclePlus className="text-blue-500 text-2xl" />
-              </button>
-            </div>
+      <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_300px] lg:gap-12">
+        <div>
+          <div className="mb-7 flex items-center gap-3">
+            <span className="grid size-11 shrink-0 place-items-center rounded-xl bg-[var(--secondary-soft)] text-[var(--secondary)]"><HelpCircle size={22} aria-hidden="true" /></span>
+            <div><p className="text-xs font-bold uppercase tracking-[0.18em] text-[var(--secondary)]">Yordam markazi</p><h1 className="mt-1 font-[family-name:var(--font-manrope)] text-3xl font-extrabold text-[var(--text)] sm:text-4xl">Savol-javob</h1></div>
           </div>
+          <FAQAccordion />
         </div>
-
-        {/* O'NG TOMON: BANNERLAR VA OBUNA BO'LISH */}
-        <div className="w-full lg:w-[320px] flex flex-col gap-6">
-
-          {/* Obuna bo'lish formasi */}
-          <div className="bg-gray-50 rounded-xl p-6 border border-gray-100">
-            <h4 className="font-bold text-center text-slate-800 mb-2">Yangiliklarga obuna bo&apos;ling</h4>
-            <p className="text-[12px] text-gray-500 text-center mb-4 leading-snug">
-              Muntazam chegirmalar, maxsus takliflar va kompaniya yangiliklari.
-            </p>
-            <input
-              type="email"
-              placeholder="Email manzilingiz"
-              className="w-full p-3 border border-gray-200 rounded-md mb-4 outline-none focus:border-blue-500 transition-all text-sm"
-            />
-            <button className="w-full bg-blue-600 text-white font-bold py-3 rounded-md hover:bg-blue-700 transition-colors text-sm mb-4 uppercase tracking-wider">
-              Obuna bo&apos;lish
-            </button>
-            <div className="flex items-start gap-2">
-              <input type="checkbox" className="mt-1" id="confirm" />
-              <label htmlFor="confirm" className="text-[10px] text-gray-400 leading-tight cursor-pointer">
-                Maxfiylik siyosatiga muvofiq shaxsiy ma&apos;lumotlarni qayta ishlashga roziman
-              </label>
-            </div>
-          </div>
-
-        </div>
+        <aside className="h-fit rounded-2xl border border-[var(--border)] bg-[var(--surface-muted)] p-6">
+          <h2 className="text-lg font-bold text-[var(--text)]">Javob topilmadimi?</h2>
+          <p className="mt-2 text-sm leading-6 text-[var(--text-muted)]">Savolingizni bizga yuboring, mavjud ma’lumotlar asosida yordam beramiz.</p>
+          <Link href="/aloqa" className="mt-5 inline-flex min-h-11 items-center gap-2 font-semibold text-[var(--secondary)] hover:underline">Aloqa sahifasi <ArrowRight size={16} /></Link>
+        </aside>
       </div>
-    </div>
+    </section>
   );
 }

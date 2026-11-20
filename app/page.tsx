@@ -15,7 +15,7 @@ const benefits = [
 
 export default function Home() {
   return (
-    <main className="bg-[var(--background)]">
+      <div className="bg-[var(--background)]">
       <section className="relative overflow-hidden bg-gradient-to-br from-[var(--primary)] via-[#10345b] to-[#0e7c86] text-white">
         <div className="mx-auto grid max-w-7xl gap-8 px-4 py-16 sm:px-6 sm:py-20 lg:grid-cols-[1.1fr_.9fr] lg:items-center lg:px-8 lg:py-24">
           <div className="max-w-2xl">
@@ -40,6 +40,6 @@ export default function Home() {
         <CategoryGrid />
       </section>
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8"><HomAksiya /><Tabs1 /><Tabs2 /><SungiYangliklar /></div>
-    </main>
+      </div>
   );
 }

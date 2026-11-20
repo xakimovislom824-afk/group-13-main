@@ -591,7 +591,7 @@ function ShaxsiyKabinetContent() {
           </aside>
 
           {/* Main content */}
-          <main className="flex-1 min-w-0 w-full">
+          <div className="flex-1 min-w-0 w-full">
 
             {/* ── DASHBOARD ── */}
             {activeTab === "dashboard" && (
@@ -933,7 +933,7 @@ function ShaxsiyKabinetContent() {
               </div>
             )}
 
-          </main>
+          </div>
         </div>
       </div>
     </div>

@@ -19,7 +19,7 @@ export default function Xavfsizlik() {
         <h1 className="text-3xl md:text-4xl font-bold text-[#1A202C]">Maxfiylik siyosati va xavfsizlik</h1>
       </header>
 
-      <main className="max-w-360 mx-auto px-4 py-10 md:px-20 lg:px-32">
+      <div className="max-w-360 mx-auto px-4 py-10 md:px-20 lg:px-32">
         <div className="bg-white border border-gray-100 rounded-sm shadow-sm p-6 md:p-16 lg:p-20">
 
           <div className="prose prose-sm max-w-none text-gray-600 space-y-10">
@@ -203,7 +203,7 @@ export default function Xavfsizlik() {
           </div>
 
         </div>
-      </main>
+      </div>
     </div>
   );
 }
