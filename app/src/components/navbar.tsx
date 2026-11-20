@@ -333,6 +333,7 @@ export default function Navbar() {
   const pathname = usePathname();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isDarkMode, setIsDarkMode] = useState(false);
+  const [hasMounted, setHasMounted] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [userData, setUserData] = useState<UserData>({ username: null, avatar: null });
 
@@ -341,6 +342,10 @@ export default function Navbar() {
   const { data: cart = [] } = useGetCartsQuery();
   const { data: apiCategories = [] } = useGetCategoriesQuery();
   const cartCount = cart.reduce((total, item) => total + Number(item.quantity ?? 0), 0);
+
+  useEffect(() => {
+    setHasMounted(true);
+  }, []);
 
   useEffect(() => {
     if (isSidebarOpen) {
@@ -415,8 +420,8 @@ export default function Navbar() {
 
   const sidebarLinks = useMemo(() => [
     { href: "/aksiyalar", label: "Barcha aksiyalar", icon: <FiGift size={20} /> },
-    { href: "/tulov", label: "To'lov" },
-    { href: "/yetkazibBerish", label: "Yetkazib berish" },
+    { href: "/tolov", label: "To'lov" },
+    { href: "/yetkazib-berish", label: "Yetkazib berish" },
     { href: "/fikrlar", label: "Fikrlar" },
     { href: "/blog", label: "Yangiliklar" },
     { href: "/aloqa", label: "Aloqa" },
@@ -427,8 +432,8 @@ export default function Navbar() {
 
       {/* ── MAIN NAVBAR ── */}
       <div className="flex items-center justify-between gap-3 px-4 py-3 md:gap-4 md:px-6">
-        <Link href="/" aria-label="Islomx7 bosh sahifasi" className="flex shrink-0 items-center">
-          <Image src="/logo.png" alt="Islomx7 logo" width={1040} height={360} priority className="h-10 w-auto object-contain" />
+        <Link href="/" aria-label="Islomx7 bosh sahifasi" className="inline-flex shrink-0 items-center rounded-xl bg-black px-3 py-1.5">
+          <Image src="/logo.png" alt="Islomx7 logo" width={160} height={40} priority className="h-8 w-auto object-contain md:h-10" />
         </Link>
 
         {/* Desktop SearchBox */}
@@ -471,8 +476,7 @@ export default function Navbar() {
       {/* ── SIDEBAR ── */}
       <div className={`fixed inset-0 bg-black/60 z-[2000] transition-opacity duration-300 ${isSidebarOpen ? "opacity-100 visible" : "opacity-0 invisible pointer-events-none"}`}>
         <div className={`fixed top-0 left-0 h-full w-[85%] max-w-[360px] bg-white shadow-2xl transition-transform duration-300 transform ${isSidebarOpen ? "translate-x-0" : "-translate-x-full"} flex flex-col`}>
-          <div className="flex justify-between items-center p-4 border-b bg-white shrink-0">
-            <span className="font-bold text-[18px] text-gray-800">Menyu</span>
+          <div className="flex justify-end items-center p-4 border-b bg-white shrink-0">
             <button onClick={closeSidebar} className="p-1 bg-gray-100 rounded-md text-blue-600" aria-label="Menyuni yopish">
               <IoClose size={24} />
             </button>
@@ -486,10 +490,12 @@ export default function Navbar() {
                   {l.label}
                 </Link>
               ))}
-              <div className="border-b border-border p-4">
-                <p className="mb-2 text-xs font-bold uppercase text-muted-foreground">Kategoriyalar</p>
-                {apiCategories.map((category) => <Link key={category.slug} href={`/katalog/${category.slug}`} onClick={closeSidebar} className="block rounded-md px-2 py-2 text-sm text-foreground hover:bg-muted">{getCategoryDisplayName(category)}</Link>)}
-              </div>
+              {hasMounted && apiCategories.length > 0 && (
+                <div className="border-b border-border p-4">
+                  <p className="mb-2 text-xs font-bold uppercase text-muted-foreground">Kategoriyalar</p>
+                  {apiCategories.map((category) => <Link key={category.slug} href={`/katalog/${category.slug}`} onClick={closeSidebar} className="block rounded-md px-2 py-2 text-sm text-foreground hover:bg-muted">{getCategoryDisplayName(category)}</Link>)}
+                </div>
+              )}
               {isLoggedIn ? (
                 <Link href="/kabnet" onClick={closeSidebar} className="p-4 border-b flex items-center gap-3 text-gray-700 hover:bg-gray-50">
                   <UserAvatar avatar={userData.avatar} username={userData.username} size="lg" />
