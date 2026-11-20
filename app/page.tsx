@@ -1,6 +1,5 @@
 import Link from "next/link";
 import { ArrowRight, Hammer, Package, Search, ShoppingCart, Star } from "lucide-react";
-import CategoryGrid from "../components/CategoryGrid";
 import HomAksiya from "../components/homAksiya";
 import Tabs1 from "../components/engKopSotilganlar";
 import StoreMarquee from "../components/StoreMarquee";
@@ -35,10 +34,6 @@ export default function Home() {
       </section>
       <section aria-label="Xizmatlar afzalliklari" className="mx-auto grid max-w-7xl grid-cols-2 gap-4 px-4 py-8 sm:px-6 md:grid-cols-4 lg:px-8">
         {benefits.map(({ label, icon: Icon }) => <div key={label} className="flex items-center gap-3 rounded-xl border border-[var(--border)] bg-[var(--surface)] p-4 shadow-sm"><Icon className="shrink-0 text-[var(--secondary)]" size={22} /><span className="text-sm font-semibold text-[var(--text)]">{label}</span></div>)}
-      </section>
-      <section className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
-        <div className="mb-5 flex items-end justify-between"><div><p className="text-sm font-bold uppercase tracking-widest text-[var(--secondary)]">Islomx7 katalogi</p><h2 className="mt-1 font-[family-name:var(--font-manrope)] text-2xl font-extrabold text-[var(--primary)] sm:text-3xl">Bo&apos;limlar</h2></div><Link href="/katalog" className="text-sm font-semibold text-[var(--secondary)] hover:underline">Barcha mahsulotlar <ArrowRight className="ml-1 inline" size={16} /></Link></div>
-        <CategoryGrid />
       </section>
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8"><HomAksiya /><Tabs1 /><StoreMarquee /><Tabs2 /><SungiYangliklar /></div>
       </div>

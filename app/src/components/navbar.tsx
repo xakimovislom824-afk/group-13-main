@@ -475,9 +475,6 @@ export default function Navbar() {
                 </Link>
               );
             })}
-            <Link href="/katalog" aria-current={pathname === "/katalog" || pathname?.startsWith("/katalog/") ? "page" : undefined} className={`whitespace-nowrap rounded-md px-1.5 py-2 text-[11px] font-semibold transition-colors hover:bg-[var(--surface-muted)] hover:text-[var(--secondary)] min-[1366px]:px-2 min-[1440px]:px-2.5 min-[1440px]:text-xs ${pathname === "/katalog" || pathname?.startsWith("/katalog/") ? "text-[var(--secondary)]" : "text-[var(--text-muted)]"}`}>
-              Kategoriyalar
-            </Link>
           </nav>
 
           <div className="hidden w-[clamp(220px,20vw,260px)] shrink min-[1200px]:block">
@@ -502,6 +499,7 @@ export default function Navbar() {
               </Link>
             )}
             <NavIcon href="/savatcha" icon={<FaShoppingCart size={18} />} label="Savat" badge={cartCount || ""} />
+            <NavIcon href="/wishlist" icon={<FaHeart size={18} />} label="Sevimlilar" badge={wishlist.length || ""} className="hidden min-[768px]:inline-flex" />
             <button type="button" onClick={isSidebarOpen ? closeSidebar : openSidebar} className="inline-flex size-10 shrink-0 items-center justify-center rounded-lg hover:bg-[var(--surface-muted)] min-[768px]:hidden" aria-label={isSidebarOpen ? "Menyuni yopish" : "Menyuni ochish"} aria-expanded={isSidebarOpen} aria-controls="mobile-navigation">
               {isSidebarOpen ? <IoClose size={22} /> : <IoMenu size={23} />}
             </button>
@@ -516,7 +514,6 @@ export default function Navbar() {
             const isActive = pathname === link.href || pathname?.startsWith(`${link.href}/`);
             return <Link key={link.href} href={link.href} aria-current={isActive ? "page" : undefined} className={`whitespace-nowrap rounded-md px-2 py-1.5 text-xs font-semibold transition-colors hover:bg-[var(--surface-muted)] hover:text-[var(--secondary)] ${isActive ? "text-[var(--secondary)]" : "text-[var(--text-muted)]"}`}>{link.label}</Link>;
           })}
-          <Link href="/katalog" aria-current={pathname === "/katalog" || pathname?.startsWith("/katalog/") ? "page" : undefined} className={`whitespace-nowrap rounded-md px-2 py-1.5 text-xs font-semibold transition-colors hover:bg-[var(--surface-muted)] hover:text-[var(--secondary)] ${pathname === "/katalog" || pathname?.startsWith("/katalog/") ? "text-[var(--secondary)]" : "text-[var(--text-muted)]"}`}>Kategoriyalar</Link>
         </nav>
 
         <div id="compact-search" className={`grid transition-[grid-template-rows,opacity,padding] duration-200 min-[768px]:hidden ${isSearchOpen ? "grid-rows-[1fr] pb-3 opacity-100" : "grid-rows-[0fr] pb-0 opacity-0"}`} aria-hidden={!isSearchOpen}>
@@ -540,7 +537,6 @@ export default function Navbar() {
                   {link.icon && <span className="text-[var(--secondary)]">{link.icon}</span>}{link.label}
                 </Link>;
               })}
-              <Link href="/katalog" onClick={closeSidebar} aria-current={pathname === "/katalog" || pathname?.startsWith("/katalog/") ? "page" : undefined} className={`flex min-h-12 items-center rounded-lg px-3 text-sm font-semibold transition-colors ${pathname === "/katalog" || pathname?.startsWith("/katalog/") ? "bg-[var(--secondary-soft)] text-[var(--secondary)]" : "text-[var(--text)] hover:bg-[var(--surface-muted)]"}`}>Kategoriyalar</Link>
               <Link href="/wishlist" onClick={closeSidebar} className="flex min-h-12 items-center gap-3 rounded-lg px-3 text-sm font-semibold text-[var(--text)] hover:bg-[var(--surface-muted)]"><FaHeart className="text-[var(--secondary)]" />Saralangan{wishlist.length > 0 && <span className="ml-auto rounded-full bg-red-600 px-2 py-0.5 text-xs text-white">{wishlist.length}</span>}</Link>
             </div>
             {hasMounted && apiCategories.length > 0 && <div className="mt-4 border-t border-[var(--border)] pt-4"><p className="px-3 pb-2 text-xs font-bold uppercase tracking-wider text-[var(--text-muted)]">Mahsulot kategoriyalari</p><div className="flex flex-col gap-1">{apiCategories.map((category) => <Link key={category.slug} href={`/katalog/${category.slug}`} onClick={closeSidebar} aria-current={pathname === `/katalog/${category.slug}` ? "page" : undefined} className={`rounded-lg px-3 py-2.5 text-sm transition-colors ${pathname === `/katalog/${category.slug}` ? "bg-[var(--secondary-soft)] font-semibold text-[var(--secondary)]" : "text-[var(--text-muted)] hover:bg-[var(--surface-muted)] hover:text-[var(--text)]"}`}>{getCategoryDisplayName(category)}</Link>)}</div></div>}

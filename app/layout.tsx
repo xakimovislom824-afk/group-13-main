@@ -96,6 +96,7 @@ export default function RootLayout({
 }>) {
   return (
     <html
+      data-scroll-behavior="smooth"
       lang="uz"
       suppressHydrationWarning
       className={`${inter.variable} ${manrope.variable} min-h-full antialiased`}

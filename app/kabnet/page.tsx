@@ -2,7 +2,7 @@
 
 import { useGetProfileQuery, useEditProfilMutation } from "../../services/editProfileApi";
 import { useChangeParolMutation } from "../../services/changePasswordApi";
-import { useState, useEffect, Suspense, type ReactNode } from "react";
+import { useState, useEffect, Suspense, useSyncExternalStore, type ReactNode } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import {
   FaUserCircle, FaListUl, FaMapMarkerAlt, FaShieldAlt,
@@ -57,6 +57,10 @@ type CabinetNavItem = {
   icon: ReactNode;
   badge?: number;
 };
+
+const subscribeToHydration = () => () => {};
+const getClientSnapshot = () => true;
+const getServerSnapshot = () => false;
 
 const getErrorData = (error: unknown): Record<string, unknown> => {
   if (!error || typeof error !== "object" || !("data" in error)) return {};
@@ -309,6 +313,7 @@ function AddressTab() {
 function ShaxsiyKabinetContent() {
   const { data: payments = [] } = useGetPaymentsQuery();
   const { data: wishlists = [], isLoading: wishlistLoading } = useGetWishlistQuery();
+  const hasMounted = useSyncExternalStore(subscribeToHydration, getClientSnapshot, getServerSnapshot);
   const [removeWishlist] = useRemoveWishlistMutation();
   const searchParams = useSearchParams();
   const router = useRouter();
@@ -469,17 +474,17 @@ function ShaxsiyKabinetContent() {
   const navItems: CabinetNavItem[] = [
     { id: "dashboard", label: "Mening hisobim", icon: <FaUserCircle size={18} /> },
     { id: "profile", label: "Profilni tahrirlash", icon: <LiaUserEditSolid size={18} /> },
-    { id: "orders", label: "Mening buyurtmalarim", icon: <FaListUl size={18} />, badge: payments.length },
+    { id: "orders", label: "Mening buyurtmalarim", icon: <FaListUl size={18} />, badge: hasMounted ? payments.length : 0 },
     { id: "address", label: "Yetkazib berish manzili", icon: <FaMapMarkerAlt size={18} /> },
-    { id: "favorites", label: "Tanlangan tovarlar", icon: <FaHeart size={18} />, badge: wishlists.length },
+    { id: "favorites", label: "Tanlangan tovarlar", icon: <FaHeart size={18} />, badge: hasMounted ? wishlists.length : 0 },
     { id: "password", label: "Parolni o'zgartirish", icon: <FaShieldAlt size={18} /> },
   ];
 
   const menuCards: CabinetNavItem[] = [
-    { id: "orders", label: "MENING BUYURTMALARIM", icon: <FaListUl size={24} />, badge: payments.length },
+    { id: "orders", label: "MENING BUYURTMALARIM", icon: <FaListUl size={24} />, badge: hasMounted ? payments.length : 0 },
     { id: "profile", label: "PROFILNI TAHRIRLASH", icon: <FiUser size={24} /> },
     { id: "address", label: "YETKAZIB BERISH MANZILI", icon: <FaMapMarkerAlt size={24} /> },
-    { id: "favorites", label: "TANLANGAN TOVARLAR", icon: <FaHeart size={24} />, badge: wishlists.length },
+    { id: "favorites", label: "TANLANGAN TOVARLAR", icon: <FaHeart size={24} />, badge: hasMounted ? wishlists.length : 0 },
     { id: "password", label: "PAROLNI O'ZGARTIRISH", icon: <FaShieldAlt size={24} /> },
     { id: "logout", label: "CHIQISH", icon: <FaSignOutAlt size={24} /> },
   ];
