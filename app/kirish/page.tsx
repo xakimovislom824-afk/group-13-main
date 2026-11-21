@@ -10,6 +10,7 @@ import { Eye, EyeOff, UserPlus, ChevronRight } from "lucide-react";
 import { authClient } from "../../lib/auth/client";
 import { AUTH_SESSION_KEY } from "../../lib/auth/use-session";
 import { mutate } from "swr";
+import { notify } from "../../lib/notifications";
 
 const loginSchema = z.object({
   identifier: z
@@ -26,6 +27,7 @@ type LoginFormData = z.infer<typeof loginSchema>;
 export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [isGoogleLoading, setIsGoogleLoading] = useState(false);
   const router = useRouter();
 
   const {
@@ -41,6 +43,25 @@ export default function LoginPage() {
     },
   });
 
+  const handleGoogleLogin = async () => {
+    setIsGoogleLoading(true);
+    notify.info("Google hisobingiz tekshirilmoqda.");
+    try {
+      const { error } = await authClient.signIn.social({
+        provider: "google",
+        callbackURL: `${window.location.origin}/kabnet?auth=google-success`,
+        errorCallbackURL: `${window.location.origin}/kirish?auth=google-error`,
+      });
+      if (error) {
+        notify.error("Google orqali kirishda xatolik yuz berdi.");
+        setIsGoogleLoading(false);
+      }
+    } catch {
+      notify.error("Google orqali kirishda xatolik yuz berdi.");
+      setIsGoogleLoading(false);
+    }
+  };
+
   const onSubmit = async (data: LoginFormData) => {
     setIsLoading(true);
     try {
@@ -50,7 +71,7 @@ export default function LoginPage() {
         rememberMe: data.rememberMe,
       });
       if (error) {
-        alert("Email yoki parol noto'g'ri.");
+        notify.error("Email yoki parol noto'g'ri.");
         return;
       }
 
@@ -60,10 +81,18 @@ export default function LoginPage() {
         ? requestedNext
         : "/kabnet";
       await mutate(AUTH_SESSION_KEY);
+      notify.success("Tizimga muvaffaqiyatli kirdingiz.");
       router.push(next);
       router.refresh();
-    } catch {
-      alert("Tizimga kirib bo'lmadi. Qayta urinib ko'ring.");
+    } catch (error: unknown) {
+      const authError = typeof error === "object" && error !== null
+        ? error as { code?: unknown; status?: unknown; statusCode?: unknown; message?: unknown }
+        : {};
+      const invalidCredentials = authError.status === 401
+        || authError.statusCode === 401
+        || authError.code === "INVALID_EMAIL_OR_PASSWORD"
+        || (typeof authError.message === "string" && /invalid email or password/i.test(authError.message));
+      notify.error(invalidCredentials ? "Email yoki parol noto'g'ri." : "Tizimga kirib bo'lmadi. Qayta urinib ko'ring.");
     } finally {
       setIsLoading(false);
     }
@@ -155,6 +184,16 @@ export default function LoginPage() {
                 className="w-full bg-[#1A73E8] hover:bg-[#1557B0] text-white font-bold py-4 rounded-lg uppercase text-xs tracking-widest shadow-md disabled:opacity-50"
               >
                 {isLoading ? "KIRILMOQDA..." : "AVTORIZATSIYA"}
+              </button>
+
+              <button
+                type="button"
+                onClick={handleGoogleLogin}
+                disabled={isGoogleLoading}
+                className="flex w-full items-center justify-center gap-3 rounded-lg border border-gray-200 bg-white py-3.5 text-sm font-semibold text-gray-700 transition-colors hover:bg-gray-50 disabled:cursor-wait disabled:opacity-60"
+              >
+                <span aria-hidden="true" className="font-bold text-lg text-[#4285F4]">G</span>
+                {isGoogleLoading ? "Google hisobingiz tekshirilmoqda..." : "Google orqali kirish"}
               </button>
 
               <label className="flex items-center gap-3 cursor-pointer">

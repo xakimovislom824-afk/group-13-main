@@ -3,7 +3,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { FiGift } from "react-icons/fi";
-import { FiMoon, FiSun } from "react-icons/fi";
+import { FiMoon, FiSun, FiGrid } from "react-icons/fi";
 import { useState, useEffect, useCallback, useMemo, useRef, useSyncExternalStore, Suspense } from "react";
 import {
   FaUser,
@@ -21,6 +21,7 @@ import { useProductSearch } from "../../hooks/useProductSearch";
 import { formatPrice } from "../../../lib/site-config";
 import { getCategoryDisplayName, useGetCategoriesQuery } from "../../../services/categoryApi";
 import { useAuthSession } from "../../../lib/auth/use-session";
+import { notify } from "../../../lib/notifications";
 
 export const dynamic = "force-dynamic";
 
@@ -61,7 +62,7 @@ const UserAvatar = ({ avatar, username, size = "md" }: UserAvatarProps) => {
   const sz = { sm: "w-6 h-6 text-[10px]", md: "w-8 h-8 text-xs", lg: "w-10 h-10 text-sm" }[size];
   if (avatar) return (
     <div className={`${sz} rounded-full overflow-hidden border-2 border-blue-100 shrink-0`}>
-      <Image src={avatar} alt={username || "avatar"} width={40} height={40} className="w-full h-full object-cover" />
+      <Image src={avatar} alt={username ? `${username} profil rasmi` : "Profil rasmi"} width={40} height={40} unoptimized className="w-full h-full object-cover" />
     </div>
   );
   return (
@@ -76,7 +77,7 @@ const UserAvatar = ({ avatar, username, size = "md" }: UserAvatarProps) => {
 // ─────────────────────────────────────────────
 interface NavIconProps { href: string; icon: React.ReactNode; label: string; badge?: number | string; className?: string }
 const NavIcon = ({ href, icon, label, badge, className = "" }: NavIconProps) => (
-  <Link href={href} aria-label={label} className={`relative inline-flex size-10 shrink-0 items-center justify-center rounded-lg text-[var(--text-muted)] transition-colors hover:bg-[var(--surface-muted)] hover:text-[var(--secondary)] ${className}`}>
+  <Link href={href} aria-label={label} className={`relative inline-flex size-9 shrink-0 items-center justify-center rounded-lg text-[var(--text-muted)] transition-colors hover:bg-[var(--surface-muted)] hover:text-[var(--secondary)] sm:size-10 ${className}`}>
     {icon}
     {badge !== undefined && badge !== "" && (
       <span className="absolute right-0.5 top-0.5 min-w-4 rounded-full border-2 border-[var(--surface)] bg-red-600 px-1 text-center text-[9px] leading-[14px] text-white">
@@ -307,9 +308,29 @@ export default function Navbar() {
   const hasMounted = useSyncExternalStore(subscribeToHydration, getClientSnapshot, getServerSnapshot);
   const { data: authSession } = useAuthSession();
   const isLoggedIn = Boolean(authSession?.user);
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const authResult = params.get("auth");
+    if (!authResult) return;
+    if (authResult === "google-error") {
+      notify.error("Google orqali kirishda xatolik yuz berdi.");
+    } else if (authResult === "google-success" && authSession?.user) {
+      notify.success("Google orqali muvaffaqiyatli kirdingiz.");
+    } else {
+      return;
+    }
+    params.delete("auth");
+    const query = params.toString();
+    window.history.replaceState(window.history.state, "", `${window.location.pathname}${query ? `?${query}` : ""}${window.location.hash}`);
+  }, [authSession?.user, pathname]);
   const userData = {
     username: authSession?.user.name || authSession?.user.email || null,
-    avatar: authSession?.user.image ? "/api/avatar" : null,
+    avatar: authSession?.user.image
+      ? authSession.user.image.startsWith("avatars/")
+        ? "/api/avatar"
+        : authSession.user.image
+      : null,
   };
 
   const { openModal } = useModal();
@@ -412,6 +433,7 @@ export default function Navbar() {
     { href: "/fikrlar", label: "Fikrlar" },
     { href: "/blog", label: "Yangiliklar" },
     { href: "/aloqa", label: "Aloqa" },
+    { href: "/katalog", label: "Kategoriyalar", icon: <FiGrid size={18} /> },
   ], []);
 
   return (
@@ -420,53 +442,53 @@ export default function Navbar() {
         <div className="flex min-h-[68px] items-center gap-2 sm:gap-3 xl:gap-5">
           <BrandLogo compact />
 
-          <nav aria-label="Asosiy navigatsiya" className="hidden min-w-0 flex-1 items-center justify-center gap-0.5 min-[1200px]:flex">
+          <nav aria-label="Asosiy navigatsiya" className="hidden min-w-0 flex-1 items-center justify-center gap-0.5 min-[1440px]:flex">
             {sidebarLinks.map((link) => {
               const isActive = pathname === link.href || pathname?.startsWith(`${link.href}/`);
               return (
-                <Link key={link.href} href={link.href} aria-current={isActive ? "page" : undefined} className={`whitespace-nowrap rounded-md px-1.5 py-2 text-[11px] font-semibold transition-colors hover:bg-[var(--surface-muted)] hover:text-[var(--secondary)] min-[1366px]:px-2 min-[1440px]:px-2.5 min-[1440px]:text-xs ${isActive ? "text-[var(--secondary)]" : "text-[var(--text-muted)]"}`}>
+                <Link key={link.href} href={link.href} aria-current={isActive ? "page" : undefined} className={`relative whitespace-nowrap rounded-md px-1.5 py-2 text-[11px] font-semibold transition-colors hover:bg-[var(--surface-muted)] hover:text-[var(--secondary)] after:absolute after:bottom-1 after:left-2 after:right-2 after:h-0.5 after:rounded-full after:bg-[var(--secondary)] after:content-[''] after:scale-x-0 after:transition-transform hover:after:scale-x-100 min-[1366px]:px-2 min-[1440px]:px-2.5 min-[1440px]:text-xs ${isActive ? "text-[var(--secondary)] after:scale-x-100" : "text-[var(--text-muted)]"}`}>
                   {link.label}
                 </Link>
               );
             })}
           </nav>
 
-          <div className="hidden w-[clamp(220px,20vw,260px)] shrink min-[1200px]:block">
+          <div className="hidden w-[clamp(190px,18vw,240px)] shrink min-[1440px]:block">
             <SearchBox />
           </div>
 
-          <div className="hidden w-[clamp(200px,24vw,260px)] shrink-0 min-[768px]:block min-[1200px]:hidden">
+          <div className="hidden w-[clamp(180px,24vw,260px)] shrink-0 min-[768px]:block min-[1440px]:hidden">
             <SearchBox />
           </div>
 
           <div className="ml-auto flex shrink-0 items-center gap-0.5 text-[var(--text-muted)] sm:gap-1">
-            <button type="button" onClick={() => setIsSearchOpen((open) => !open)} className="inline-flex size-10 shrink-0 items-center justify-center rounded-lg hover:bg-[var(--surface-muted)] hover:text-[var(--secondary)] min-[768px]:hidden" aria-label={isSearchOpen ? "Qidiruvni yopish" : "Mahsulot qidirish"} aria-expanded={isSearchOpen} aria-controls="compact-search">
+            <button type="button" onClick={() => setIsSearchOpen((open) => !open)} className="inline-flex size-9 shrink-0 items-center justify-center rounded-lg hover:bg-[var(--surface-muted)] hover:text-[var(--secondary)] min-[768px]:hidden sm:size-10" aria-label={isSearchOpen ? "Qidiruvni yopish" : "Mahsulot qidirish"} aria-expanded={isSearchOpen} aria-controls="compact-search">
               {isSearchOpen ? <IoClose size={21} /> : <FaSearch size={17} />}
             </button>
             {isLoggedIn ? (
-              <Link href="/kabnet" aria-label="Shaxsiy hisob" title={userData.username || "Shaxsiy hisob"} className="inline-flex size-10 shrink-0 items-center justify-center rounded-lg text-[var(--text-muted)] transition-colors hover:bg-[var(--surface-muted)] hover:text-[var(--secondary)]">
-                {userData.avatar ? <UserAvatar avatar={userData.avatar} username={userData.username} size="lg" /> : <FaUser size={18} />}
+              <Link href="/kabnet" aria-label="Shaxsiy hisob" title={userData.username || "Shaxsiy hisob"} className="inline-flex size-9 shrink-0 items-center justify-center rounded-lg text-[var(--text-muted)] transition-colors hover:bg-[var(--surface-muted)] hover:text-[var(--secondary)] sm:size-10">
+                {userData.avatar ? <UserAvatar avatar={userData.avatar} username={userData.username} size="md" /> : <FaUser size={18} />}
               </Link>
             ) : (
-              <Link href="/kirish" aria-label="Kirish" title="Kirish" className="inline-flex size-10 shrink-0 items-center justify-center rounded-lg text-[var(--text-muted)] transition-colors hover:bg-[var(--surface-muted)] hover:text-[var(--secondary)]">
+              <Link href="/kirish" aria-label="Kirish" title="Kirish" className="inline-flex size-9 shrink-0 items-center justify-center rounded-lg text-[var(--text-muted)] transition-colors hover:bg-[var(--surface-muted)] hover:text-[var(--secondary)] sm:size-10">
                 <FaUser size={18} />
               </Link>
             )}
             <NavIcon href="/savatcha" icon={<FaShoppingCart size={18} />} label="Savat" badge={cartCount || ""} />
-            <NavIcon href="/wishlist" icon={<FaHeart size={18} />} label="Sevimlilar" badge={wishlist.length || ""} className="hidden min-[768px]:inline-flex" />
-            <button type="button" onClick={isSidebarOpen ? closeSidebar : openSidebar} className="inline-flex size-10 shrink-0 items-center justify-center rounded-lg hover:bg-[var(--surface-muted)] min-[768px]:hidden" aria-label={isSidebarOpen ? "Menyuni yopish" : "Menyuni ochish"} aria-expanded={isSidebarOpen} aria-controls="mobile-navigation">
+            <NavIcon href="/wishlist" icon={<FaHeart size={18} />} label="Sevimlilar" badge={wishlist.length || ""} className="!hidden min-[768px]:!inline-flex" />
+            <button type="button" onClick={isSidebarOpen ? closeSidebar : openSidebar} className="inline-flex size-9 shrink-0 items-center justify-center rounded-lg hover:bg-[var(--surface-muted)] min-[640px]:hidden sm:size-10" aria-label={isSidebarOpen ? "Menyuni yopish" : "Menyuni ochish"} aria-expanded={isSidebarOpen} aria-controls="mobile-navigation">
               {isSidebarOpen ? <IoClose size={22} /> : <IoMenu size={23} />}
             </button>
-            <button type="button" onClick={toggleDarkMode} aria-label={isDarkMode ? "Yorug' rejimni yoqish" : "Tungi rejimni yoqish"} aria-pressed={isDarkMode} className="inline-flex size-10 shrink-0 items-center justify-center rounded-lg text-[var(--text-muted)] hover:bg-[var(--surface-muted)] hover:text-[var(--secondary)]" title={isDarkMode ? "Yorug' rejim" : "Tungi rejim"}>
+            <button type="button" onClick={toggleDarkMode} aria-label={isDarkMode ? "Yorug' rejimni yoqish" : "Tungi rejimni yoqish"} aria-pressed={isDarkMode} className="inline-flex size-9 shrink-0 items-center justify-center rounded-lg text-[var(--text-muted)] hover:bg-[var(--surface-muted)] hover:text-[var(--secondary)] sm:size-10" title={isDarkMode ? "Yorug' rejim" : "Tungi rejim"}>
               {isDarkMode ? <FiSun size={19} /> : <FiMoon size={19} />}
             </button>
           </div>
         </div>
 
-        <nav aria-label="Asosiy navigatsiya" className="hidden min-[768px]:flex min-[1200px]:hidden min-h-11 flex-wrap items-center justify-center gap-x-2 gap-y-1 border-t border-[var(--border)] py-1">
+        <nav aria-label="Asosiy navigatsiya" className="hidden min-[640px]:flex min-[1440px]:hidden min-h-11 flex-wrap items-center justify-center gap-x-2 gap-y-1 border-t border-[var(--border)] py-1">
           {sidebarLinks.map((link) => {
             const isActive = pathname === link.href || pathname?.startsWith(`${link.href}/`);
-            return <Link key={link.href} href={link.href} aria-current={isActive ? "page" : undefined} className={`whitespace-nowrap rounded-md px-2 py-1.5 text-xs font-semibold transition-colors hover:bg-[var(--surface-muted)] hover:text-[var(--secondary)] ${isActive ? "text-[var(--secondary)]" : "text-[var(--text-muted)]"}`}>{link.label}</Link>;
+            return <Link key={link.href} href={link.href} aria-current={isActive ? "page" : undefined} className={`relative whitespace-nowrap rounded-md px-2 py-1.5 text-xs font-semibold transition-colors hover:bg-[var(--surface-muted)] hover:text-[var(--secondary)] after:absolute after:bottom-0.5 after:left-2 after:right-2 after:h-0.5 after:rounded-full after:bg-[var(--secondary)] after:content-[''] after:scale-x-0 after:transition-transform hover:after:scale-x-100 ${isActive ? "text-[var(--secondary)] after:scale-x-100" : "text-[var(--text-muted)]"}`}>{link.label}</Link>;
           })}
         </nav>
 

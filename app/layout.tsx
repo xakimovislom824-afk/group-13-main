@@ -3,6 +3,7 @@ import Script from "next/script";
 import { Analytics } from "@vercel/analytics/next";
 import { Inter, Manrope } from "next/font/google";
 import { siteConfig } from "../lib/site-config";
+import "react-toastify/dist/ReactToastify.css";
 import "./globals.css";
 
 import Navbar from "../app/src/components/navbar";
@@ -112,7 +113,7 @@ export default function RootLayout({
         />
         <ModalProvider>
           <Providers>
-            <ToastContainer position="top-right" autoClose={2000} />
+            <ToastContainer position="top-right" autoClose={3800} newestOnTop closeOnClick={false} pauseOnFocusLoss draggable pauseOnHover theme="light" />
 
             <div className="w-full max-w-[1508px] mx-auto flex flex-col min-h-screen">
               <Navbar />
