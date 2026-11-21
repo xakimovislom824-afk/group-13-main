@@ -476,7 +476,7 @@ export default function Navbar() {
             )}
             <NavIcon href="/savatcha" icon={<FaShoppingCart size={18} />} label="Savat" badge={cartCount || ""} />
             <NavIcon href="/wishlist" icon={<FaHeart size={18} />} label="Sevimlilar" badge={wishlist.length || ""} className="!hidden min-[768px]:!inline-flex" />
-            <button type="button" onClick={isSidebarOpen ? closeSidebar : openSidebar} className="inline-flex size-9 shrink-0 items-center justify-center rounded-lg hover:bg-[var(--surface-muted)] min-[768px]:hidden sm:size-10" aria-label={isSidebarOpen ? "Menyuni yopish" : "Menyuni ochish"} aria-expanded={isSidebarOpen} aria-controls="mobile-navigation">
+            <button type="button" onClick={isSidebarOpen ? closeSidebar : openSidebar} className="inline-flex size-9 shrink-0 items-center justify-center rounded-lg hover:bg-[var(--surface-muted)] min-[640px]:hidden sm:size-10" aria-label={isSidebarOpen ? "Menyuni yopish" : "Menyuni ochish"} aria-expanded={isSidebarOpen} aria-controls="mobile-navigation">
               {isSidebarOpen ? <IoClose size={22} /> : <IoMenu size={23} />}
             </button>
             <button type="button" onClick={toggleDarkMode} aria-label={isDarkMode ? "Yorug' rejimni yoqish" : "Tungi rejimni yoqish"} aria-pressed={isDarkMode} className="inline-flex size-9 shrink-0 items-center justify-center rounded-lg text-[var(--text-muted)] hover:bg-[var(--surface-muted)] hover:text-[var(--secondary)] sm:size-10" title={isDarkMode ? "Yorug' rejim" : "Tungi rejim"}>
@@ -485,7 +485,7 @@ export default function Navbar() {
           </div>
         </div>
 
-        <nav aria-label="Asosiy navigatsiya" className="hidden min-[768px]:flex min-[1440px]:hidden min-h-11 flex-wrap items-center justify-center gap-x-2 gap-y-1 border-t border-[var(--border)] py-1">
+        <nav aria-label="Asosiy navigatsiya" className="hidden min-[640px]:flex min-[1440px]:hidden min-h-11 flex-wrap items-center justify-center gap-x-2 gap-y-1 border-t border-[var(--border)] py-1">
           {sidebarLinks.map((link) => {
             const isActive = pathname === link.href || pathname?.startsWith(`${link.href}/`);
             return <Link key={link.href} href={link.href} aria-current={isActive ? "page" : undefined} className={`relative whitespace-nowrap rounded-md px-2 py-1.5 text-xs font-semibold transition-colors hover:bg-[var(--surface-muted)] hover:text-[var(--secondary)] after:absolute after:bottom-0.5 after:left-2 after:right-2 after:h-0.5 after:rounded-full after:bg-[var(--secondary)] after:content-[''] after:scale-x-0 after:transition-transform hover:after:scale-x-100 ${isActive ? "text-[var(--secondary)] after:scale-x-100" : "text-[var(--text-muted)]"}`}>{link.label}</Link>;
