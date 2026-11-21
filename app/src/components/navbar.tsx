@@ -20,22 +20,13 @@ import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useProductSearch } from "../../hooks/useProductSearch";
 import { formatPrice } from "../../../lib/site-config";
 import { getCategoryDisplayName, useGetCategoriesQuery } from "../../../services/categoryApi";
+import { useAuthSession } from "../../../lib/auth/use-session";
 
 export const dynamic = "force-dynamic";
 
 // ─────────────────────────────────────────────
 // TYPES
 // ─────────────────────────────────────────────
-interface UserData { username: string | null; avatar: string | null }
-
-// ─────────────────────────────────────────────
-// CONSTANTS
-// ─────────────────────────────────────────────
-const STORAGE_KEYS = {
-  user: ["user", "userInfo", "userData", "currentUser", "profile"],
-  token: ["access", "access_token", "accessToken", "token"],
-};
-
 const subscribeToHydration = () => () => {};
 const getClientSnapshot = () => true;
 const getServerSnapshot = () => false;
@@ -43,30 +34,6 @@ const getServerSnapshot = () => false;
 // ─────────────────────────────────────────────
 // HELPERS
 // ─────────────────────────────────────────────
-const getUserDataFromStorage = (): UserData => {
-  try {
-    for (const key of STORAGE_KEYS.user) {
-      const raw = localStorage.getItem(key);
-      if (!raw) continue;
-      try {
-        const p = JSON.parse(raw);
-        const username =
-          p.username || p.first_name || p.name || p.full_name ||
-          (p.first_name && p.last_name ? `${p.first_name} ${p.last_name}` : null) ||
-          p.email || null;
-        const avatar = p.avatar || p.avatar_url || p.profile_image || p.image || p.photo || null;
-        return { username, avatar };
-      } catch { return { username: raw, avatar: null }; }
-    }
-  } catch { }
-  return { username: null, avatar: null };
-};
-
-const checkIsLoggedIn = (): boolean => {
-  try { return STORAGE_KEYS.token.some(k => !!localStorage.getItem(k)); }
-  catch { return false; }
-};
-
 const getInitials = (name: string | null): string => {
   if (!name) return "U";
   const p = name.trim().split(/\s+/);
@@ -338,8 +305,12 @@ export default function Navbar() {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isDarkMode, setIsDarkMode] = useState(false);
   const hasMounted = useSyncExternalStore(subscribeToHydration, getClientSnapshot, getServerSnapshot);
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [userData, setUserData] = useState<UserData>({ username: null, avatar: null });
+  const { data: authSession } = useAuthSession();
+  const isLoggedIn = Boolean(authSession?.user);
+  const userData = {
+    username: authSession?.user.name || authSession?.user.email || null,
+    avatar: authSession?.user.image ? "/api/avatar" : null,
+  };
 
   const { openModal } = useModal();
   const { data: wishlist = [] } = useGetWishlistQuery();
@@ -382,23 +353,6 @@ export default function Navbar() {
       previousFocus?.focus();
     };
   }, [isSidebarOpen]);
-
-  const refreshAuth = useCallback(() => {
-    const ok = checkIsLoggedIn();
-    setIsLoggedIn(ok);
-    setUserData(ok ? getUserDataFromStorage() : { username: null, avatar: null });
-  }, []);
-
-  useEffect(() => {
-    const timeoutId = window.setTimeout(refreshAuth, 0);
-    window.addEventListener("storage", refreshAuth);
-    window.addEventListener("authChange", refreshAuth);
-    return () => {
-      window.clearTimeout(timeoutId);
-      window.removeEventListener("storage", refreshAuth);
-      window.removeEventListener("authChange", refreshAuth);
-    };
-  }, [refreshAuth]);
 
   useEffect(() => {
     const root = document.documentElement;

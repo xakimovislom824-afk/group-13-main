@@ -2,7 +2,7 @@
 
 import { useGetProfileQuery, useEditProfilMutation } from "../../services/editProfileApi";
 import { useChangeParolMutation } from "../../services/changePasswordApi";
-import { useState, useEffect, Suspense, type ReactNode } from "react";
+import { useState, useEffect, Suspense, useRef, type ReactNode, type ChangeEvent } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import {
   FaUserCircle, FaListUl, FaMapMarkerAlt, FaShieldAlt,
@@ -11,6 +11,9 @@ import {
   FaRegEye, FaRegEyeSlash, FaPlus, FaTimes,
 } from "react-icons/fa";
 import { FiUser } from "react-icons/fi";
+import { AUTH_SESSION_KEY, useAuthSession } from "../../lib/auth/use-session";
+import { authClient } from "../../lib/auth/client";
+import { mutate } from "swr";
 import { LiaUserEditSolid } from "react-icons/lia";
 import { Heart } from "lucide-react";
 import Link from "next/link";
@@ -316,33 +319,20 @@ function ShaxsiyKabinetContent() {
   const [activeTab, setActiveTab] = useState("dashboard");
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [showPass, setShowPass] = useState({ old: false, new: false, confirm: false });
-  const [userInfo, setUserInfo] = useState<UserInfo | null>(null);
+  const { data: authSession, isLoading: authPending } = useAuthSession();
+  const userInfo: UserInfo | null = authSession?.user
+    ? { name: authSession.user.name, full_name: authSession.user.name, email: authSession.user.email }
+    : null;
   const [userOrders, setUserOrders] = useState<SavedOrder[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
   const ITEMS_PER_PAGE = 5;
+  const avatarInputRef = useRef<HTMLInputElement>(null);
+  const [avatarLoading, setAvatarLoading] = useState(false);
+  const [avatarError, setAvatarError] = useState("");
 
-  // ── localStorage dan user ma'lumotlari ──
   useEffect(() => {
-    const timeoutId = window.setTimeout(() => {
-      const keys = ["user", "userInfo", "userData", "authUser", "currentUser"];
-      let found: UserInfo | null = null;
-      for (const key of keys) {
-        const raw = localStorage.getItem(key) || sessionStorage.getItem(key);
-        if (raw) {
-          try {
-            const parsed: unknown = JSON.parse(raw);
-            found = parsed && typeof parsed === "object" ? parsed as UserInfo : null;
-            break;
-          } catch {
-            found = { username: raw };
-            break;
-          }
-        }
-      }
-      setUserInfo(found);
-    }, 0);
-    return () => window.clearTimeout(timeoutId);
-  }, []);
+    if (!authPending && !authSession?.user) router.replace("/kirish?next=%2Fkabnet");
+  }, [authPending, authSession, router]);
 
   useEffect(() => {
     const tab = searchParams.get("tab");
@@ -366,15 +356,40 @@ function ShaxsiyKabinetContent() {
     return () => window.clearTimeout(timeoutId);
   }, [activeTab]);
 
-  const handleLogout = () => {
-    [
-      "user", "userInfo", "userData", "authUser", "currentUser",
-      "token", "access", "access_token", "accessToken",
-      "refresh_token", "refresh", "refreshToken", "userOrders",
-    ].forEach((k) => { localStorage.removeItem(k); sessionStorage.removeItem(k); });
-    window.dispatchEvent(new Event("authChange"));
-    setUserInfo(null); setUserOrders([]);
+  const handleAvatarUpload = async (event: ChangeEvent<HTMLInputElement>) => {
+    const file = event.currentTarget.files?.[0];
+    event.currentTarget.value = "";
+    setAvatarError("");
+    if (!file) return;
+    if (file.size > 5 * 1024 * 1024) {
+      setAvatarError("Rasm hajmi 5 MB dan oshmasligi kerak.");
+      return;
+    }
+
+    setAvatarLoading(true);
+    try {
+      const formData = new FormData();
+      formData.set("file", file);
+      const response = await fetch("/api/avatar", { method: "POST", body: formData });
+      if (!response.ok) {
+        const result = await response.json().catch(() => ({}));
+        setAvatarError(typeof result.error === "string" ? result.error : "Rasmni yuklab bo'lmadi.");
+        return;
+      }
+      window.location.reload();
+    } catch {
+      setAvatarError("Rasmni yuklab bo'lmadi. Qayta urinib ko'ring.");
+    } finally {
+      setAvatarLoading(false);
+    }
+  };
+
+  const handleLogout = async () => {
+    await authClient.signOut({});
+    await mutate(AUTH_SESSION_KEY, null, { revalidate: false });
+    setUserOrders([]);
     router.push("/kirish");
+    router.refresh();
   };
 
   const getUserDisplayName = () => {
@@ -674,6 +689,24 @@ function ShaxsiyKabinetContent() {
             {activeTab === "profile" && (
               <div className="bg-white p-5 md:p-8 rounded-xl shadow-sm border border-gray-100 w-full max-w-2xl">
                 <h2 className="text-xl font-bold mb-6">Profilni tahrirlash</h2>
+                <div className="mb-7 flex flex-wrap items-center gap-4 rounded-xl border border-gray-100 bg-gray-50/70 p-4">
+                  <div className="flex size-16 items-center justify-center overflow-hidden rounded-full border border-gray-200 bg-white text-lg font-bold text-blue-700">
+                    {authSession?.user.image ? (
+                      <Image src="/api/avatar" alt="Profil rasmi" width={64} height={64} unoptimized className="h-full w-full object-cover" />
+                    ) : (
+                      getUserInitials()
+                    )}
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <p className="font-semibold text-gray-800">Profil rasmi</p>
+                    <p className="mt-1 text-xs text-gray-500">JPEG, PNG yoki WebP. Maksimal hajmi 5 MB.</p>
+                    <input ref={avatarInputRef} type="file" accept="image/jpeg,image/png,image/webp" onChange={handleAvatarUpload} className="sr-only" aria-label="Yangi profil rasmi tanlash" />
+                    <button type="button" onClick={() => avatarInputRef.current?.click()} disabled={avatarLoading} className="mt-3 inline-flex min-h-10 items-center justify-center rounded-lg bg-[#1D71D4] px-4 text-sm font-semibold text-white transition hover:bg-[#1659a8] disabled:cursor-not-allowed disabled:opacity-60">
+                      {avatarLoading ? "Yuklanmoqda..." : authSession?.user.image ? "Rasmni almashtirish" : "Rasm yuklash"}
+                    </button>
+                    {avatarError && <p role="alert" className="mt-2 text-sm text-red-600">{avatarError}</p>}
+                  </div>
+                </div>
                 <div className="space-y-4">
                   {[
                     { label: "Username", type: "text", placeholder: "Username kiriting", key: "username", required: true },

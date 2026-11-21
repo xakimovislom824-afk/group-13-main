@@ -6,7 +6,10 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Eye, EyeOff, UserPlus, ChevronRight } from "lucide-react";
-import { useRegisterUserMutation } from "../../services/registerApi";
+import { useRouter } from "next/navigation";
+import { authClient } from "../../lib/auth/client";
+import { AUTH_SESSION_KEY } from "../../lib/auth/use-session";
+import { mutate } from "swr";
 
 // =========================
 // ZOD SCHEMA
@@ -44,8 +47,8 @@ type RegisterFormData = z.infer<typeof registerSchema>;
 export default function RegisterPage() {
   const [showPass, setShowPass] = useState(false);
   const [showConfirmPass, setShowConfirmPass] = useState(false);
-
-  const [registerUser, { isLoading }] = useRegisterUserMutation();
+  const [isLoading, setIsLoading] = useState(false);
+  const router = useRouter();
 
   const {
     register,
@@ -70,16 +73,24 @@ export default function RegisterPage() {
   // =========================
 
   const onSubmit = async (data: RegisterFormData) => {
+    setIsLoading(true);
     try {
-      const { username, email, first_name, last_name, password } = data;
-      await registerUser({ username, email, first_name, last_name, password }).unwrap();
-      alert("Muvaffaqiyatli ro'yxatdan o'tdingiz!");
-    } catch (error: unknown) {
-      const data = error && typeof error === "object" && "data" in error
-        && error.data && typeof error.data === "object"
-        ? error.data as Record<string, unknown>
-        : {};
-      alert(typeof data.message === "string" ? data.message : "Xatolik yuz berdi. Qayta urinib ko'ring!");
+      const { error } = await authClient.signUp.email({
+        email: data.email.trim(),
+        name: `${data.first_name.trim()} ${data.last_name.trim()}`,
+        password: data.password,
+      });
+      if (error) {
+        alert("Ro'yxatdan o'tib bo'lmadi. Ma'lumotlarni tekshirib, qayta urinib ko'ring.");
+        return;
+      }
+      await mutate(AUTH_SESSION_KEY);
+      router.push("/kabnet");
+      router.refresh();
+    } catch {
+      alert("Xatolik yuz berdi. Qayta urinib ko'ring.");
+    } finally {
+      setIsLoading(false);
     }
   };
 
