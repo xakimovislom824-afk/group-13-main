@@ -276,7 +276,7 @@ export default function Navbar() {
             })}
           </nav>
 
-          <div className="col-span-2 row-start-2 min-w-0 md:col-span-2 md:row-start-3 xl:col-span-1 xl:col-start-3 xl:row-start-1">
+          <div className="col-span-2 row-start-2 min-w-0 md:col-span-4 md:row-start-3 xl:col-span-1 xl:col-start-3 xl:row-start-1">
             <SearchBoxSlot />
           </div>
 
