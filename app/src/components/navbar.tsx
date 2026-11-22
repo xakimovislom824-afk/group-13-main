@@ -263,7 +263,7 @@ export default function Navbar() {
   const utilityLinkClass = "relative shrink-0 items-center justify-center rounded-full text-white/80 transition hover:bg-white/10 hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white";
 
   return (
-    <header className="relative z-10 w-full px-2 pt-2 sm:px-5 sm:pt-4">
+    <header className="fixed inset-x-0 top-0 z-[1000] w-full px-2 pt-2 sm:px-5 sm:pt-4">
       <div className="mx-auto max-w-[1508px] rounded-[26px] border border-white/[0.08] bg-[#071525]/95 p-2 text-white shadow-[0_16px_48px_rgba(4,16,31,0.22)] backdrop-blur-xl min-[480px]:p-3 sm:px-5 sm:py-3">
         <div className="flex min-w-0 items-center gap-1 min-[480px]:gap-2 xl:gap-3">
           <BrandLogo compact inverse />
@@ -286,7 +286,7 @@ export default function Navbar() {
             <Link href="/savatcha" aria-label={`Savat${cartCount ? `, ${cartCount} ta mahsulot` : ""}`} className={`${utilityLinkClass} inline-flex size-9 min-[480px]:size-10`}><FiShoppingCart aria-hidden="true" size={18} />{cartCount > 0 && <span className="absolute right-0 top-0 flex min-w-4 items-center justify-center rounded-full bg-[#1476F2] px-1 text-[10px] font-bold leading-4 text-white">{cartCount}</span>}</Link>
             <Link href="/wishlist" aria-label={`Sevimlilar${wishlist.length ? `, ${wishlist.length} ta mahsulot` : ""}`} className={`${utilityLinkClass} hidden min-[480px]:inline-flex size-10`}><FiHeart aria-hidden="true" size={18} />{wishlist.length > 0 && <span className="absolute right-0 top-0 flex min-w-4 items-center justify-center rounded-full bg-[#1476F2] px-1 text-[10px] font-bold leading-4 text-white">{wishlist.length}</span>}</Link>
             <button type="button" onClick={toggleDarkMode} aria-label={isDarkMode ? "Yorug' rejimni yoqish" : "Tungi rejimni yoqish"} aria-pressed={isDarkMode} className={`${utilityLinkClass} hidden min-[480px]:inline-flex size-10`} title={isDarkMode ? "Yorug' rejim" : "Tungi rejim"}>{isDarkMode ? <FiSun aria-hidden="true" size={18} /> : <FiMoon aria-hidden="true" size={18} />}</button>
-            <button type="button" onClick={isMenuOpen ? closeMenu : openMenu} className="inline-flex size-9 shrink-0 items-center justify-center rounded-full bg-white text-[#071525] transition hover:bg-slate-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white min-[480px]:size-10" aria-label={isMenuOpen ? "Menyuni yopish" : "Menyuni ochish"} aria-expanded={isMenuOpen} aria-controls="mobile-navigation">{isMenuOpen ? <FiX aria-hidden="true" size={20} /> : <FiMenu aria-hidden="true" size={20} />}</button>
+            <button type="button" onClick={isMenuOpen ? closeMenu : openMenu} className="inline-flex size-9 shrink-0 items-center justify-center rounded-full bg-white/10 text-white transition hover:bg-white/20 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white min-[480px]:size-10" aria-label={isMenuOpen ? "Menyuni yopish" : "Menyuni ochish"} aria-expanded={isMenuOpen} aria-controls="mobile-navigation">{isMenuOpen ? <FiX aria-hidden="true" size={20} /> : <FiMenu aria-hidden="true" size={20} />}</button>
           </div>
         </div>
       </div>
