@@ -11,6 +11,7 @@ import { authClient } from "../../lib/auth/client";
 import { AUTH_SESSION_KEY } from "../../lib/auth/use-session";
 import { mutate } from "swr";
 import { notify } from "../../lib/notifications";
+import { GoogleSignInButton } from "../../components/GoogleSignInButton";
 
 // =========================
 // ZOD SCHEMA
@@ -49,7 +50,6 @@ export default function RegisterPage() {
   const [showPass, setShowPass] = useState(false);
   const [showConfirmPass, setShowConfirmPass] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [isGoogleLoading, setIsGoogleLoading] = useState(false);
   const router = useRouter();
 
   const {
@@ -73,25 +73,6 @@ export default function RegisterPage() {
   // =========================
   // SUBMIT
   // =========================
-
-  const handleGoogleLogin = async () => {
-    setIsGoogleLoading(true);
-    notify.info("Google hisobingiz tekshirilmoqda.");
-    try {
-      const { error } = await authClient.signIn.social({
-        provider: "google",
-        callbackURL: `${window.location.origin}/kabnet?auth=google-success`,
-        errorCallbackURL: `${window.location.origin}/kirish?auth=google-error`,
-      });
-      if (error) {
-        notify.error("Google orqali kirishda xatolik yuz berdi.");
-        setIsGoogleLoading(false);
-      }
-    } catch {
-      notify.error("Google orqali kirishda xatolik yuz berdi.");
-      setIsGoogleLoading(false);
-    }
-  };
 
   const onSubmit = async (data: RegisterFormData) => {
     setIsLoading(true);
@@ -324,15 +305,7 @@ export default function RegisterPage() {
               >
                 {isLoading ? "YUKLANMOQDA..." : "RO'YXATDAN O'TISH"}
               </button>
-              <button
-                type="button"
-                onClick={handleGoogleLogin}
-                disabled={isGoogleLoading}
-                className="flex w-full items-center justify-center gap-3 rounded-lg border border-gray-200 bg-white py-3.5 text-sm font-semibold text-gray-700 transition-colors hover:bg-gray-50 disabled:cursor-wait disabled:opacity-60"
-              >
-                <span aria-hidden="true" className="font-bold text-lg text-[#4285F4]">G</span>
-                {isGoogleLoading ? "Google hisobingiz tekshirilmoqda..." : "Google orqali ro'yxatdan o'tish"}
-              </button>
+              <GoogleSignInButton label="Google orqali ro‘yxatdan o‘tish" />
             </form>
           </div>
 

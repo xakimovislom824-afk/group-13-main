@@ -11,6 +11,7 @@ import { authClient } from "../../lib/auth/client";
 import { AUTH_SESSION_KEY } from "../../lib/auth/use-session";
 import { mutate } from "swr";
 import { notify } from "../../lib/notifications";
+import { GoogleSignInButton } from "../../components/GoogleSignInButton";
 
 const loginSchema = z.object({
   identifier: z
@@ -27,7 +28,6 @@ type LoginFormData = z.infer<typeof loginSchema>;
 export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [isGoogleLoading, setIsGoogleLoading] = useState(false);
   const router = useRouter();
 
   const {
@@ -42,25 +42,6 @@ export default function LoginPage() {
       rememberMe: false,
     },
   });
-
-  const handleGoogleLogin = async () => {
-    setIsGoogleLoading(true);
-    notify.info("Google hisobingiz tekshirilmoqda.");
-    try {
-      const { error } = await authClient.signIn.social({
-        provider: "google",
-        callbackURL: `${window.location.origin}/kabnet?auth=google-success`,
-        errorCallbackURL: `${window.location.origin}/kirish?auth=google-error`,
-      });
-      if (error) {
-        notify.error("Google orqali kirishda xatolik yuz berdi.");
-        setIsGoogleLoading(false);
-      }
-    } catch {
-      notify.error("Google orqali kirishda xatolik yuz berdi.");
-      setIsGoogleLoading(false);
-    }
-  };
 
   const onSubmit = async (data: LoginFormData) => {
     setIsLoading(true);
@@ -186,15 +167,7 @@ export default function LoginPage() {
                 {isLoading ? "KIRILMOQDA..." : "AVTORIZATSIYA"}
               </button>
 
-              <button
-                type="button"
-                onClick={handleGoogleLogin}
-                disabled={isGoogleLoading}
-                className="flex w-full items-center justify-center gap-3 rounded-lg border border-gray-200 bg-white py-3.5 text-sm font-semibold text-gray-700 transition-colors hover:bg-gray-50 disabled:cursor-wait disabled:opacity-60"
-              >
-                <span aria-hidden="true" className="font-bold text-lg text-[#4285F4]">G</span>
-                {isGoogleLoading ? "Google hisobingiz tekshirilmoqda..." : "Google orqali kirish"}
-              </button>
+              <GoogleSignInButton label="Google orqali kirish" />
 
               <label className="flex items-center gap-3 cursor-pointer">
                 <input
