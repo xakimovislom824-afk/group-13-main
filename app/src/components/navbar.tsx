@@ -22,7 +22,6 @@ const getServerSnapshot = () => false;
 const primaryLinks = [
   { href: "/", label: "Bosh sahifa" },
   { href: "/katalog", label: "Mahsulotlar" },
-  { href: "/katalog", label: "Kategoriyalar" },
   { href: "/biz-haqimizda", label: "Biz haqimizda" },
   { href: "/aloqa", label: "Aloqa" },
 ];
@@ -261,34 +260,33 @@ export default function Navbar() {
   const openMenu = useCallback(() => setIsMenuOpen(true), []);
   const userInitials = useMemo(() => getInitials(username), [username]);
 
-  const utilityLinkClass = "relative inline-flex size-10 shrink-0 items-center justify-center rounded-full text-white/80 transition hover:bg-white/10 hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white";
+  const utilityLinkClass = "relative shrink-0 items-center justify-center rounded-full text-white/80 transition hover:bg-white/10 hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white";
 
   return (
-    <header className="sticky top-0 z-[1000] w-full px-3 pt-3 sm:px-5 sm:pt-4">
-      <div className="mx-auto max-w-[1508px] rounded-[26px] border border-white/[0.08] bg-[#071525]/95 p-3 text-white shadow-[0_16px_48px_rgba(4,16,31,0.22)] backdrop-blur-xl sm:px-5 sm:py-3">
-        <div className="grid grid-cols-[1fr_auto] items-center gap-x-3 gap-y-3 md:grid-cols-[auto_auto_minmax(180px,1fr)_auto] md:gap-x-4 xl:grid-cols-[auto_auto_minmax(200px,1fr)_auto] xl:gap-x-5">
+    <header className="relative z-10 w-full px-2 pt-2 sm:px-5 sm:pt-4">
+      <div className="mx-auto max-w-[1508px] rounded-[26px] border border-white/[0.08] bg-[#071525]/95 p-2 text-white shadow-[0_16px_48px_rgba(4,16,31,0.22)] backdrop-blur-xl min-[480px]:p-3 sm:px-5 sm:py-3">
+        <div className="flex min-w-0 items-center gap-1 min-[480px]:gap-2 xl:gap-3">
           <BrandLogo compact inverse />
 
-          <nav aria-label="Asosiy navigatsiya" className="col-span-2 row-start-2 hidden items-center justify-center gap-1 md:flex md:col-span-4 md:row-start-2 xl:col-span-1 xl:col-start-2 xl:row-start-1 xl:gap-0.5">
+          <nav aria-label="Asosiy navigatsiya" className="hidden shrink-0 items-center justify-center gap-0.5 xl:flex">
             {primaryLinks.map((link) => {
               const active = pathname === link.href || (link.href !== "/" && pathname?.startsWith(`${link.href}/`));
               return <Link key={link.label} href={link.href} aria-current={active ? "page" : undefined} className={`whitespace-nowrap rounded-full px-2.5 py-2 text-[12px] font-semibold transition-colors hover:bg-white/10 hover:text-white xl:px-2.5 min-[1440px]:px-3 ${active ? "bg-white/10 text-white" : "text-white/70"}`}>{link.label}</Link>;
             })}
           </nav>
 
-          <div className="col-span-2 row-start-2 min-w-0 md:col-span-4 md:row-start-3 xl:col-span-1 xl:col-start-3 xl:row-start-1">
+          <div className="min-w-0 flex-1">
             <SearchBoxSlot />
           </div>
 
-          <div className="col-start-2 row-start-1 flex items-center justify-end gap-1 xl:col-start-4">
-            <Link href={isLoggedIn ? "/kabnet" : "/kirish"} aria-label={isLoggedIn ? username || "Shaxsiy hisob" : "Kirish"} title={username || "Kirish"} className={`${utilityLinkClass} hidden min-[480px]:inline-flex`}>
+          <div className="flex shrink-0 items-center justify-end gap-0 min-[480px]:gap-1">
+            <Link href={isLoggedIn ? "/kabnet" : "/kirish"} aria-label={isLoggedIn ? username || "Shaxsiy hisob" : "Kirish"} title={username || "Kirish"} className={`${utilityLinkClass} hidden min-[480px]:inline-flex size-10`}>
               {avatar ? <Image src={avatar} alt="" width={30} height={30} unoptimized className="size-7 rounded-full object-cover ring-2 ring-white/20" /> : isLoggedIn ? <span className="text-xs font-bold">{userInitials}</span> : <FiUser aria-hidden="true" size={18} />}
             </Link>
-            <Link href="/savatcha" aria-label={`Savat${cartCount ? `, ${cartCount} ta mahsulot` : ""}`} className={utilityLinkClass}><FiShoppingCart aria-hidden="true" size={18} />{cartCount > 0 && <span className="absolute right-0 top-0 flex min-w-4 items-center justify-center rounded-full bg-[#1476F2] px-1 text-[10px] font-bold leading-4 text-white">{cartCount}</span>}</Link>
-            <Link href="/wishlist" aria-label={`Sevimlilar${wishlist.length ? `, ${wishlist.length} ta mahsulot` : ""}`} className={`${utilityLinkClass} hidden min-[480px]:inline-flex`}><FiHeart aria-hidden="true" size={18} />{wishlist.length > 0 && <span className="absolute right-0 top-0 flex min-w-4 items-center justify-center rounded-full bg-[#1476F2] px-1 text-[10px] font-bold leading-4 text-white">{wishlist.length}</span>}</Link>
-            <button type="button" onClick={toggleDarkMode} aria-label={isDarkMode ? "Yorug' rejimni yoqish" : "Tungi rejimni yoqish"} aria-pressed={isDarkMode} className={`${utilityLinkClass} hidden min-[480px]:inline-flex`} title={isDarkMode ? "Yorug' rejim" : "Tungi rejim"}>{isDarkMode ? <FiSun aria-hidden="true" size={18} /> : <FiMoon aria-hidden="true" size={18} />}</button>
-            <Link href="/katalog" className="hidden h-10 items-center gap-2 rounded-full bg-[#1476F2] px-4 text-xs font-bold text-white transition hover:bg-[#328AFF] xl:inline-flex"><FiShoppingBag aria-hidden="true" size={16} />Katalog</Link>
-            <button type="button" onClick={isMenuOpen ? closeMenu : openMenu} className="inline-flex size-10 shrink-0 items-center justify-center rounded-full bg-white text-[#071525] transition hover:bg-slate-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white md:hidden" aria-label={isMenuOpen ? "Menyuni yopish" : "Menyuni ochish"} aria-expanded={isMenuOpen} aria-controls="mobile-navigation">{isMenuOpen ? <FiX aria-hidden="true" size={20} /> : <FiMenu aria-hidden="true" size={20} />}</button>
+            <Link href="/savatcha" aria-label={`Savat${cartCount ? `, ${cartCount} ta mahsulot` : ""}`} className={`${utilityLinkClass} inline-flex size-9 min-[480px]:size-10`}><FiShoppingCart aria-hidden="true" size={18} />{cartCount > 0 && <span className="absolute right-0 top-0 flex min-w-4 items-center justify-center rounded-full bg-[#1476F2] px-1 text-[10px] font-bold leading-4 text-white">{cartCount}</span>}</Link>
+            <Link href="/wishlist" aria-label={`Sevimlilar${wishlist.length ? `, ${wishlist.length} ta mahsulot` : ""}`} className={`${utilityLinkClass} hidden min-[480px]:inline-flex size-10`}><FiHeart aria-hidden="true" size={18} />{wishlist.length > 0 && <span className="absolute right-0 top-0 flex min-w-4 items-center justify-center rounded-full bg-[#1476F2] px-1 text-[10px] font-bold leading-4 text-white">{wishlist.length}</span>}</Link>
+            <button type="button" onClick={toggleDarkMode} aria-label={isDarkMode ? "Yorug' rejimni yoqish" : "Tungi rejimni yoqish"} aria-pressed={isDarkMode} className={`${utilityLinkClass} hidden min-[480px]:inline-flex size-10`} title={isDarkMode ? "Yorug' rejim" : "Tungi rejim"}>{isDarkMode ? <FiSun aria-hidden="true" size={18} /> : <FiMoon aria-hidden="true" size={18} />}</button>
+            <button type="button" onClick={isMenuOpen ? closeMenu : openMenu} className="inline-flex size-9 shrink-0 items-center justify-center rounded-full bg-white text-[#071525] transition hover:bg-slate-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white min-[480px]:size-10" aria-label={isMenuOpen ? "Menyuni yopish" : "Menyuni ochish"} aria-expanded={isMenuOpen} aria-controls="mobile-navigation">{isMenuOpen ? <FiX aria-hidden="true" size={20} /> : <FiMenu aria-hidden="true" size={20} />}</button>
           </div>
         </div>
       </div>
