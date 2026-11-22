@@ -111,8 +111,8 @@ function SearchBox() {
 
   return (
     <div ref={wrapperRef} className="relative min-w-0 w-full">
-      <form onSubmit={submitSearch} role="search" className="group flex h-11 w-full items-center rounded-full border border-white/15 bg-white/[0.08] px-1.5 text-white transition-all duration-200 focus-within:border-[#1682FF] focus-within:bg-white/[0.12] focus-within:ring-4 focus-within:ring-[#1682FF]/20">
-        <FiSearch aria-hidden="true" className="ml-3 shrink-0 text-white/55 transition-colors group-focus-within:text-white" size={17} />
+      <form onSubmit={submitSearch} role="search" className="site-search group flex h-11 w-full items-center rounded-full border px-1.5 transition-all duration-200 focus-within:border-[#1682FF] focus-within:ring-2 focus-within:ring-[#1682FF]/25">
+        <FiSearch aria-hidden="true" className="ml-3 shrink-0 text-slate-500 transition-colors group-focus-within:text-[#1476F2] dark:text-slate-400 dark:group-focus-within:text-[#5AA2FF]" size={17} />
         <input
           ref={inputRef}
           type="search"
@@ -129,7 +129,7 @@ function SearchBox() {
           className="h-full min-w-0 flex-1 bg-transparent px-3 text-sm text-white outline-none placeholder:text-white/50"
         />
         {inputValue && <button type="button" onClick={clearSearch} aria-label="Qidiruvni tozalash" className="mr-1 inline-flex size-8 shrink-0 items-center justify-center rounded-full text-white/60 transition hover:bg-white/10 hover:text-white"><FiX aria-hidden="true" size={16} /></button>}
-        <button type="submit" aria-label="Qidirish" className="inline-flex size-9 shrink-0 items-center justify-center rounded-full bg-[#1476F2] text-white transition hover:bg-[#328AFF] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"><FiSearch aria-hidden="true" size={16} /></button>
+        <button type="submit" aria-label="Qidirish" className="inline-flex size-9 shrink-0 items-center justify-center rounded-full bg-[#1476F2] text-white transition hover:bg-[#328AFF] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#1682FF]"><FiSearch aria-hidden="true" size={16} /></button>
       </form>
 
       {isOpen && searchQuery.trim().length >= 2 && (
@@ -264,9 +264,9 @@ export default function Navbar() {
 
   return (
     <header className="fixed inset-x-0 top-0 z-[1000] w-full px-2 pt-2 sm:px-5 sm:pt-4">
-      <div className="mx-auto max-w-[1508px] rounded-[26px] border border-white/[0.08] bg-[#071525]/95 p-2 text-white shadow-[0_16px_48px_rgba(4,16,31,0.22)] backdrop-blur-xl min-[480px]:p-3 sm:px-5 sm:py-3">
+      <div className="site-navbar mx-auto max-w-[1508px] rounded-[26px] border p-2 text-[var(--text)] shadow-[0_10px_32px_rgba(15,23,42,0.08)] backdrop-blur-xl min-[480px]:p-3 sm:px-5 sm:py-3">
         <div className="flex min-w-0 items-center gap-1 min-[480px]:gap-2 xl:gap-3">
-          <BrandLogo compact inverse />
+          <BrandLogo compact />
 
           <nav aria-label="Asosiy navigatsiya" className="hidden shrink-0 items-center justify-center gap-0.5 xl:flex">
             {primaryLinks.map((link) => {
@@ -292,8 +292,8 @@ export default function Navbar() {
       </div>
 
       <div className={`fixed inset-0 z-[2000] bg-slate-950/55 transition-opacity duration-200 motion-reduce:transition-none ${isMenuOpen ? "visible opacity-100" : "invisible pointer-events-none opacity-0"}`} onClick={closeMenu} aria-hidden={!isMenuOpen}>
-        <aside id="mobile-navigation" role="dialog" aria-modal="true" aria-label="Sayt menyusi" inert={!isMenuOpen} onClick={(event) => event.stopPropagation()} className={`absolute inset-y-0 right-0 flex w-[min(88vw,390px)] flex-col bg-[#071525] text-white shadow-2xl transition-transform duration-300 motion-reduce:transition-none ${isMenuOpen ? "translate-x-0" : "translate-x-full"}`}>
-          <div className="flex min-h-[76px] items-center justify-between border-b border-white/10 px-5"><BrandLogo compact inverse /><button type="button" onClick={closeMenu} aria-label="Menyuni yopish" className="inline-flex size-10 items-center justify-center rounded-full text-white/70 transition hover:bg-white/10 hover:text-white"><FiX aria-hidden="true" size={21} /></button></div>
+        <aside id="mobile-navigation" role="dialog" aria-modal="true" aria-label="Sayt menyusi" inert={!isMenuOpen} onClick={(event) => event.stopPropagation()} className={`site-drawer absolute inset-y-0 right-0 flex w-[min(88vw,390px)] flex-col shadow-2xl transition-transform duration-300 motion-reduce:transition-none ${isMenuOpen ? "translate-x-0" : "translate-x-full"}`}>
+          <div className="flex min-h-[76px] items-center justify-between border-b border-white/10 px-5"><BrandLogo compact /><button type="button" onClick={closeMenu} aria-label="Menyuni yopish" className="inline-flex size-10 items-center justify-center rounded-full text-white/70 transition hover:bg-white/10 hover:text-white"><FiX aria-hidden="true" size={21} /></button></div>
           <nav aria-label="Mobil navigatsiya" className="flex-1 overflow-y-auto p-4">
             <div className="flex flex-col gap-1">
               {menuLinks.map((link) => {
