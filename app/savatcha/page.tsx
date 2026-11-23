@@ -61,19 +61,11 @@ export default function SavatchaPage() {
     0
   );
 
-  const handleDecrease = (id: number, product: number, currentQty: number) => {
-    if (currentQty <= 1) {
-      deleteCart(id);
-    } else {
-      updateCart({ id, product, quantity: currentQty - 1 });
-    }
-  };
-
   const [promoInput, setPromoInput] = useState("");
   const [promoApplied, setPromoApplied] = useState(false);
   const [promoError, setPromoError] = useState("");
 
-  const PROMO_CODE = "Nodir";
+  const PROMO_CODE = "BOTIRGEY";
   const PROMO_DISCOUNT_PERCENT = 20;
 
   const promoDiscount = promoApplied
@@ -82,12 +74,20 @@ export default function SavatchaPage() {
   const finalTotal = cartTotal - promoDiscount;
 
   const handleApplyPromo = () => {
-    if (promoInput.trim() === PROMO_CODE) {
+    if (promoInput.trim().toUpperCase() === PROMO_CODE) {
       setPromoApplied(true);
       setPromoError("");
     } else {
       setPromoApplied(false);
       setPromoError("Noto'g'ri promokod. Qayta urinib ko'ring.");
+    }
+  };
+
+  const handleDecrease = (id: number, product: number, currentQty: number) => {
+    if (currentQty <= 1) {
+      deleteCart(id);
+    } else {
+      updateCart({ id, product, quantity: currentQty - 1 });
     }
   };
 

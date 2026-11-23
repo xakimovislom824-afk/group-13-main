@@ -9,4 +9,4 @@ export default function robots(): MetadataRoute.Robots {
         sitemap: "https://group-13-main-zeta.vercel.app/sitemap.xml",
 
     };
-}
+} 
