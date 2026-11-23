@@ -112,7 +112,6 @@ function SearchBox() {
   return (
     <div ref={wrapperRef} className="relative min-w-0 w-full">
       <form onSubmit={submitSearch} role="search" className="site-search group flex h-11 w-full items-center rounded-full border px-1.5 transition-all duration-200 focus-within:border-[#1682FF] focus-within:ring-2 focus-within:ring-[#1682FF]/25">
-        <FiSearch aria-hidden="true" className="ml-3 shrink-0 text-slate-500 transition-colors group-focus-within:text-[#1476F2] dark:text-slate-400 dark:group-focus-within:text-[#5AA2FF]" size={17} />
         <input
           ref={inputRef}
           type="search"
@@ -265,7 +264,7 @@ export default function Navbar() {
   return (
     <header className="fixed inset-x-0 top-0 z-[1000] w-full px-2 pt-2 sm:px-5 sm:pt-4">
       <div className="site-navbar mx-auto max-w-[1508px] rounded-[26px] border p-2 text-[var(--text)] shadow-[0_10px_32px_rgba(15,23,42,0.08)] backdrop-blur-xl min-[480px]:p-3 sm:px-5 sm:py-3">
-        <div className="flex min-w-0 items-center gap-1 min-[480px]:gap-2 xl:gap-3">
+        <div className="flex min-w-0 flex-wrap items-center gap-1 min-[480px]:gap-2 xl:gap-3">
           <BrandLogo compact />
 
           <nav aria-label="Asosiy navigatsiya" className="hidden shrink-0 items-center justify-center gap-0.5 xl:flex">
@@ -275,11 +274,11 @@ export default function Navbar() {
             })}
           </nav>
 
-          <div className="min-w-0 flex-1">
+          <div className="min-w-0 flex-1 max-[639px]:order-3 max-[639px]:mt-1 max-[639px]:w-full max-[639px]:flex-none">
             <SearchBoxSlot />
           </div>
 
-          <div className="flex shrink-0 items-center justify-end gap-0 min-[480px]:gap-1">
+          <div className="ml-auto flex shrink-0 items-center justify-end gap-0 min-[480px]:gap-1 max-[639px]:order-2">
             <Link href={isLoggedIn ? "/kabnet" : "/kirish"} aria-label={isLoggedIn ? username || "Shaxsiy hisob" : "Kirish"} title={username || "Kirish"} className={`${utilityLinkClass} hidden min-[480px]:inline-flex size-10`}>
               {avatar ? <Image src={avatar} alt="" width={30} height={30} unoptimized className="size-7 rounded-full object-cover ring-2 ring-white/20" /> : isLoggedIn ? <span className="text-xs font-bold">{userInitials}</span> : <FiUser aria-hidden="true" size={18} />}
             </Link>
