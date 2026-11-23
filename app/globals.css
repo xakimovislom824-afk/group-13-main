@@ -83,7 +83,7 @@ html.dark {
   --search-border: #33465C;
 }
 
-:root { --navbar-offset: 4.5rem; }
+:root { --navbar-offset: 7.75rem; }
 @media (min-width: 640px) { :root { --navbar-offset: 6rem; } }
 * { border-color: var(--border); }
 body { background: var(--background); color: var(--text); font-family: var(--font-inter), sans-serif; }
