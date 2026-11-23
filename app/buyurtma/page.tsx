@@ -7,7 +7,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import Image from "next/image";
 import { useGetFaqsQuery } from "../../services/faqApi";
-import { CheckCircle } from "lucide-react";
+import { notify } from "../../lib/notifications";
 import { formatPrice } from "../../lib/site-config";
 
 type OrderItem = {
@@ -34,41 +34,6 @@ const orderSchema = z.object({
 
 type OrderFormData = z.infer<typeof orderSchema>;
 
-// ── Toast komponenti ──
-// FIX: min-w-[300px] o'rniga ekran kengligiga moslashuvchan w-[calc(100vw-2rem)] + max-w
-// qo'shildi, shunda 360px ekranda toast chetlardan chiqib ketmaydi.
-function SuccessToast({ visible, onClose }: { visible: boolean; onClose: () => void }) {
-  useEffect(() => {
-    if (visible) {
-      const timer = setTimeout(onClose, 3500);
-      return () => clearTimeout(timer);
-    }
-  }, [visible, onClose]);
-
-  return (
-    <div
-      className={`fixed bottom-4 sm:bottom-6 left-1/2 -translate-x-1/2 z-50 w-[calc(100%-2rem)] max-w-[340px] transition-all duration-500 ${visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6 pointer-events-none"
-        }`}
-    >
-      <div className="flex items-center gap-3 bg-white border border-green-200 shadow-2xl shadow-green-100 rounded-2xl px-4 sm:px-6 py-3 sm:py-4 w-full">
-        <div className="w-9 h-9 sm:w-10 sm:h-10 bg-green-100 rounded-full flex items-center justify-center shrink-0">
-          <CheckCircle className="text-green-600 w-5 h-5" />
-        </div>
-        <div className="min-w-0">
-          <p className="text-[13px] sm:text-sm font-bold text-gray-800 truncate">Demo buyurtma qurilmada saqlandi</p>
-          <p className="text-[11px] sm:text-xs text-gray-400 mt-0.5 truncate">Serverga yuborilmadi, to&apos;lov olinmadi.</p>
-        </div>
-        <button
-          onClick={onClose}
-          className="ml-auto text-gray-300 hover:text-gray-500 transition text-lg leading-none shrink-0"
-        >
-          ×
-        </button>
-      </div>
-    </div>
-  );
-}
-
 function generateOrderId() {
   return `LOCAL-${Date.now()}`;
 }
@@ -80,7 +45,6 @@ export default function BuyurtmaPage() {
   const [delivery, setDelivery] = useState("pickup");
   const [payment, setPayment] = useState("card");
   const [openFaq, setOpenFaq] = useState<number | null>(null);
-  const [showToast, setShowToast] = useState(false);
 
   const { data: faqs = [] } = useGetFaqsQuery();
 
@@ -112,7 +76,7 @@ export default function BuyurtmaPage() {
 
   const onOrderSubmit = (formData: OrderFormData) => {
     if (!order || order.items.length === 0) {
-      alert("Savat bo'sh!");
+      notify.warning("Savat bo'sh.");
       return;
     }
 
@@ -137,9 +101,8 @@ export default function BuyurtmaPage() {
     localStorage.setItem("userOrders", JSON.stringify(orders));
     sessionStorage.removeItem("orderSnapshot");
 
-    // Faqat toast ko'rsatish, sahifa o'zgarmaydi
     setOrder(null);
-    setShowToast(true);
+    notify.info("Demo buyurtma qurilmada saqlandi. Serverga yuborilmadi, to'lov olinmadi.");
     // FIX: Buyurtma berilgandan so'ng Ism, Familiya, Email, Telefon
     // maydonlari bo'shatiladi (PhoneInput ham reset() orqali tozalanadi,
     // chunki u Controller bilan boshqariladi)
@@ -155,9 +118,6 @@ export default function BuyurtmaPage() {
   return (
     // FIX: py-10 -> py-6 sm:py-10, kichik ekranda bo'sh joy kamaytirildi
     <div className="bg-[#f5f7fb] min-h-screen py-6 sm:py-10">
-      {/* Toast */}
-      <SuccessToast visible={showToast} onClose={() => setShowToast(false)} />
-
       {/* FIX: px-4 saqlanadi, lekin ichki konteynerlar endi mobil uchun moslashtirildi */}
       <div className="max-w-7xl mx-auto px-4">
         {/* FIX: text-3xl -> text-2xl sm:text-3xl, 360px da sarlavha siqilmaydi */}
@@ -371,7 +331,6 @@ export default function BuyurtmaPage() {
               <button
                 type="submit"
                 className="mt-6 w-full bg-blue-600 text-white font-bold py-3.5 sm:py-4 rounded-xl hover:bg-blue-700 shadow-lg shadow-blue-200 transition-all uppercase text-xs tracking-[1.5px] sm:tracking-[2px] disabled:opacity-60"
-                disabled={showToast}
               >
                 Buyurtma berish
               </button>

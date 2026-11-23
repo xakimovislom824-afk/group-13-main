@@ -7,12 +7,16 @@ import { useForm } from "react-hook-form";
 import * as z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Eye, EyeOff, UserPlus, ChevronRight } from "lucide-react";
-import { useLoginUserMutation } from "../../services/loginApi";
+import { authClient } from "../../lib/auth/client";
+import { AUTH_SESSION_KEY } from "../../lib/auth/use-session";
+import { mutate } from "swr";
+import { notify } from "../../lib/notifications";
+import { GoogleSignInButton } from "../../components/GoogleSignInButton";
 
 const loginSchema = z.object({
   identifier: z
     .string()
-    .min(1, "Username, email yoki telefon raqami kiritilishi shart"),
+    .min(1, "Email kiritilishi shart"),
   password: z
     .string()
     .min(5, "Parol kamida 5 ta belgidan iborat bo'lishi kerak"),
@@ -21,25 +25,10 @@ const loginSchema = z.object({
 
 type LoginFormData = z.infer<typeof loginSchema>;
 
-function setCookie(name: string, value: string, days?: number) {
-  let expires = "";
-  if (days) {
-    const date = new Date();
-    date.setTime(date.getTime() + days * 24 * 60 * 60 * 1000);
-    expires = `; expires=${date.toUTCString()}`;
-  }
-  document.cookie = `${name}=${value}${expires}; path=/; SameSite=Lax`;
-}
-
-export function clearAuthCookies() {
-  document.cookie = "access=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
-  document.cookie = "refresh=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
-}
-
 export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
-  const [loginUser, { isLoading }] = useLoginUserMutation();
 
   const {
     register,
@@ -55,46 +44,38 @@ export default function LoginPage() {
   });
 
   const onSubmit = async (data: LoginFormData) => {
+    setIsLoading(true);
     try {
-      const response = await loginUser({
-        username: data.identifier.trim(),
+      const { error } = await authClient.signIn.email({
+        email: data.identifier.trim(),
         password: data.password,
-      }).unwrap();
-
-      localStorage.setItem("access", response.access);
-      localStorage.setItem("refresh", response.refresh);
-
-      const cookieDays = data.rememberMe ? 30 : undefined;
-      setCookie("access", response.access, cookieDays);
-      setCookie("refresh", response.refresh, cookieDays);
-
-      if (response.user) {
-        localStorage.setItem("user", JSON.stringify(response.user));
-      } else {
-        localStorage.setItem(
-          "user",
-          JSON.stringify({ username: data.identifier.trim() })
-        );
+        rememberMe: data.rememberMe,
+      });
+      if (error) {
+        notify.error("Email yoki parol noto'g'ri.");
+        return;
       }
-
-      if (data.rememberMe) {
-        localStorage.setItem("remember_me", "true");
-      }
-
-      window.dispatchEvent(new Event("authChange"));
 
       const params = new URLSearchParams(window.location.search);
-      const next = params.get("next") || "/kabnet";
+      const requestedNext = params.get("next");
+      const next = requestedNext?.startsWith("/") && !requestedNext.startsWith("//")
+        ? requestedNext
+        : "/kabnet";
+      await mutate(AUTH_SESSION_KEY);
+      notify.success("Tizimga muvaffaqiyatli kirdingiz.");
       router.push(next);
+      router.refresh();
     } catch (error: unknown) {
-      const data = error && typeof error === "object" && "data" in error
-        && error.data && typeof error.data === "object"
-        ? error.data as Record<string, unknown>
+      const authError = typeof error === "object" && error !== null
+        ? error as { code?: unknown; status?: unknown; statusCode?: unknown; message?: unknown }
         : {};
-      const errorMessage = [data.detail, data.message].find(
-        (value): value is string => typeof value === "string" && value.length > 0
-      ) || "Login yoki parol noto'g'ri!";
-      alert(errorMessage);
+      const invalidCredentials = authError.status === 401
+        || authError.statusCode === 401
+        || authError.code === "INVALID_EMAIL_OR_PASSWORD"
+        || (typeof authError.message === "string" && /invalid email or password/i.test(authError.message));
+      notify.error(invalidCredentials ? "Email yoki parol noto'g'ri." : "Tizimga kirib bo'lmadi. Qayta urinib ko'ring.");
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -119,16 +100,19 @@ export default function LoginPage() {
           <div className="w-full lg:w-1/2 p-6 md:p-10 lg:p-14 border-b lg:border-b-0 lg:border-r border-gray-100">
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-5 md:space-y-6">
               <div className="space-y-2">
-                <label className="text-[13px] font-semibold text-gray-600">
-                  Username <span className="text-red-500">*</span>
+                  <label className="text-[13px] font-semibold text-gray-600">
+                  Email <span className="text-red-500">*</span>
                 </label>
                 <input
                   {...register("identifier")}
+                  type="email"
+                  autoComplete="email"
                   className={`w-full border rounded-lg p-3.5 text-sm outline-none transition-all ${errors.identifier
+
                       ? "border-red-500 bg-red-50"
                       : "border-gray-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
                     }`}
-                  placeholder="Usernameni kiriting"
+                  placeholder="Emailingizni kiriting"
                 />
                 {errors.identifier && (
                   <p className="text-red-500 text-xs mt-1">
@@ -183,6 +167,8 @@ export default function LoginPage() {
                 {isLoading ? "KIRILMOQDA..." : "AVTORIZATSIYA"}
               </button>
 
+              <GoogleSignInButton label="Google orqali kirish" />
+
               <label className="flex items-center gap-3 cursor-pointer">
                 <input
                   {...register("rememberMe")}
@@ -218,7 +204,7 @@ export default function LoginPage() {
             </div>
 
             <div className="mt-10">
-              <Link href="/yetkazibBerish" className="inline-block w-full sm:w-auto">
+              <Link href="/register" className="inline-block w-full sm:w-auto">
                 <button
                   type="button"
                   className="w-full sm:w-auto flex items-center justify-center gap-3 bg-[#0B1320] hover:bg-black text-white px-10 py-4 rounded-lg uppercase text-[11px] font-bold tracking-[2px] transition-all group shadow-lg"

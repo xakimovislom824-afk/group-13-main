@@ -16,7 +16,7 @@ import Link from "next/link";
 import { IProduct } from "../Types/index.types";
 import { formatPrice } from "../lib/site-config";
 import { useState } from "react";
-import { toast } from "react-toastify";
+import { notify } from "../lib/notifications";
 
 type CartEntry = {
     id: number;
@@ -87,7 +87,7 @@ function ProductCard({ product }: { product: IProduct }) {
             }).unwrap();
         } catch {
             setLocalLiked(liked);
-        } finally {
+            notify.error("Sevimlilar ro'yxatini yangilab bo'lmadi.");        } finally {
             setTimeout(() => setLocalLiked(null), 500);
         }
     };
@@ -99,9 +99,9 @@ function ProductCard({ product }: { product: IProduct }) {
         if (cartBusy) return;
         try {
             await addToCart({ product: product.id, quantity: 1, product_data: product }).unwrap();
-            toast.success("Savatchaga qo'shildi!", { autoClose: 1200 });
+            notify.success("Mahsulot savatga qo'shildi.");
         } catch (error: unknown) {
-            toast.error(getMutationErrorMessage(error, "Xatolik yuz berdi"), { autoClose: 2000 });
+            notify.error(getMutationErrorMessage(error, "Amalni bajarib bo'lmadi."));
         }
     };
 
@@ -118,7 +118,7 @@ function ProductCard({ product }: { product: IProduct }) {
                 quantity: cartItem.quantity + 1,
             }).unwrap();
         } catch (error: unknown) {
-            toast.error(getMutationErrorMessage(error, "Xatolik"), { autoClose: 1500 });
+            notify.error(getMutationErrorMessage(error, "Miqdorni o'zgartirib bo'lmadi."));
         }
     };
 
@@ -138,7 +138,7 @@ function ProductCard({ product }: { product: IProduct }) {
                 }).unwrap();
             }
         } catch (error: unknown) {
-            toast.error(getMutationErrorMessage(error, "Xatolik"), { autoClose: 1500 });
+            notify.error(getMutationErrorMessage(error, "Miqdorni o'zgartirib bo'lmadi."));
         }
     };
 

@@ -1,7 +1,9 @@
 import type { Metadata, Viewport } from "next";
 import Script from "next/script";
+import { Analytics } from "@vercel/analytics/next";
 import { Inter, Manrope } from "next/font/google";
 import { siteConfig } from "../lib/site-config";
+import "react-toastify/dist/ReactToastify.css";
 import "./globals.css";
 
 import Navbar from "../app/src/components/navbar";
@@ -85,7 +87,7 @@ export const viewport: Viewport = {
   colorScheme: "light dark",
   themeColor: [
     { media: "(prefers-color-scheme: light)", color: "#f7f9fc" },
-    { media: "(prefers-color-scheme: dark)", color: "#101820" },
+    { media: "(prefers-color-scheme: dark)", color: "#0B0F14" },
   ],
 };
 
@@ -111,7 +113,7 @@ export default function RootLayout({
         />
         <ModalProvider>
           <Providers>
-            <ToastContainer position="top-right" autoClose={2000} />
+            <ToastContainer position="top-right" autoClose={3800} newestOnTop closeOnClick={false} pauseOnFocusLoss draggable pauseOnHover theme="light" />
 
             <div className="w-full max-w-[1508px] mx-auto flex flex-col min-h-screen">
               <Navbar />
@@ -126,6 +128,7 @@ export default function RootLayout({
             </div>
           </Providers>
         </ModalProvider>
+        <Analytics />
       </body>
     </html>
   );

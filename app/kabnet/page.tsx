@@ -2,7 +2,7 @@
 
 import { useGetProfileQuery, useEditProfilMutation } from "../../services/editProfileApi";
 import { useChangeParolMutation } from "../../services/changePasswordApi";
-import { useState, useEffect, Suspense, useSyncExternalStore, type ReactNode } from "react";
+import { useState, useEffect, Suspense, useRef, useSyncExternalStore, type ReactNode, type ChangeEvent } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import {
   FaUserCircle, FaListUl, FaMapMarkerAlt, FaShieldAlt,
@@ -11,6 +11,10 @@ import {
   FaRegEye, FaRegEyeSlash, FaPlus, FaTimes,
 } from "react-icons/fa";
 import { FiUser } from "react-icons/fi";
+import { AUTH_SESSION_KEY, useAuthSession } from "../../lib/auth/use-session";
+import { authClient } from "../../lib/auth/client";
+import { mutate } from "swr";
+import { notify } from "../../lib/notifications";
 import { LiaUserEditSolid } from "react-icons/lia";
 import { Heart } from "lucide-react";
 import Link from "next/link";
@@ -116,11 +120,11 @@ function AddressTab() {
   const [editId, setEditId] = useState<number | null>(null);
   const [form, setForm] = useState<CreateOrderAddressBody>(EMPTY_ADDR);
   const [formError, setFormError] = useState("");
-  const [formSuccess, setFormSuccess] = useState("");
+  const [pendingDeleteId, setPendingDeleteId] = useState<number | null>(null);
 
   const openNew = () => {
     setEditId(null); setForm(EMPTY_ADDR);
-    setFormError(""); setFormSuccess(""); setShowForm(true);
+    setFormError(""); setShowForm(true);
   };
 
   const openEdit = (a: OrderAddress) => {
@@ -131,32 +135,37 @@ function AddressTab() {
       street: a.street, house: a.house, apartment: a.apartment,
       postal_code: a.postal_code, note: a.note, is_default: a.is_default,
     });
-    setFormError(""); setFormSuccess(""); setShowForm(true);
+    setFormError(""); setShowForm(true);
   };
 
   const handleSave = async () => {
-    setFormError(""); setFormSuccess("");
+    setFormError("");
     const missing = ADDR_FIELDS.find((f) => f.required && !String(form[f.key] ?? "").trim());
     if (missing) { setFormError(`"${missing.label}" maydonini to'ldiring`); return; }
     try {
       if (editId !== null) {
         await updateAddress({ id: editId, body: form }).unwrap();
-        setFormSuccess("Manzil yangilandi!");
+        notify.success("Manzil yangilandi.");
       } else {
         await createAddress(form).unwrap();
-        setFormSuccess("Yangi manzil qo'shildi!");
+        notify.success("Yangi manzil qo'shildi.");
       }
-      setTimeout(() => { setShowForm(false); setFormSuccess(""); }, 1200);
+      setTimeout(() => setShowForm(false), 1200);
     } catch (err: unknown) {
       const data = getErrorData(err);
       setFormError(getFirstErrorMessage(data.detail) || getFirstErrorMessage(data.phone) || "Xatolik yuz berdi");
     }
   };
 
-  const handleDelete = async (id: number) => {
-    if (!confirm("Bu manzilni o'chirishni xohlaysizmi?")) return;
-    try { await deleteAddress(id).unwrap(); }
-    catch { alert("O'chirishda xatolik"); }
+  const handleDelete = async () => {
+    if (pendingDeleteId === null) return;
+    try {
+      await deleteAddress(pendingDeleteId).unwrap();
+      setPendingDeleteId(null);
+      notify.success("Manzil o'chirildi.");
+    } catch {
+      notify.error("Manzilni o'chirib bo'lmadi.");
+    }
   };
 
   return (
@@ -227,7 +236,7 @@ function AddressTab() {
               <FaEdit size={14} /> Tahrirlash
             </button>
             <button
-              onClick={() => handleDelete(addr.id)}
+              onClick={() => setPendingDeleteId(addr.id)}
               disabled={deleting}
               className="flex-1 p-4 flex items-center justify-center gap-2 text-gray-400 hover:bg-red-50 hover:text-red-500 transition-all disabled:opacity-50"
             >
@@ -285,7 +294,6 @@ function AddressTab() {
             </div>
           </div>
           {formError && <p className="mt-4 text-red-500 text-sm font-medium">{formError}</p>}
-          {formSuccess && <p className="mt-4 text-green-500 text-sm font-medium">{formSuccess}</p>}
           <div className="flex gap-3 mt-6">
             <button
               onClick={() => setShowForm(false)}
@@ -301,6 +309,19 @@ function AddressTab() {
               {creating || updating ? "Saqlanmoqda..." : "Saqlash"}
             </button>
           </div>
+        </div>
+      )}
+
+      {pendingDeleteId !== null && (
+        <div className="fixed inset-0 z-[1200] flex items-center justify-center bg-black/45 p-4" onClick={() => setPendingDeleteId(null)} onKeyDown={(event) => { if (event.key === "Escape") setPendingDeleteId(null); }}>
+          <section role="alertdialog" aria-modal="true" aria-labelledby="delete-address-title" aria-describedby="delete-address-description" onClick={(event) => event.stopPropagation()} className="w-full max-w-md rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-6 text-[var(--text)] shadow-2xl">
+            <h2 id="delete-address-title" className="text-lg font-bold">Manzilni o&apos;chirasizmi?</h2>
+            <p id="delete-address-description" className="mt-2 text-sm text-[var(--text-muted)]">Bu manzil ro&apos;yxatingizdan o&apos;chiriladi. Bu amalni ortga qaytarib bo&apos;lmaydi.</p>
+            <div className="mt-6 flex justify-end gap-3">
+              <button type="button" autoFocus onClick={() => setPendingDeleteId(null)} className="min-h-10 rounded-lg border border-[var(--border)] px-4 text-sm font-semibold hover:bg-[var(--surface-muted)]">Bekor qilish</button>
+              <button type="button" onClick={() => void handleDelete()} disabled={deleting} className="min-h-10 rounded-lg bg-red-600 px-4 text-sm font-semibold text-white hover:bg-red-700 disabled:opacity-60">{deleting ? "O'chirilmoqda..." : "O'chirish"}</button>
+            </div>
+          </section>
         </div>
       )}
     </div>
@@ -321,33 +342,19 @@ function ShaxsiyKabinetContent() {
   const [activeTab, setActiveTab] = useState("dashboard");
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [showPass, setShowPass] = useState({ old: false, new: false, confirm: false });
-  const [userInfo, setUserInfo] = useState<UserInfo | null>(null);
+  const { data: authSession, isLoading: authPending } = useAuthSession();
+  const userInfo: UserInfo | null = authSession?.user
+    ? { name: authSession.user.name, full_name: authSession.user.name, email: authSession.user.email }
+    : null;
   const [userOrders, setUserOrders] = useState<SavedOrder[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
   const ITEMS_PER_PAGE = 5;
+  const avatarInputRef = useRef<HTMLInputElement>(null);
+  const [avatarLoading, setAvatarLoading] = useState(false);
 
-  // ── localStorage dan user ma'lumotlari ──
   useEffect(() => {
-    const timeoutId = window.setTimeout(() => {
-      const keys = ["user", "userInfo", "userData", "authUser", "currentUser"];
-      let found: UserInfo | null = null;
-      for (const key of keys) {
-        const raw = localStorage.getItem(key) || sessionStorage.getItem(key);
-        if (raw) {
-          try {
-            const parsed: unknown = JSON.parse(raw);
-            found = parsed && typeof parsed === "object" ? parsed as UserInfo : null;
-            break;
-          } catch {
-            found = { username: raw };
-            break;
-          }
-        }
-      }
-      setUserInfo(found);
-    }, 0);
-    return () => window.clearTimeout(timeoutId);
-  }, []);
+    if (!authPending && !authSession?.user) router.replace("/kirish?next=%2Fkabnet");
+  }, [authPending, authSession, router]);
 
   useEffect(() => {
     const tab = searchParams.get("tab");
@@ -371,15 +378,46 @@ function ShaxsiyKabinetContent() {
     return () => window.clearTimeout(timeoutId);
   }, [activeTab]);
 
-  const handleLogout = () => {
-    [
-      "user", "userInfo", "userData", "authUser", "currentUser",
-      "token", "access", "access_token", "accessToken",
-      "refresh_token", "refresh", "refreshToken", "userOrders",
-    ].forEach((k) => { localStorage.removeItem(k); sessionStorage.removeItem(k); });
-    window.dispatchEvent(new Event("authChange"));
-    setUserInfo(null); setUserOrders([]);
-    router.push("/kirish");
+  const handleAvatarUpload = async (event: ChangeEvent<HTMLInputElement>) => {
+    const file = event.currentTarget.files?.[0];
+    event.currentTarget.value = "";
+    if (!file) return;
+    if (file.size > 5 * 1024 * 1024) {
+      notify.warning("Fayl hajmi 5 MB dan katta bo'lmasligi kerak.");
+      return;
+    }
+
+    setAvatarLoading(true);
+    try {
+      const formData = new FormData();
+      formData.set("file", file);
+      const response = await fetch("/api/avatar", { method: "POST", body: formData });
+      if (!response.ok) {
+        const result = await response.json().catch(() => ({}));
+        notify.error(typeof result.error === "string" ? result.error : "Rasmni yuklab bo'lmadi.");
+        return;
+      }
+      await mutate(AUTH_SESSION_KEY);
+      notify.success("Profil rasmi saqlandi.");
+    } catch {
+      notify.error("Rasmni yuklab bo'lmadi. Qayta urinib ko'ring.");
+    } finally {
+      setAvatarLoading(false);
+    }
+  };
+
+  const handleLogout = async () => {
+    try {
+      const { error } = await authClient.signOut({});
+      if (error) throw error;
+      await mutate(AUTH_SESSION_KEY, null, { revalidate: false });
+      setUserOrders([]);
+      notify.success("Tizimdan muvaffaqiyatli chiqdingiz.");
+      router.push("/kirish");
+      router.refresh();
+    } catch {
+      notify.error("Tizimdan chiqishda xatolik yuz berdi.");
+    }
   };
 
   const getUserDisplayName = () => {
@@ -411,16 +449,15 @@ function ShaxsiyKabinetContent() {
   // ── Password state ──
   const [passValues, setPassValues] = useState({ old: "", new: "", confirm: "" });
   const [passError, setPassError] = useState("");
-  const [passSuccess, setPassSuccess] = useState("");
   const [changeParol, { isLoading: passLoading }] = useChangeParolMutation();
 
   const handleChangePassword = async () => {
-    setPassError(""); setPassSuccess("");
+    setPassError("");
     if (!passValues.old || !passValues.new || !passValues.confirm) { setPassError("Barcha maydonlarni to'ldiring"); return; }
     if (passValues.new !== passValues.confirm) { setPassError("Yangi parollar mos kelmadi"); return; }
     try {
       await changeParol({ old_password: passValues.old, new_password: passValues.new }).unwrap();
-      setPassSuccess("Parol muvaffaqiyatli o'zgartirildi!");
+      notify.success("Parol muvaffaqiyatli o'zgartirildi.");
       setPassValues({ old: "", new: "", confirm: "" });
     } catch (err: unknown) {
       const data = getErrorData(err);
@@ -430,7 +467,6 @@ function ShaxsiyKabinetContent() {
 
   // ── Profile state ──
   const [profileValues, setProfileValues] = useState({ username: "", email: "", first_name: "", last_name: "" });
-  const [profileSuccess, setProfileSuccess] = useState("");
   const [profileError, setProfileError] = useState("");
   const { data: profile } = useGetProfileQuery();
   const [editProfil, { isLoading: profileLoading }] = useEditProfilMutation();
@@ -447,7 +483,7 @@ function ShaxsiyKabinetContent() {
   }, [profile]);
 
   const handleSaveProfile = async () => {
-    setProfileError(""); setProfileSuccess("");
+    setProfileError("");
     if (!profileValues.username.trim()) { setProfileError("Username majburiy"); return; }
     if (!profileValues.email.trim()) { setProfileError("Email majburiy"); return; }
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(profileValues.email)) { setProfileError("Email formati noto'g'ri"); return; }
@@ -459,7 +495,7 @@ function ShaxsiyKabinetContent() {
     ) { setProfileError("Hech qanday o'zgarish yo'q"); return; }
     try {
       await editProfil(profileValues).unwrap();
-      setProfileSuccess("Profil muvaffaqiyatli yangilandi!");
+      notify.success("Profil muvaffaqiyatli yangilandi.");
     } catch (err: unknown) {
       const data = getErrorData(err);
       const emailError = getFirstErrorMessage(data.email);
@@ -679,6 +715,23 @@ function ShaxsiyKabinetContent() {
             {activeTab === "profile" && (
               <div className="bg-white p-5 md:p-8 rounded-xl shadow-sm border border-gray-100 w-full max-w-2xl">
                 <h2 className="text-xl font-bold mb-6">Profilni tahrirlash</h2>
+                <div className="mb-7 flex flex-wrap items-center gap-4 rounded-xl border border-gray-100 bg-gray-50/70 p-4">
+                  <div className="flex size-16 items-center justify-center overflow-hidden rounded-full border border-gray-200 bg-white text-lg font-bold text-blue-700">
+                    {authSession?.user.image ? (
+                      <Image src={authSession.user.image.startsWith("avatars/") ? "/api/avatar" : authSession.user.image} alt="Profil rasmi" width={64} height={64} unoptimized className="h-full w-full object-cover" />
+                    ) : (
+                      getUserInitials()
+                    )}
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <p className="font-semibold text-gray-800">Profil rasmi</p>
+                    <p className="mt-1 text-xs text-gray-500">JPEG, PNG yoki WebP. Maksimal hajmi 5 MB.</p>
+                    <input ref={avatarInputRef} type="file" accept="image/jpeg,image/png,image/webp" onChange={handleAvatarUpload} className="sr-only" aria-label="Yangi profil rasmi tanlash" />
+                    <button type="button" onClick={() => avatarInputRef.current?.click()} disabled={avatarLoading} className="mt-3 inline-flex min-h-10 items-center justify-center rounded-lg bg-[#1D71D4] px-4 text-sm font-semibold text-white transition hover:bg-[#1659a8] disabled:cursor-not-allowed disabled:opacity-60">
+                      {avatarLoading ? "Yuklanmoqda..." : authSession?.user.image ? "Rasmni almashtirish" : "Rasm yuklash"}
+                    </button>
+                  </div>
+                </div>
                 <div className="space-y-4">
                   {[
                     { label: "Username", type: "text", placeholder: "Username kiriting", key: "username", required: true },
@@ -703,7 +756,6 @@ function ShaxsiyKabinetContent() {
                     </div>
                   ))}
                   {profileError && <p className="text-red-500 text-sm font-medium">{profileError}</p>}
-                  {profileSuccess && <p className="text-green-500 text-sm font-medium">{profileSuccess}</p>}
                   <button
                     onClick={handleSaveProfile}
                     disabled={profileLoading}
@@ -926,7 +978,6 @@ function ShaxsiyKabinetContent() {
                     </div>
                   ))}
                   {passError && <p className="text-red-500 text-sm font-medium">{passError}</p>}
-                  {passSuccess && <p className="text-green-500 text-sm font-medium">{passSuccess}</p>}
                   <button
                     onClick={handleChangePassword}
                     disabled={passLoading}

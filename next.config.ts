@@ -24,7 +24,7 @@ const nextConfig: NextConfig = {
       { source: "/savol-javob", destination: "/savolJavob", permanent: true },
       { source: "/maxfiylik-siyosati", destination: "/xafsizlik", permanent: true },
       { source: "/tolov", destination: "/tulov", permanent: true },
-      { source: "/login", destination: "/kirish", permanent: true },
+      { source: "/login", destination: "/register", permanent: true },
     ];
   },
   images: {

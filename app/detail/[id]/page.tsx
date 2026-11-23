@@ -6,12 +6,13 @@ import Link from "next/link";
 import Image from "next/image";
 import {
   ShoppingCart, Heart, GitCompareArrows, CheckCircle,
-  X, Plus, Minus, Zap, CreditCard, Truck,
+  Plus, Minus, Zap, CreditCard, Truck,
   ChevronRight, ChevronDown, ChevronUp, Shield, RotateCcw, Package,
   AlertCircle, Loader2,
 } from "lucide-react";
 import { useGetProductByIdQuery } from "../../../services/productDetailApi";
 import { formatPrice } from "../../../lib/site-config";
+import { notify } from "../../../lib/notifications";
 
 import {
   useGetCartsQuery,
@@ -25,14 +26,6 @@ import {
   useGetWishlistQuery,
 } from "../../../services/wishlistApi";
 
-// ── TOAST ──
-type ToastType = "success" | "wish" | "error";
-interface ToastItem {
-  id: number;
-  message: string;
-  type: ToastType;
-}
-
 type CartRecord = Record<string, unknown>;
 
 const isRecord = (value: unknown): value is CartRecord =>
@@ -42,37 +35,6 @@ const getRequestErrorMessage = (error: unknown, fallback: string) => {
   if (!isRecord(error) || !isRecord(error.data)) return fallback;
   return typeof error.data.detail === "string" ? error.data.detail : fallback;
 };
-
-function ToastContainer({ toasts, onRemove }: { toasts: ToastItem[]; onRemove: (id: number) => void }) {
-  return (
-    <div className="fixed bottom-28 md:bottom-10 left-1/2 -translate-x-1/2 z-[100000] pointer-events-none flex flex-col gap-2.5 items-center">
-      {toasts.map((toast) => (
-        <div
-          key={toast.id}
-          style={{ fontFamily: "'DM Sans', sans-serif" }}
-          className={`
-            flex items-center gap-3 bg-white border rounded-2xl px-5 py-3.5
-            text-sm font-medium shadow-xl pointer-events-auto whitespace-nowrap
-            ${toast.type === "success" ? "border-l-4 border-l-emerald-500 border-gray-100" : ""}
-            ${toast.type === "wish"    ? "border-l-4 border-l-pink-400 border-gray-100"   : ""}
-            ${toast.type === "error"   ? "border-l-4 border-l-red-400 border-gray-100"    : ""}
-          `}
-        >
-          {toast.type === "success" && <CheckCircle size={16} className="text-emerald-500 shrink-0" />}
-          {toast.type === "wish"    && <Heart        size={16} className="text-pink-400 shrink-0"    />}
-          {toast.type === "error"   && <AlertCircle  size={16} className="text-red-400 shrink-0"     />}
-          <span className="text-gray-700">{toast.message}</span>
-          <button
-            onClick={() => onRemove(toast.id)}
-            className="ml-2 text-gray-300 hover:text-gray-500 transition-colors pointer-events-auto"
-          >
-            <X size={13} />
-          </button>
-        </div>
-      ))}
-    </div>
-  );
-}
 
 // ── SKELETON ──
 function Skeleton({ className }: { className?: string }) {
@@ -566,19 +528,6 @@ export default function ProductDetail({
   const [cartQty, setCartQty] = useState(0);
   const [cartLoading, setCartLoading] = useState(false);
   const [wishLoading, setWishLoading] = useState(false);
-  const [toasts, setToasts] = useState<ToastItem[]>([]);
-
-  // ── Toast helper ──
-  const notify = useCallback((message: string, type: ToastType = "success") => {
-    const id = Date.now();
-    setToasts((prev) => [...prev, { id, message, type }]);
-    setTimeout(() => setToasts((prev) => prev.filter((t) => t.id !== id)), 3000);
-  }, []);
-
-  const removeToast = useCallback((id: number) => {
-    setToasts((prev) => prev.filter((t) => t.id !== id));
-  }, []);
-
   // ── Sync wishlist state from API ──
   useEffect(() => {
     if (!wishlistData || !productId) return;
@@ -627,10 +576,10 @@ export default function ProductDetail({
     setCartQty(1);
     try {
       await addToCart({ product: productId, quantity: 1, product_data: product }).unwrap();
-      notify("Savatchaga qo'shildi!", "success");
+      notify.success("Mahsulot savatga qo'shildi.");
     } catch (err: unknown) {
       setCartQty(0);
-      notify(getRequestErrorMessage(err, "Xatolik yuz berdi"), "error");
+      notify.error(getRequestErrorMessage(err, "Amalni bajarib bo'lmadi."));
     } finally {
       setCartLoading(false);
     }
@@ -647,7 +596,7 @@ export default function ProductDetail({
       await updateCart({ id: Number(cartItem.id), product: productId, quantity: newQty }).unwrap();
     } catch {
       setCartQty(cartQty);
-      notify("Miqdorni oshirishda xatolik", "error");
+      notify.error("Miqdorni oshirib bo'lmadi.");
     } finally {
       setCartLoading(false);
     }
@@ -663,10 +612,10 @@ export default function ProductDetail({
       setCartQty(0);
       try {
         await deleteCart(Number(cartItem.id)).unwrap();
-        notify("Savatdan o'chirildi", "success");
+        notify.success("Mahsulot savatdan o'chirildi.");
       } catch {
         setCartQty(cartQty);
-        notify("O'chirishda xatolik", "error");
+        notify.error("Mahsulotni savatdan o'chirib bo'lmadi.");
       } finally {
         setCartLoading(false);
       }
@@ -677,7 +626,7 @@ export default function ProductDetail({
       await updateCart({ id: Number(cartItem.id), product: productId, quantity: newQty }).unwrap();
     } catch {
       setCartQty(cartQty);
-      notify("Miqdorni kamaytirishda xatolik", "error");
+      notify.error("Miqdorni kamaytirib bo'lmadi.");
     } finally {
       setCartLoading(false);
     }
@@ -694,10 +643,10 @@ export default function ProductDetail({
         product_id: productId,
         product_detail: product,
       }).unwrap();
-      notify(wasInList ? "Sevimlilardan olib tashlandi" : "Sevimlilarga qo'shildi!", "wish");
+      notify.success(wasInList ? "Sevimlilardan olib tashlandi." : "Sevimlilarga qo'shildi.");
     } catch (err: unknown) {
       setInWishlist(wasInList);
-      notify(getRequestErrorMessage(err, "Xatolik yuz berdi"), "error");
+      notify.error(getRequestErrorMessage(err, "Amalni bajarib bo'lmadi."));
     } finally {
       setWishLoading(false);
     }
@@ -706,7 +655,7 @@ export default function ProductDetail({
   const handleCompare = () => {
     const next = !inCompare;
     setInCompare(next);
-    notify(next ? "Taqqoslashga qo'shildi ✓" : "Taqqoslashdan olib tashlandi");
+    notify.info(next ? "Mahsulot taqqoslashga qo'shildi." : "Mahsulot taqqoslashdan olindi.");
     if (next) setTimeout(() => router.push("/taqqoslash"), 1200);
   };
 
@@ -774,8 +723,6 @@ export default function ProductDetail({
       `}</style>
 
       <div style={{ fontFamily: "'DM Sans', sans-serif" }} className="bg-[#faf9f7] min-h-screen pb-28 md:pb-14 text-stone-900">
-        <ToastContainer toasts={toasts} onRemove={removeToast} />
-
         {showBuyModal && (
           <BuyNowModal
             product={{

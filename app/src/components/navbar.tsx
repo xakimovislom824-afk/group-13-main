@@ -1,315 +1,153 @@
 "use client";
 
-import Link from "next/link";
 import Image from "next/image";
-import { FiGift } from "react-icons/fi";
-import { FiMoon, FiSun } from "react-icons/fi";
-import { useState, useEffect, useCallback, useMemo, useRef, useSyncExternalStore, Suspense } from "react";
-import {
-  FaUser,
-  FaHeart,
-  FaShoppingCart,
-  FaSearch,
-} from "react-icons/fa";
-import { IoClose, IoMenu } from "react-icons/io5";
+import Link from "next/link";
+import { Suspense, useCallback, useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { FiGift, FiHeart, FiMenu, FiMoon, FiSearch, FiShoppingBag, FiShoppingCart, FiSun, FiUser, FiX } from "react-icons/fi";
 import BrandLogo from "./BrandLogo";
 import { useModal } from "../../context/ModalContext";
 import { useGetWishlistQuery } from "../../../services/wishlistApi";
 import { useGetCartsQuery } from "../../../services/cartApi";
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { getCategoryDisplayName, useGetCategoriesQuery } from "../../../services/categoryApi";
+import { useAuthSession } from "../../../lib/auth/use-session";
 import { useProductSearch } from "../../hooks/useProductSearch";
 import { formatPrice } from "../../../lib/site-config";
-import { getCategoryDisplayName, useGetCategoriesQuery } from "../../../services/categoryApi";
-
-export const dynamic = "force-dynamic";
-
-// ─────────────────────────────────────────────
-// TYPES
-// ─────────────────────────────────────────────
-interface UserData { username: string | null; avatar: string | null }
-
-// ─────────────────────────────────────────────
-// CONSTANTS
-// ─────────────────────────────────────────────
-const STORAGE_KEYS = {
-  user: ["user", "userInfo", "userData", "currentUser", "profile"],
-  token: ["access", "access_token", "accessToken", "token"],
-};
+import { notify } from "../../../lib/notifications";
 
 const subscribeToHydration = () => () => {};
 const getClientSnapshot = () => true;
 const getServerSnapshot = () => false;
 
-// ─────────────────────────────────────────────
-// HELPERS
-// ─────────────────────────────────────────────
-const getUserDataFromStorage = (): UserData => {
-  try {
-    for (const key of STORAGE_KEYS.user) {
-      const raw = localStorage.getItem(key);
-      if (!raw) continue;
-      try {
-        const p = JSON.parse(raw);
-        const username =
-          p.username || p.first_name || p.name || p.full_name ||
-          (p.first_name && p.last_name ? `${p.first_name} ${p.last_name}` : null) ||
-          p.email || null;
-        const avatar = p.avatar || p.avatar_url || p.profile_image || p.image || p.photo || null;
-        return { username, avatar };
-      } catch { return { username: raw, avatar: null }; }
-    }
-  } catch { }
-  return { username: null, avatar: null };
-};
+const primaryLinks = [
+  { href: "/", label: "Bosh sahifa" },
+  { href: "/katalog", label: "Mahsulotlar" },
+  { href: "/biz-haqimizda", label: "Biz haqimizda" },
+  { href: "/aloqa", label: "Aloqa" },
+];
 
-const checkIsLoggedIn = (): boolean => {
-  try { return STORAGE_KEYS.token.some(k => !!localStorage.getItem(k)); }
-  catch { return false; }
-};
+const menuLinks = [
+  ...primaryLinks,
+  { href: "/aksiyalar", label: "Barcha aksiyalar", icon: <FiGift aria-hidden="true" /> },
+  { href: "/tulov", label: "To'lov" },
+  { href: "/yetkazibBerish", label: "Yetkazib berish" },
+  { href: "/fikrlar", label: "Fikrlar" },
+  { href: "/blog", label: "Yangiliklar" },
+  { href: "/savolJavob", label: "Savol-javob" },
+];
 
-const getInitials = (name: string | null): string => {
+function getInitials(name: string | null) {
   if (!name) return "U";
-  const p = name.trim().split(/\s+/);
-  return p.length >= 2 ? (p[0][0] + p[1][0]).toUpperCase() : name.slice(0, 2).toUpperCase();
-};
-
-function highlightMatch(text: string, query: string) {
-  if (!query) return <>{text}</>;
-  const idx = text.toLowerCase().indexOf(query.toLowerCase());
-  if (idx === -1) return <>{text}</>;
-  return (
-    <>
-      {text.slice(0, idx)}
-      <span className="text-blue-600 font-bold">{text.slice(idx, idx + query.length)}</span>
-      {text.slice(idx + query.length)}
-    </>
-  );
+  const words = name.trim().split(/\s+/);
+  return words.length > 1 ? `${words[0][0]}${words[1][0]}`.toUpperCase() : name.slice(0, 2).toUpperCase();
 }
 
-// ─────────────────────────────────────────────
-// UserAvatar
-// ─────────────────────────────────────────────
-interface UserAvatarProps { avatar: string | null; username: string | null; size?: "sm" | "md" | "lg" }
-const UserAvatar = ({ avatar, username, size = "md" }: UserAvatarProps) => {
-  const sz = { sm: "w-6 h-6 text-[10px]", md: "w-8 h-8 text-xs", lg: "w-10 h-10 text-sm" }[size];
-  if (avatar) return (
-    <div className={`${sz} rounded-full overflow-hidden border-2 border-blue-100 shrink-0`}>
-      <Image src={avatar} alt={username || "avatar"} width={40} height={40} className="w-full h-full object-cover" />
-    </div>
-  );
-  return (
-    <div className={`${sz} rounded-full bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center text-white font-semibold shrink-0 border-2 border-blue-100`}>
-      {getInitials(username)}
-    </div>
-  );
-};
-
-// ─────────────────────────────────────────────
-// NavIcon
-// ─────────────────────────────────────────────
-interface NavIconProps { href: string; icon: React.ReactNode; label: string; badge?: number | string; className?: string }
-const NavIcon = ({ href, icon, label, badge, className = "" }: NavIconProps) => (
-  <Link href={href} aria-label={label} className={`relative inline-flex size-10 shrink-0 items-center justify-center rounded-lg text-[var(--text-muted)] transition-colors hover:bg-[var(--surface-muted)] hover:text-[var(--secondary)] ${className}`}>
-    {icon}
-    {badge !== undefined && badge !== "" && (
-      <span className="absolute right-0.5 top-0.5 min-w-4 rounded-full border-2 border-[var(--surface)] bg-red-600 px-1 text-center text-[9px] leading-[14px] text-white">
-        {badge}
-      </span>
-    )}
-    <span className="sr-only">{label}</span>
-  </Link>
-);
-
-// ─────────────────────────────────────────────
-// SearchBoxContent
-// ─────────────────────────────────────────────
-interface SearchBoxProps { isMobile?: boolean }
-
-function SearchBoxContent({ isMobile = false }: SearchBoxProps) {
+function SearchBox() {
   const router = useRouter();
   const pathname = usePathname();
-  const urlSearchParams = useSearchParams();
-
+  const searchParams = useSearchParams();
   const [inputValue, setInputValue] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
   const [isOpen, setIsOpen] = useState(false);
   const [selected, setSelected] = useState(false);
-
   const wrapperRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
-  const prevUrlSearchRef = useRef<string>("");
-
-  const { products: results, isError: searchError, isFetching: searchFetching, refetch: refetchSearch } = useProductSearch(searchQuery);
-
-  useEffect(() => {
-    if (selected || searchQuery.trim().length < 2 || (!searchError && !searchFetching && results.length === 0)) return;
-    const timeoutId = window.setTimeout(() => setIsOpen(true), 0);
-    return () => window.clearTimeout(timeoutId);
-  }, [results, searchError, searchFetching, selected, searchQuery]);
+  const previousSearchRef = useRef("");
+  const { products, isError, isFetching, refetch } = useProductSearch(searchQuery);
 
   useEffect(() => {
-    const handler = (e: MouseEvent) => {
-      if (wrapperRef.current && !wrapperRef.current.contains(e.target as Node)) {
-        setIsOpen(false);
-      }
+    const closeOnOutsideClick = (event: MouseEvent) => {
+      if (wrapperRef.current && !wrapperRef.current.contains(event.target as Node)) setIsOpen(false);
     };
-    document.addEventListener("mousedown", handler);
-    return () => document.removeEventListener("mousedown", handler);
+    document.addEventListener("mousedown", closeOnOutsideClick);
+    return () => document.removeEventListener("mousedown", closeOnOutsideClick);
   }, []);
 
-  // Faqat URL'dagi "search" parametri TASHQARIDAN (masalan "Tozalash" havolasi orqali)
-  // bo'shatilganda inputni tozalaydi. inputValue endi dependency emas, shuning uchun
-  // foydalanuvchi yozayotganda bu effekt ishga tushmaydi va inputni to'sib qo'ymaydi.
   useEffect(() => {
     if (pathname !== "/katalog") {
-      prevUrlSearchRef.current = "";
+      previousSearchRef.current = "";
       return;
     }
-    const urlSearch = urlSearchParams.get("search") || "";
-    if (urlSearch === "" && prevUrlSearchRef.current !== "") {
+    const urlSearch = searchParams.get("search") || "";
+    if (urlSearch === "" && previousSearchRef.current !== "") {
       setInputValue("");
       setSearchQuery("");
       setSelected(false);
       setIsOpen(false);
     }
-    prevUrlSearchRef.current = urlSearch;
-  }, [urlSearchParams, pathname]);
+    previousSearchRef.current = urlSearch;
+  }, [pathname, searchParams]);
 
-  const handleChange = (val: string) => {
-    setInputValue(val);
-    setSelected(false);
-
-    if (val.trim().length >= 2) {
-      setSearchQuery(val);
-    } else {
-      setIsOpen(false);
-      setSearchQuery("");
-    }
+  const submitSearch = (event?: React.FormEvent<HTMLFormElement>) => {
+    event?.preventDefault();
+    setIsOpen(false);
+    setSelected(true);
+    const query = inputValue.trim();
+    router.push(query ? `/katalog?search=${encodeURIComponent(query)}` : "/katalog");
   };
 
-  const handleClear = () => {
+  const handleChange = (value: string) => {
+    setInputValue(value);
+    setSelected(false);
+    const hasSearchableQuery = value.trim().length >= 2;
+    setSearchQuery(hasSearchableQuery ? value : "");
+    setIsOpen(hasSearchableQuery);
+  };
+
+  const clearSearch = () => {
     setInputValue("");
     setSearchQuery("");
     setIsOpen(false);
     setSelected(false);
     inputRef.current?.focus();
-
-    if (pathname === "/katalog") {
-      router.push("/katalog");
-    }
+    if (pathname === "/katalog") router.push("/katalog");
   };
 
-  const handleSubmit = () => {
-    setIsOpen(false);
-    setSelected(true);
-    const trimmed = inputValue.trim();
-
-    if (!trimmed) {
-      router.push("/katalog");
-      return;
-    }
-
-    router.push(`/katalog?search=${encodeURIComponent(trimmed)}`);
+  const highlightMatch = (name: string) => {
+    const start = name.toLowerCase().indexOf(searchQuery.toLowerCase());
+    if (start < 0) return name;
+    return <>{name.slice(0, start)}<strong className="text-[#1476F2]">{name.slice(start, start + searchQuery.length)}</strong>{name.slice(start + searchQuery.length)}</>;
   };
-
-  const handleFocus = () => {
-    if (!selected && searchQuery.trim().length >= 2 && (results.length > 0 || searchError || searchFetching)) {
-      setIsOpen(true);
-    }
-  };
-
-  const showClear = inputValue.length > 0;
 
   return (
-    <div ref={wrapperRef} className="relative w-full">
-      <div className="flex h-10 items-center overflow-hidden rounded-lg border border-[var(--border)] bg-[var(--surface)] transition-[border-color,box-shadow] focus-within:border-[var(--secondary)] focus-within:shadow-[0_0_0_3px_color-mix(in_srgb,var(--secondary)_14%,transparent)]">
+    <div ref={wrapperRef} className="relative min-w-0 w-full">
+      <form onSubmit={submitSearch} role="search" className="site-search group flex h-11 w-full items-center rounded-full border px-1.5 transition-all duration-200 focus-within:border-[#1682FF] focus-within:ring-2 focus-within:ring-[#1682FF]/25">
         <input
           ref={inputRef}
           type="search"
+          role="combobox"
+          aria-autocomplete="list"
           value={inputValue}
-          onChange={e => handleChange(e.target.value)}
-          onFocus={handleFocus}
-          onKeyDown={e => e.key === "Enter" && !e.nativeEvent.isComposing && e.keyCode !== 229 && handleSubmit()}
-          placeholder="Mahsulot qidirish..."
-          aria-label="Mahsulot qidirish"
-          className="h-full w-full min-w-0 bg-transparent px-2.5 text-sm text-[var(--text)] outline-none placeholder:text-[var(--text-muted)]"
+          onChange={(event) => handleChange(event.target.value)}
+          onFocus={() => { if (searchQuery.trim().length >= 2 && !selected) setIsOpen(true); }}
+          placeholder="Mahsulotlarni qidirish..."
+          aria-label="Mahsulotlarni qidirish"
+          aria-expanded={isOpen}
+          aria-controls="product-search-results"
+          autoComplete="off"
+          className="h-full min-w-0 flex-1 bg-transparent px-3 text-sm text-white outline-none placeholder:text-white/50"
         />
-        {showClear && (
-          <button
-            type="button"
-            onMouseDown={e => { e.preventDefault(); handleClear(); }}
-            className="mr-1 inline-flex size-8 shrink-0 items-center justify-center rounded-md text-[var(--text-muted)] hover:bg-[var(--surface-muted)] hover:text-[var(--text)]"
-            tabIndex={-1}
-            aria-label="Tozalash"
-          >
-            <IoClose size={17} />
-          </button>
-        )}
-        <button
-          type="button"
-          onClick={handleSubmit}
-          className="mr-1 inline-flex size-8 shrink-0 items-center justify-center rounded-md text-[var(--text-muted)] hover:bg-[var(--surface-muted)] hover:text-[var(--secondary)]"
-          aria-label="Qidirish"
-        >
-          <FaSearch aria-hidden="true" size={14} />
-        </button>
-      </div>
+        {inputValue && <button type="button" onClick={clearSearch} aria-label="Qidiruvni tozalash" className="mr-1 inline-flex size-8 shrink-0 items-center justify-center rounded-full text-white/60 transition hover:bg-white/10 hover:text-white"><FiX aria-hidden="true" size={16} /></button>}
+        <button type="submit" aria-label="Qidirish" className="inline-flex size-9 shrink-0 items-center justify-center rounded-full bg-[#1476F2] text-white transition hover:bg-[#328AFF] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#1682FF]"><FiSearch aria-hidden="true" size={16} /></button>
+      </form>
 
       {isOpen && searchQuery.trim().length >= 2 && (
-        <div
-          className={`absolute left-0 top-[calc(100%+8px)] z-[1100] flex w-full flex-col overflow-hidden rounded-xl border border-[var(--border)] bg-[var(--surface)] text-[var(--text)] shadow-xl ${isMobile ? "max-h-[60vh]" : "max-h-[420px]"}`}
-        >
-          {searchError ? (
-            <div role="alert" className="px-5 py-6 text-center text-sm text-muted-foreground">
-              <p>Qidiruv natijalarini yuklab bo&apos;lmadi.</p>
-              <button type="button" onClick={() => void refetchSearch()} className="mt-2 font-semibold text-primary hover:underline">Qayta urinish</button>
-            </div>
-          ) : searchFetching && results.length === 0 ? (
-            <p role="status" className="px-5 py-8 text-center text-sm text-muted-foreground">Qidirilmoqda...</p>
-          ) : results.length === 0 ? (
-            <div className="px-5 py-8 text-center text-gray-400 text-sm">
-              <FaSearch className="mx-auto mb-2 text-gray-300" size={22} />
-              <p>«{searchQuery}» bo&apos;yicha mahsulot topilmadi</p>
-            </div>
+        <div id="product-search-results" role="listbox" aria-label="Mahsulot qidiruv natijalari" className="absolute left-0 top-[calc(100%+10px)] z-[1200] max-h-[min(420px,65vh)] w-full min-w-[min(360px,calc(100vw-2rem))] overflow-hidden rounded-2xl border border-slate-200 bg-white text-slate-900 shadow-[0_22px_60px_rgba(2,8,23,0.24)] dark:border-slate-700 dark:bg-[#172536] dark:text-white">
+          {isError ? (
+            <div role="alert" className="px-5 py-6 text-center text-sm text-slate-500 dark:text-slate-300"><p>Qidiruv natijalarini yuklab bo&apos;lmadi.</p><button type="button" onClick={() => void refetch()} className="mt-2 font-semibold text-[#1476F2] hover:underline">Qayta urinish</button></div>
+          ) : isFetching && products.length === 0 ? (
+            <p role="status" className="px-5 py-7 text-center text-sm text-slate-500 dark:text-slate-300">Mahsulotlar qidirilmoqda...</p>
+          ) : products.length === 0 ? (
+            <div className="px-5 py-8 text-center text-sm text-slate-500 dark:text-slate-300"><FiSearch aria-hidden="true" className="mx-auto mb-2 text-slate-400" size={22} /><p>“{searchQuery}” bo&apos;yicha mahsulot topilmadi</p></div>
           ) : (
             <>
-              <div className="flex shrink-0 items-center justify-between border-b border-[var(--border)] bg-[var(--surface-muted)] px-4 py-2">
-                <span className="text-[11px] font-bold uppercase tracking-wider text-[var(--text-muted)]">Mahsulotlar</span>
-                <span className="text-[11px] font-semibold text-[var(--secondary)]">{results.length} ta topildi</span>
-              </div>
-
-              <div className="overflow-y-auto flex-1">
-                {results.map(product => (
-                  <Link
-                    key={product.id}
-                    href={`/detail/${product.id}`}
-                    onClick={() => { setIsOpen(false); setSelected(true); }}
-                    className="flex items-center gap-3 px-4 py-3 hover:bg-blue-50 border-b border-gray-50 last:border-none transition-colors group"
-                  >
-                    <div className="w-11 h-11 rounded-md overflow-hidden bg-gray-100 shrink-0 border border-gray-200">
-                      {product.image ? (
-                        <Image src={product.image} alt={product.name} width={44} height={44} className="w-full h-full object-cover" />
-                      ) : (
-                        <div className="w-full h-full flex items-center justify-center text-gray-300">
-                          <FaSearch size={14} />
-                        </div>
-                      )}
-                    </div>
-
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-semibold text-gray-800 truncate group-hover:text-blue-700 transition-colors">
-                        {highlightMatch(product.name, searchQuery)}
-                      </p>
-                      {product.category && (
-                        <p className="text-[11px] text-gray-400 mt-0.5 truncate">{product.category}</p>
-                      )}
-                    </div>
-
-                    {product.price != null && (
-                      <span className="text-sm font-bold text-blue-700 whitespace-nowrap shrink-0">
-                        {formatPrice(product.price)}
-                      </span>
-                    )}
+              <div className="flex items-center justify-between border-b border-slate-100 bg-slate-50 px-4 py-2.5 dark:border-slate-700 dark:bg-slate-800/80"><span className="text-[11px] font-bold uppercase tracking-[0.14em] text-slate-500 dark:text-slate-300">Mahsulotlar</span><span className="text-xs font-semibold text-[#1476F2]">{products.length} ta topildi</span></div>
+              <div className="max-h-[360px] overflow-y-auto">
+                {products.map((product) => (
+                  <Link key={product.id} href={`/detail/${product.id}`} role="option" aria-selected="false" onClick={() => { setIsOpen(false); setSelected(true); }} className="flex items-center gap-3 border-b border-slate-100 px-4 py-3 transition-colors last:border-0 hover:bg-slate-50 dark:border-slate-700 dark:hover:bg-slate-800">
+                    <span className="flex size-11 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-slate-100 dark:bg-slate-700">{product.image ? <Image src={product.image} alt="" width={44} height={44} className="size-full object-cover" /> : <FiShoppingBag aria-hidden="true" className="text-slate-400" size={18} />}</span>
+                    <span className="min-w-0 flex-1"><span className="block truncate text-sm font-semibold">{highlightMatch(product.name)}</span>{product.category && <span className="mt-0.5 block truncate text-xs text-slate-500 dark:text-slate-400">{product.category}</span>}</span>
+                    {product.price != null && <span className="shrink-0 whitespace-nowrap text-sm font-bold text-[#1476F2]">{formatPrice(product.price)}</span>}
                   </Link>
                 ))}
               </div>
@@ -321,94 +159,44 @@ function SearchBoxContent({ isMobile = false }: SearchBoxProps) {
   );
 }
 
-function SearchBox({ isMobile = false }: SearchBoxProps) {
-  return (
-    <Suspense fallback={<div className="w-full h-10 bg-gray-100 animate-pulse rounded-sm" />}>
-      <SearchBoxContent isMobile={isMobile} />
-    </Suspense>
-  );
+function SearchBoxFallback() {
+  return <div aria-hidden="true" className="h-11 w-full animate-pulse rounded-full bg-white/10" />;
 }
 
-// ─────────────────────────────────────────────
-// MAIN NAVBAR
-// ─────────────────────────────────────────────
+function SearchBoxSlot() {
+  return <Suspense fallback={<SearchBoxFallback />}><SearchBox /></Suspense>;
+}
+
 export default function Navbar() {
   const pathname = usePathname();
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isDarkMode, setIsDarkMode] = useState(false);
   const hasMounted = useSyncExternalStore(subscribeToHydration, getClientSnapshot, getServerSnapshot);
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [userData, setUserData] = useState<UserData>({ username: null, avatar: null });
-
+  const { data: authSession } = useAuthSession();
+  const isLoggedIn = Boolean(authSession?.user);
   const { openModal } = useModal();
   const { data: wishlist = [] } = useGetWishlistQuery();
   const { data: cart = [] } = useGetCartsQuery();
-  const { data: apiCategories = [] } = useGetCategoriesQuery();
+  const { data: categories = [] } = useGetCategoriesQuery();
   const cartCount = cart.reduce((total, item) => total + Number(item.quantity ?? 0), 0);
+  const username = authSession?.user.name || authSession?.user.email || null;
+  const avatar = authSession?.user.image ? (authSession.user.image.startsWith("avatars/") ? "/api/avatar" : authSession.user.image) : null;
 
   useEffect(() => {
-    const previousOverflow = document.body.style.overflow;
-    if (isSidebarOpen) document.body.style.overflow = "hidden";
-    else document.body.style.overflow = "";
-    return () => { document.body.style.overflow = previousOverflow; };
-  }, [isSidebarOpen]);
-
-  useEffect(() => {
-    if (!isSidebarOpen) return;
-    const drawer = document.getElementById("mobile-navigation");
-    const previousFocus = document.activeElement instanceof HTMLElement ? document.activeElement : null;
-    const focusable = Array.from(drawer?.querySelectorAll<HTMLElement>('a[href], button:not([disabled])') ?? []);
-    focusable[0]?.focus();
-    const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === "Escape") {
-        setIsSidebarOpen(false);
-        return;
-      }
-      if (event.key !== "Tab" || focusable.length === 0) return;
-      const first = focusable[0];
-      const last = focusable[focusable.length - 1];
-      if (event.shiftKey && document.activeElement === first) {
-        event.preventDefault();
-        last.focus();
-      } else if (!event.shiftKey && document.activeElement === last) {
-        event.preventDefault();
-        first.focus();
-      }
-    };
-    document.addEventListener("keydown", handleKeyDown);
-    return () => {
-      document.removeEventListener("keydown", handleKeyDown);
-      previousFocus?.focus();
-    };
-  }, [isSidebarOpen]);
-
-  const refreshAuth = useCallback(() => {
-    const ok = checkIsLoggedIn();
-    setIsLoggedIn(ok);
-    setUserData(ok ? getUserDataFromStorage() : { username: null, avatar: null });
-  }, []);
-
-  useEffect(() => {
-    const timeoutId = window.setTimeout(refreshAuth, 0);
-    window.addEventListener("storage", refreshAuth);
-    window.addEventListener("authChange", refreshAuth);
-    return () => {
-      window.clearTimeout(timeoutId);
-      window.removeEventListener("storage", refreshAuth);
-      window.removeEventListener("authChange", refreshAuth);
-    };
-  }, [refreshAuth]);
+    const params = new URLSearchParams(window.location.search);
+    const authResult = params.get("auth");
+    if (authResult === "google-error") notify.error("Google orqali kirishda xatolik yuz berdi.");
+    else if (authResult === "google-success" && authSession?.user) notify.success("Google orqali muvaffaqiyatli kirdingiz.");
+    else return;
+    params.delete("auth");
+    const query = params.toString();
+    window.history.replaceState(window.history.state, "", `${window.location.pathname}${query ? `?${query}` : ""}${window.location.hash}`);
+  }, [authSession?.user, pathname]);
 
   useEffect(() => {
     const root = document.documentElement;
     const media = window.matchMedia("(prefers-color-scheme: dark)");
-    const applyTheme = (dark: boolean) => {
-      setIsDarkMode(dark);
-      root.classList.toggle("dark", dark);
-      root.style.colorScheme = dark ? "dark" : "light";
-    };
-    const getSavedMode = () => {
+    const readSavedMode = () => {
       const saved = localStorage.getItem("theme");
       try {
         const parsed: unknown = saved ? JSON.parse(saved) : null;
@@ -421,24 +209,44 @@ export default function Navbar() {
       }
       return null;
     };
+    const applyTheme = (dark: boolean) => {
+      setIsDarkMode(dark);
+      root.classList.toggle("dark", dark);
+      root.style.colorScheme = dark ? "dark" : "light";
+    };
     const syncTheme = () => {
-      const saved = getSavedMode();
+      const saved = readSavedMode();
       applyTheme(saved === null ? media.matches : saved === "dark");
     };
-    const syncSystemTheme = (event: MediaQueryListEvent) => {
-      if (getSavedMode() === null) applyTheme(event.matches);
-    };
-    const syncStoredTheme = (event: StorageEvent) => {
-      if (event.key === null || event.key === "theme") syncTheme();
-    };
+    const syncSystemTheme = (event: MediaQueryListEvent) => { if (readSavedMode() === null) applyTheme(event.matches); };
+    const syncStoredTheme = (event: StorageEvent) => { if (event.key === null || event.key === "theme") syncTheme(); };
     syncTheme();
     media.addEventListener("change", syncSystemTheme);
     window.addEventListener("storage", syncStoredTheme);
-    return () => {
-      media.removeEventListener("change", syncSystemTheme);
-      window.removeEventListener("storage", syncStoredTheme);
-    };
+    return () => { media.removeEventListener("change", syncSystemTheme); window.removeEventListener("storage", syncStoredTheme); };
   }, []);
+
+  useEffect(() => {
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = isMenuOpen ? "hidden" : "";
+    return () => { document.body.style.overflow = previousOverflow; };
+  }, [isMenuOpen]);
+
+  useEffect(() => {
+    if (!isMenuOpen) return;
+    const drawer = document.getElementById("mobile-navigation");
+    const previousFocus = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+    const focusable = Array.from(drawer?.querySelectorAll<HTMLElement>('a[href], button:not([disabled])') ?? []);
+    focusable[0]?.focus();
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") { setIsMenuOpen(false); return; }
+      if (event.key !== "Tab" || focusable.length === 0) return;
+      if (event.shiftKey && document.activeElement === focusable[0]) { event.preventDefault(); focusable[focusable.length - 1].focus(); }
+      else if (!event.shiftKey && document.activeElement === focusable[focusable.length - 1]) { event.preventDefault(); focusable[0].focus(); }
+    };
+    document.addEventListener("keydown", handleKeyDown);
+    return () => { document.removeEventListener("keydown", handleKeyDown); previousFocus?.focus(); };
+  }, [isMenuOpen]);
 
   const toggleDarkMode = useCallback(() => {
     const next = !isDarkMode;
@@ -447,106 +255,57 @@ export default function Navbar() {
     localStorage.setItem("theme", JSON.stringify({ mode: next ? "dark" : "light" }));
     setIsDarkMode(next);
   }, [isDarkMode]);
+  const closeMenu = useCallback(() => setIsMenuOpen(false), []);
+  const openMenu = useCallback(() => setIsMenuOpen(true), []);
+  const userInitials = useMemo(() => getInitials(username), [username]);
 
-  const closeSidebar = useCallback(() => setIsSidebarOpen(false), []);
-  const openSidebar = useCallback(() => setIsSidebarOpen(true), []);
-
-  const sidebarLinks = useMemo(() => [
-    { href: "/aksiyalar", label: "Barcha aksiyalar", icon: <FiGift size={20} /> },
-    { href: "/tulov", label: "To'lov" },
-    { href: "/yetkazibBerish", label: "Yetkazib berish" },
-    { href: "/fikrlar", label: "Fikrlar" },
-    { href: "/blog", label: "Yangiliklar" },
-    { href: "/aloqa", label: "Aloqa" },
-  ], []);
+  const utilityLinkClass = "relative shrink-0 items-center justify-center rounded-full text-white/80 transition hover:bg-white/10 hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white";
 
   return (
-    <header className="sticky top-0 z-[1000] w-full border-b border-[var(--border)] bg-[var(--surface)] shadow-[0_2px_12px_rgb(15_23_42_/_0.04)]">
-      <div className="mx-auto max-w-[1508px] px-3 sm:px-5 xl:px-6">
-        <div className="flex min-h-[68px] items-center gap-2 sm:gap-3 xl:gap-5">
+    <header className="fixed inset-x-0 top-0 z-[1000] w-full px-2 pt-2 sm:px-5 sm:pt-4">
+      <div className="site-navbar mx-auto max-w-[1508px] rounded-[26px] border p-2 text-[var(--text)] shadow-[0_10px_32px_rgba(15,23,42,0.08)] backdrop-blur-xl min-[480px]:p-3 sm:px-5 sm:py-3">
+        <div className="flex min-w-0 flex-wrap items-center gap-1 min-[480px]:gap-2 xl:gap-3">
           <BrandLogo compact />
 
-          <nav aria-label="Asosiy navigatsiya" className="hidden min-w-0 flex-1 items-center justify-center gap-0.5 min-[1200px]:flex">
-            {sidebarLinks.map((link) => {
-              const isActive = pathname === link.href || pathname?.startsWith(`${link.href}/`);
-              return (
-                <Link key={link.href} href={link.href} aria-current={isActive ? "page" : undefined} className={`whitespace-nowrap rounded-md px-1.5 py-2 text-[11px] font-semibold transition-colors hover:bg-[var(--surface-muted)] hover:text-[var(--secondary)] min-[1366px]:px-2 min-[1440px]:px-2.5 min-[1440px]:text-xs ${isActive ? "text-[var(--secondary)]" : "text-[var(--text-muted)]"}`}>
-                  {link.label}
-                </Link>
-              );
+          <nav aria-label="Asosiy navigatsiya" className="hidden shrink-0 items-center justify-center gap-0.5 xl:flex">
+            {primaryLinks.map((link) => {
+              const active = pathname === link.href || (link.href !== "/" && pathname?.startsWith(`${link.href}/`));
+              return <Link key={link.label} href={link.href} aria-current={active ? "page" : undefined} className={`whitespace-nowrap rounded-full px-2.5 py-2 text-[12px] font-semibold transition-colors hover:bg-white/10 hover:text-white xl:px-2.5 min-[1440px]:px-3 ${active ? "bg-white/10 text-white" : "text-white/70"}`}>{link.label}</Link>;
             })}
           </nav>
 
-          <div className="hidden w-[clamp(220px,20vw,260px)] shrink min-[1200px]:block">
-            <SearchBox />
+          <div className="min-w-0 flex-1 max-[639px]:order-3 max-[639px]:mt-1 max-[639px]:w-full max-[639px]:flex-none">
+            <SearchBoxSlot />
           </div>
 
-          <div className="hidden w-[clamp(200px,24vw,260px)] shrink-0 min-[768px]:block min-[1200px]:hidden">
-            <SearchBox />
-          </div>
-
-          <div className="ml-auto flex shrink-0 items-center gap-0.5 text-[var(--text-muted)] sm:gap-1">
-            <button type="button" onClick={() => setIsSearchOpen((open) => !open)} className="inline-flex size-10 shrink-0 items-center justify-center rounded-lg hover:bg-[var(--surface-muted)] hover:text-[var(--secondary)] min-[768px]:hidden" aria-label={isSearchOpen ? "Qidiruvni yopish" : "Mahsulot qidirish"} aria-expanded={isSearchOpen} aria-controls="compact-search">
-              {isSearchOpen ? <IoClose size={21} /> : <FaSearch size={17} />}
-            </button>
-            {isLoggedIn ? (
-              <Link href="/kabnet" aria-label="Shaxsiy hisob" title={userData.username || "Shaxsiy hisob"} className="inline-flex size-10 shrink-0 items-center justify-center rounded-lg text-[var(--text-muted)] transition-colors hover:bg-[var(--surface-muted)] hover:text-[var(--secondary)]">
-                {userData.avatar ? <UserAvatar avatar={userData.avatar} username={userData.username} size="lg" /> : <FaUser size={18} />}
-              </Link>
-            ) : (
-              <Link href="/kirish" aria-label="Kirish" title="Kirish" className="inline-flex size-10 shrink-0 items-center justify-center rounded-lg text-[var(--text-muted)] transition-colors hover:bg-[var(--surface-muted)] hover:text-[var(--secondary)]">
-                <FaUser size={18} />
-              </Link>
-            )}
-            <NavIcon href="/savatcha" icon={<FaShoppingCart size={18} />} label="Savat" badge={cartCount || ""} />
-            <NavIcon href="/wishlist" icon={<FaHeart size={18} />} label="Sevimlilar" badge={wishlist.length || ""} className="hidden min-[768px]:inline-flex" />
-            <button type="button" onClick={isSidebarOpen ? closeSidebar : openSidebar} className="inline-flex size-10 shrink-0 items-center justify-center rounded-lg hover:bg-[var(--surface-muted)] min-[768px]:hidden" aria-label={isSidebarOpen ? "Menyuni yopish" : "Menyuni ochish"} aria-expanded={isSidebarOpen} aria-controls="mobile-navigation">
-              {isSidebarOpen ? <IoClose size={22} /> : <IoMenu size={23} />}
-            </button>
-            <button type="button" onClick={toggleDarkMode} aria-label={isDarkMode ? "Yorug' rejimni yoqish" : "Tungi rejimni yoqish"} aria-pressed={isDarkMode} className="inline-flex size-10 shrink-0 items-center justify-center rounded-lg text-[var(--text-muted)] hover:bg-[var(--surface-muted)] hover:text-[var(--secondary)]" title={isDarkMode ? "Yorug' rejim" : "Tungi rejim"}>
-              {isDarkMode ? <FiSun size={19} /> : <FiMoon size={19} />}
-            </button>
-          </div>
-        </div>
-
-        <nav aria-label="Asosiy navigatsiya" className="hidden min-[768px]:flex min-[1200px]:hidden min-h-11 flex-wrap items-center justify-center gap-x-2 gap-y-1 border-t border-[var(--border)] py-1">
-          {sidebarLinks.map((link) => {
-            const isActive = pathname === link.href || pathname?.startsWith(`${link.href}/`);
-            return <Link key={link.href} href={link.href} aria-current={isActive ? "page" : undefined} className={`whitespace-nowrap rounded-md px-2 py-1.5 text-xs font-semibold transition-colors hover:bg-[var(--surface-muted)] hover:text-[var(--secondary)] ${isActive ? "text-[var(--secondary)]" : "text-[var(--text-muted)]"}`}>{link.label}</Link>;
-          })}
-        </nav>
-
-        <div id="compact-search" className={`grid transition-[grid-template-rows,opacity,padding] duration-200 min-[768px]:hidden ${isSearchOpen ? "grid-rows-[1fr] pb-3 opacity-100" : "grid-rows-[0fr] pb-0 opacity-0"}`} aria-hidden={!isSearchOpen}>
-          <div className="min-h-0 overflow-visible" inert={!isSearchOpen}>
-            <SearchBox isMobile />
+          <div className="ml-auto flex shrink-0 items-center justify-end gap-0 min-[480px]:gap-1 max-[639px]:order-2">
+            <Link href={isLoggedIn ? "/kabnet" : "/kirish"} aria-label={isLoggedIn ? username || "Shaxsiy hisob" : "Kirish"} title={username || "Kirish"} className={`${utilityLinkClass} hidden min-[480px]:inline-flex size-10`}>
+              {avatar ? <Image src={avatar} alt="" width={30} height={30} unoptimized className="size-7 rounded-full object-cover ring-2 ring-white/20" /> : isLoggedIn ? <span className="text-xs font-bold">{userInitials}</span> : <FiUser aria-hidden="true" size={18} />}
+            </Link>
+            <Link href="/savatcha" aria-label={`Savat${cartCount ? `, ${cartCount} ta mahsulot` : ""}`} className={`${utilityLinkClass} inline-flex size-9 min-[480px]:size-10`}><FiShoppingCart aria-hidden="true" size={18} />{cartCount > 0 && <span className="absolute right-0 top-0 flex min-w-4 items-center justify-center rounded-full bg-[#1476F2] px-1 text-[10px] font-bold leading-4 text-white">{cartCount}</span>}</Link>
+            <Link href="/wishlist" aria-label={`Sevimlilar${wishlist.length ? `, ${wishlist.length} ta mahsulot` : ""}`} className={`${utilityLinkClass} hidden min-[480px]:inline-flex size-10`}><FiHeart aria-hidden="true" size={18} />{wishlist.length > 0 && <span className="absolute right-0 top-0 flex min-w-4 items-center justify-center rounded-full bg-[#1476F2] px-1 text-[10px] font-bold leading-4 text-white">{wishlist.length}</span>}</Link>
+            <button type="button" onClick={toggleDarkMode} aria-label={isDarkMode ? "Yorug' rejimni yoqish" : "Tungi rejimni yoqish"} aria-pressed={isDarkMode} className={`${utilityLinkClass} hidden min-[480px]:inline-flex size-10`} title={isDarkMode ? "Yorug' rejim" : "Tungi rejim"}>{isDarkMode ? <FiSun aria-hidden="true" size={18} /> : <FiMoon aria-hidden="true" size={18} />}</button>
+            <button type="button" onClick={isMenuOpen ? closeMenu : openMenu} className="inline-flex size-9 shrink-0 items-center justify-center rounded-full bg-white/10 text-white transition hover:bg-white/20 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white min-[480px]:size-10" aria-label={isMenuOpen ? "Menyuni yopish" : "Menyuni ochish"} aria-expanded={isMenuOpen} aria-controls="mobile-navigation">{isMenuOpen ? <FiX aria-hidden="true" size={20} /> : <FiMenu aria-hidden="true" size={20} />}</button>
           </div>
         </div>
       </div>
 
-      <div className={`fixed inset-0 z-[2000] bg-black/45 transition-opacity duration-200 ${isSidebarOpen ? "visible opacity-100" : "invisible pointer-events-none opacity-0"}`} onClick={closeSidebar} aria-hidden={!isSidebarOpen}>
-        <aside id="mobile-navigation" role="dialog" aria-modal="true" aria-label="Sayt menyusi" inert={!isSidebarOpen} onClick={(event) => event.stopPropagation()} className={`absolute inset-y-0 right-0 flex w-[min(88vw,380px)] flex-col border-l border-[var(--border)] bg-[var(--surface)] text-[var(--text)] shadow-2xl transition-transform duration-300 motion-reduce:transition-none ${isSidebarOpen ? "translate-x-0" : "translate-x-full"}`}>
-          <div className="flex min-h-[68px] items-center justify-between border-b border-[var(--border)] px-5">
-            <BrandLogo compact />
-            <button type="button" onClick={closeSidebar} className="inline-flex size-10 items-center justify-center rounded-lg text-[var(--text-muted)] hover:bg-[var(--surface-muted)]" aria-label="Menyuni yopish"><IoClose size={23} /></button>
-          </div>
-          <nav aria-label="Mobil navigatsiya" className="flex-1 overflow-y-auto p-3">
+      <div className={`fixed inset-0 z-[2000] bg-slate-950/55 transition-opacity duration-200 motion-reduce:transition-none ${isMenuOpen ? "visible opacity-100" : "invisible pointer-events-none opacity-0"}`} onClick={closeMenu} aria-hidden={!isMenuOpen}>
+        <aside id="mobile-navigation" role="dialog" aria-modal="true" aria-label="Sayt menyusi" inert={!isMenuOpen} onClick={(event) => event.stopPropagation()} className={`site-drawer absolute inset-y-0 right-0 flex w-[min(88vw,390px)] flex-col shadow-2xl transition-transform duration-300 motion-reduce:transition-none ${isMenuOpen ? "translate-x-0" : "translate-x-full"}`}>
+          <div className="flex min-h-[76px] items-center justify-between border-b border-white/10 px-5"><BrandLogo compact /><button type="button" onClick={closeMenu} aria-label="Menyuni yopish" className="inline-flex size-10 items-center justify-center rounded-full text-white/70 transition hover:bg-white/10 hover:text-white"><FiX aria-hidden="true" size={21} /></button></div>
+          <nav aria-label="Mobil navigatsiya" className="flex-1 overflow-y-auto p-4">
             <div className="flex flex-col gap-1">
-              {sidebarLinks.map((link) => {
-                const isActive = pathname === link.href || pathname?.startsWith(`${link.href}/`);
-                return <Link key={link.href} href={link.href} onClick={closeSidebar} aria-current={isActive ? "page" : undefined} className={`flex min-h-12 items-center gap-3 rounded-lg px-3 text-sm font-semibold transition-colors ${isActive ? "bg-[var(--secondary-soft)] text-[var(--secondary)]" : "text-[var(--text)] hover:bg-[var(--surface-muted)]"}`}>
-                  {link.icon && <span className="text-[var(--secondary)]">{link.icon}</span>}{link.label}
-                </Link>;
+              {menuLinks.map((link) => {
+                const active = pathname === link.href || (link.href !== "/" && pathname?.startsWith(`${link.href}/`));
+                return <Link key={`${link.href}-${link.label}`} href={link.href} onClick={closeMenu} aria-current={active ? "page" : undefined} className={`flex min-h-12 items-center gap-3 rounded-xl px-4 text-sm font-semibold transition-colors ${active ? "bg-white/10 text-white" : "text-white/70 hover:bg-white/[0.07] hover:text-white"}`}>{"icon" in link && link.icon ? <span className="text-[#62A8FF]">{link.icon}</span> : null}{link.label}</Link>;
               })}
-              <Link href="/wishlist" onClick={closeSidebar} className="flex min-h-12 items-center gap-3 rounded-lg px-3 text-sm font-semibold text-[var(--text)] hover:bg-[var(--surface-muted)]"><FaHeart className="text-[var(--secondary)]" />Saralangan{wishlist.length > 0 && <span className="ml-auto rounded-full bg-red-600 px-2 py-0.5 text-xs text-white">{wishlist.length}</span>}</Link>
             </div>
-            {hasMounted && apiCategories.length > 0 && <div className="mt-4 border-t border-[var(--border)] pt-4"><p className="px-3 pb-2 text-xs font-bold uppercase tracking-wider text-[var(--text-muted)]">Mahsulot kategoriyalari</p><div className="flex flex-col gap-1">{apiCategories.map((category) => <Link key={category.slug} href={`/katalog/${category.slug}`} onClick={closeSidebar} aria-current={pathname === `/katalog/${category.slug}` ? "page" : undefined} className={`rounded-lg px-3 py-2.5 text-sm transition-colors ${pathname === `/katalog/${category.slug}` ? "bg-[var(--secondary-soft)] font-semibold text-[var(--secondary)]" : "text-[var(--text-muted)] hover:bg-[var(--surface-muted)] hover:text-[var(--text)]"}`}>{getCategoryDisplayName(category)}</Link>)}</div></div>}
+            {hasMounted && categories.length > 0 && <section className="mt-5 border-t border-white/10 pt-5"><h2 className="px-4 pb-2 text-[11px] font-bold uppercase tracking-[0.16em] text-white/45">Mahsulot kategoriyalari</h2><div className="flex flex-col gap-1">{categories.map((category) => <Link key={category.slug} href={`/katalog/${category.slug}`} onClick={closeMenu} aria-current={pathname === `/katalog/${category.slug}` ? "page" : undefined} className="rounded-xl px-4 py-2.5 text-sm text-white/70 transition hover:bg-white/[0.07] hover:text-white">{getCategoryDisplayName(category)}</Link>)}</div></section>}
           </nav>
-          <div className="border-t border-[var(--border)] p-4">
-            <Link href={isLoggedIn ? "/kabnet" : "/kirish"} onClick={closeSidebar} className="flex min-h-12 items-center gap-3 rounded-lg px-3 text-sm font-semibold text-[var(--text)] hover:bg-[var(--surface-muted)]">
-              {isLoggedIn ? <UserAvatar avatar={userData.avatar} username={userData.username} size="sm" /> : <FaUser className="ml-1 text-[var(--secondary)]" />}
-              <span>{isLoggedIn ? userData.username || "Shaxsiy hisob" : "Kirish / Shaxsiy hisob"}</span>
-            </Link>
-            <button type="button" onClick={openModal} className="mt-3 min-h-11 w-full rounded-lg bg-[var(--primary)] px-4 text-sm font-semibold text-white hover:opacity-90">Qo&apos;ng&apos;iroq qilishni so&apos;rang</button>
+          <div className="border-t border-white/10 p-4">
+            <Link href={isLoggedIn ? "/kabnet" : "/kirish"} onClick={closeMenu} className="flex min-h-12 items-center gap-3 rounded-xl px-4 text-sm font-semibold text-white/80 transition hover:bg-white/[0.07]">{avatar ? <Image src={avatar} alt="" width={30} height={30} unoptimized className="size-7 rounded-full object-cover" /> : <FiUser aria-hidden="true" size={18} />}{isLoggedIn ? username || "Shaxsiy hisob" : "Kirish / Shaxsiy hisob"}</Link>
+            <button type="button" onClick={() => { closeMenu(); openModal(); }} className="mt-3 min-h-12 w-full rounded-full bg-[#1476F2] px-4 text-sm font-bold text-white transition hover:bg-[#328AFF]">Qo&apos;ng&apos;iroq qilishni so&apos;rang</button>
+            <button type="button" onClick={toggleDarkMode} aria-pressed={isDarkMode} className="mt-2 flex min-h-11 w-full items-center gap-3 rounded-xl px-4 text-sm text-white/70 transition hover:bg-white/[0.07] hover:text-white">{isDarkMode ? <FiSun aria-hidden="true" size={17} /> : <FiMoon aria-hidden="true" size={17} />}{isDarkMode ? "Yorug' rejim" : "Tungi rejim"}</button>
           </div>
         </aside>
       </div>
